@@ -211,6 +211,13 @@ Model values still to confirm with real parts (marked "to check" in the scad):
 The verify script also checks that nothing (landing gear, ESCs, screws, FC, prop guard) sits in
 the Flow deck sensors' view cones down to the ground.
 
+## Firmware
+
+Bitcraze publishes the Crazyflie flight firmware (GPL-3.0). It already has drivers for the BMI088,
+BMP388, PMW3901, VL53L1x and DShot ESCs. Espressif's ESP-Drone is a working port of it to another
+MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
+[firmware/README.md](firmware/README.md).
+
 ## Design summary (from the design doc)
 
 * **Power:** a 1S 18650 cell (30 A peak) feeds two paths.
