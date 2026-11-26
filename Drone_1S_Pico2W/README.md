@@ -198,10 +198,14 @@ cross-checked from open designs and STEP models):
   * SWD goes to **J9 on the FC**: JST-SH 3 (SM03B-SRSS-TB), Raspberry Pi debug-connector style
     (SWCLK, GND, SWDIO), not fitted, on the rear bottom edge with its opening facing the edge. Its
     cable leaves backwards under the FC to the Pi's GPIO (OpenOCD) or a Raspberry Pi Debug Probe.
-  * BOOTSEL is only for the first flash: do it on the bench through the micro-USB, before the FC
-    goes in.
-  * **Check** which underside pad is which (Fig. 5's order is assumed) before routing. These pads
-    under the module need paste and reflow or hot air.
+  * **SW1 BOOTSEL button** (Omron B3U-1000P, 3.0 × 2.5 × 1.6 mm, top-actuated) on the FC
+    **bottom**, next to J9 at the rear edge (scad −24.6, −6.2), labelled BOOT. It shorts the Pico's
+    **TP6** (BOOTSEL) to GND, the same as the Pico's own button, which is hidden against the frame
+    once the FC is mounted. Press it from below (the Flow deck covers only |x| ≤ 10.5) while powering
+    up or resetting, and the Pico comes up as a USB mass-storage device for the Pi (over J7).
+    SWD (J9) remains the recovery path that needs no button.
+  * Pad positions and names are confirmed on the module's bottom silkscreen. These pads under the
+    module need paste and reflow or hot air.
 * **Bottom guides:** the Flow deck v2 outline (21.079 × 27.94 mm) and the support-IC area at the rear.
 * **Routing note:** the Pico's lands (top) and the deck pads (bottom) overlap in plan along both
   long edges. Pico signals have to leave their pads inward or outward on top before they via down.

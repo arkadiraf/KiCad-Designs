@@ -147,6 +147,12 @@ FC = dict(
     # backwards under the FC, clear of the frame and the landing gear. [ref, footprint, value,
     # (x, y) of the footprint origin, i.e. the mounting-pad line + 1.875]
     swd=("J9", "JST_SH_SM03B-SRSS-TB_1x03-1MP_P1.00mm_Horizontal", "SWD (DNP): SWCLK, GND, SWDIO", (-24.8, 0.0)),
+    # SW1 BOOTSEL: a reachable copy of the Pico's own BOOTSEL button (which is on the Pico's top, hidden
+    # against the frame once the FC is mounted). Wired from the Pico's TP6 (BOOTSEL, datasheet 2.1:
+    # "shorting it low at power-up" enters USB mass-storage mode) to GND. Omron B3U-1000P, 3.0 x 2.5 x
+    # 1.6 mm, top-actuated, on the FC BOTTOM next to J9 at the rear edge, so it is pressed from below:
+    # the Flow deck only covers |x| <= 10.5. [ref, lib, footprint, value, (x, y) scad, rotation]
+    bootsel=("SW1", "Button_Switch_SMD", "SW_SPST_B3U-1000P", "BOOTSEL (Pico TP6 to GND)", (-24.6, -6.2), 0),
 )
 
 # Crazyflie 2.x deck connector pinout (docs/cf2_exp_pinout.png in the Bitcraze

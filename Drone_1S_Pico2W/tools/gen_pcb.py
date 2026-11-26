@@ -572,6 +572,25 @@ def build_fc():
     fp.Reference().SetLayer(pcbnew.B_Fab)
     fp.Value().SetVisible(False)
 
+    # --- SW1 BOOTSEL button on the BOTTOM next to J9, pressed from below (Pico TP6 -> GND) ---
+    ref, lib, fpn, val, (x, y), rot = FC["bootsel"]
+    fp = load_fp(lib, fpn)
+    fp.SetReference(ref)
+    fp.SetValue(val)
+    board.Add(fp)
+    fp.Flip(fp.GetPosition(), True)
+    fp.SetOrientationDegrees(rot)
+    fp.SetPosition(VS(x, y))
+    fp.Reference().SetLayer(pcbnew.B_Fab)
+    fp.Reference().SetPosition(VS(x, y + 1.9))      # Fab ref above the body, the BOOT silk below it
+    fp.Reference().SetTextSize(pcbnew.VECTOR2I(mm(0.6), mm(0.6)))
+    for g in fp.GraphicalItems():                    # the footprint's own ${REFERENCE} Fab text sits on BOOT
+        if isinstance(g, pcbnew.FP_TEXT) and g.GetText() == "${REFERENCE}":
+            g.SetVisible(False)
+    fp.Value().SetVisible(False)
+    assert all(p.IsOnLayer(pcbnew.B_Cu) for p in fp.Pads())
+    text(board, "BOOT", VS(x, y - 2.5), pcbnew.B_SilkS, 0.8, 0.15)
+
     # --- guides ---
     poly(board, rect_s(dcx, dcy, *FC["deck_board"]), bot, 0.15)
     text(board, "Flow deck v2 (below, on P1/P2)", VS(dcx, dcy + 5), bot, 0.8)
