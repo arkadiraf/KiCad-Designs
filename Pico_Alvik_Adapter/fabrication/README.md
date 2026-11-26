@@ -36,6 +36,23 @@ Board parameters:
 
 KiCad DRC: 0 violations, 0 unconnected pads.
 
+## 1b. Other fabs: same copper, fab-specific packaging
+
+| Fab | Upload | Notes |
+|---|---|---|
+| **OSH Park** | `Pico_Alvik_Adapter_OSHPark.zip` (or the `.kicad_pcb`) | Protel names, drill `.XLN` (inch) |
+| **JLCPCB** | `Pico_Alvik_Adapter_JLCPCB.zip` | KiCad default names (Protel extensions), Excellon mm, PTH/NPTH files (NPTH is empty). Assembly: `production_jlcpcb/*_JLC_BOM.csv` + `*_JLC_CPL.csv` (C1, D1; fill in LCSC part numbers, check rotation in JLC's preview). The Pico W and the headers are hand-fitted. |
+| **Seeed Fusion** | `Pico_Alvik_Adapter_Seeed.zip` | Protel names, drill `.TXT` |
+| **4project.co.il** | any of the above (e.g. the OSH Park zip) | Default "6 mil / 0.3 mm" settings are enough |
+
+Settings to choose at JLCPCB, Seeed, 4project or similar: 2 layers, 1.6 mm FR4, 1 oz copper, any mask
+colour. ENIG finish recommended (flat pads for the castellated Pico and the stencil). Lead-free HASL
+also works. Minimum track 6 mil, minimum hole 0.3 mm. The board doesn't need any finer options.
+
+Silkscreen text on the bottom is 0.6–0.8 mm high, below the roughly 1 mm that JLCPCB and Seeed
+recommend for crisp text. It will still print, possibly a little soft. The D1 diode symbol
+doesn't rely on text size.
+
 ## 2. Stencils: `Pico_Alvik_Adapter_stencil_top.zip`, `Pico_Alvik_Adapter_stencil_bottom.zip`
 
 Each zip holds that side's paste layer plus the board outline (`_outline.GKO`) for alignment. Both

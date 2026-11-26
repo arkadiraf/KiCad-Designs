@@ -32,6 +32,22 @@ rm -rf "$T"
 rm -f "$O"/*.gbrjob
 (cd "$O" && zip -q "../${P}_OSHPark.zip" ./*)
 
+# Seeed Fusion: same RS-274X set, Protel names, Excellon drill as .TXT
+SD="$F/production_seeed"; mkdir -p "$SD"
+cp "$O"/$P.G* "$SD/"
+cp "$O/$P.XLN" "$SD/$P.TXT"
+(cd "$SD" && zip -q "../${P}_Seeed.zip" ./*)
+
+# JLCPCB: KiCad default gerber names (Protel extensions) + PTH/NPTH Excellon (mm)
+J="$F/production_jlcpcb"; mkdir -p "$J"
+kicad-cli pcb export gerbers \
+    --layers "F.Cu,B.Cu,F.Mask,B.Mask,F.Silkscreen,B.Silkscreen,Edge.Cuts" \
+    --subtract-soldermask --precision 6 -o "$J/" "$P.kicad_pcb" >/dev/null
+kicad-cli pcb export drill --format excellon --excellon-units mm \
+    --excellon-separate-th -o "$J/" "$P.kicad_pcb" >/dev/null
+rm -f "$J"/*.gbrjob
+(cd "$J" && zip -q "../${P}_JLCPCB.zip" ./*)
+
 # ---------------------------------------------------------------------------
 # SMT stencils: paste layer + board outline (for alignment), one set per side
 # ---------------------------------------------------------------------------
@@ -50,6 +66,8 @@ kicad-cli pcb export pos --side both --format csv --units mm \
     -o "$F/${P}_positions.csv" "$P.kicad_pcb"
 kicad-cli sch export python-bom -o "$F/docs/${P}_bom.xml" "$P.kicad_sch" >/dev/null
 python3 tools/make_bom.py "$F/docs/${P}_bom.xml" "$F/${P}_BOM.csv"
+python3 tools/make_jlc_assembly.py "$F/docs/${P}_bom.xml" "$F/${P}_positions.csv" \
+    "$F/production_jlcpcb/${P}_JLC_BOM.csv" "$F/production_jlcpcb/${P}_JLC_CPL.csv"
 rm -f "$F/docs/${P}_bom.xml"
 
 kicad-cli sch export pdf -o "$F/docs/${P}_schematic.pdf" "$P.kicad_sch"
