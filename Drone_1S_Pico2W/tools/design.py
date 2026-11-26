@@ -137,9 +137,9 @@ FC = dict(
     # deck rows (|x| <= 9, |y| <= 8.6 clear of the deck header pads), under the Flow deck.
     sensors=[
         ("U2", "KD_Sensors", "Bosch_LGA-16_3x4.5mm_P0.5mm", "BMI088", (0.0, 0.0), 0),
-        ("C1", "Capacitor_SMD", "C_0402_1005Metric", "100n", (0.0, 2.6), 0),
+        ("C1", "Capacitor_SMD", "C_0603_1608Metric", "100n", (0.0, 2.6), 0),
         ("U3", "KD_Sensors", "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
-        ("C2", "Capacitor_SMD", "C_0402_1005Metric", "100n", (-6.0, 2.1), 0),
+        ("C2", "Capacitor_SMD", "C_0603_1608Metric", "100n", (-6.0, 2.1), 0),
     ],
     # J9 SWD, NOT POPULATED: JST-SH 3 (Raspberry Pi 3-pin debug connector style: SWCLK, GND,
     # SWDIO) on the FC bottom at the rear edge, wired from the Pico's SWD pads. Its opening faces
@@ -228,6 +228,7 @@ FRAME_CONN = [
 # ---------------------------------------------------------------------------
 _R, _C = "Resistor_SMD:R_0603_1608Metric", "Capacitor_SMD:C_0603_1608Metric"
 _C08 = "Capacitor_SMD:C_0805_2012Metric"
+_C12 = "Capacitor_SMD:C_1206_3216Metric"   # passives rule: see the repository README
 FRAME_BOM = [
     # --- charger: BQ25606 from USB-C ---
     ("J10", "USB-C receptacle (GCT USB4105-GF-A)", "Connector:USB_C_Receptacle_USB2.0_16P",
@@ -267,7 +268,7 @@ FRAME_BOM = [
     ("U7", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5.1 V boost, true disconnect"),
     ("L2", "1uH (TO CHECK vs datasheet)", "Device:L", "Inductor_SMD:L_Coilcraft_XAL4020-XXX", "boost inductor"),
     ("C18 C19", "10uF 10V", "Device:C", _C08, "boost input"),
-    ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C08, "boost output"),
+    ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C12, "boost output"),
     ("R19", "100k", "Device:R", _R, "BOOST_EN pull-down: Pico off = Pi off"),
     ("R20", "current limit ~2.5 A, TO CHECK", "Device:R", _R, "boost output current limit set resistor"),
 ]

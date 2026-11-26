@@ -144,7 +144,7 @@ reference circuits:
   runs along x so the package axes line up with the drone's (axis remap in firmware).
 * **U3 BMP388 at (−6, 0):** under the deck board, so it is sheltered from prop wash and light, as
   the design doc asks.
-* **C1, C2:** 100 nF 0402 next to each.
+* **C1, C2:** 100 nF 0603 next to each (repository passives rule, see the root README).
 * The parts are 1.0 mm (BMI088) and 0.75 mm (BMP388) tall, well under the 4.1 mm deck connector
   stack.
 * The rear part of the Pico band (x −27…−12) stays free for support ICs (IMU supply filter, etc.).
