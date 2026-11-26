@@ -35,7 +35,7 @@ Pico_Alvik_Adapter.kicad_pro / .kicad_sch / .kicad_pcb   KiCad project
 PicoAlvik.kicad_sym, PicoAlvik.pretty/                   project-local symbols & footprints
 sym-lib-table, fp-lib-table                              library tables (use ${KIPRJMOD})
 tools/                                                   generator scripts (design.py is the single source of truth)
-firmware/pinout_definitions_pico.py                      Alvik MicroPython pin map for the Pico W
+firmware/                                                Alvik MicroPython library port kit for the Pico W
 fabrication/                                             gerbers, drill, BOM, position file, PDFs, renders
 Materials/                                               datasheets / pinouts / schematics used for the design
 ```
@@ -133,9 +133,11 @@ VIN (pin 30) should be ≤ 5.5 V. VUSB (pin 27) and 3V3 (pin 17) should be about
 
 ## Firmware
 
-`firmware/pinout_definitions_pico.py` is a Pico W version of the Alvik library's
-`pinout_definitions.py`. It also lists the other changes the RP2040 port needs:
-UART0 on GP16/GP17, I2C1 on GP6/GP7, and a single LED instead of an RGB LED.
+`firmware/` holds a port kit for Arduino's Alvik MicroPython library: updated
+`pinout_definitions.py` and `uart.py`, plus `port_alvik_to_pico.py`, which patches a stock
+library copy. The patches cover UART0 on GP16/GP17, I2C1 on GP6/GP7, the STM32 firmware updater's
+pins, and the LED. See `firmware/README.md` for usage and limitations (one extra thread on the
+RP2040). `tools/check_firmware.py` verifies the firmware pin map against `design.py`.
 
 ## Regenerating the design
 
