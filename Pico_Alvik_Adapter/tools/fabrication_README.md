@@ -41,7 +41,7 @@ KiCad DRC: 0 violations, 0 unconnected pads.
 | Fab | Upload | Notes |
 |---|---|---|
 | **OSH Park** | `Pico_Alvik_Adapter_OSHPark.zip` (or the `.kicad_pcb`) | Protel names, drill `.XLN` (inch) |
-| **JLCPCB** | `Pico_Alvik_Adapter_JLCPCB.zip` | KiCad default names (Protel extensions), Excellon mm, PTH/NPTH files (NPTH is empty). Assembly: `production_jlcpcb/*_JLC_BOM.csv` + `*_JLC_CPL.csv` (C1, D1; fill in LCSC part numbers, check rotation in JLC's preview). The Pico W and the headers are hand-fitted. |
+| **JLCPCB** | `Pico_Alvik_Adapter_JLCPCB.zip` | KiCad default names (Protel extensions), Excellon mm, PTH/NPTH files (NPTH is empty). PCB only, no assembly service. |
 | **Seeed Fusion** | `Pico_Alvik_Adapter_Seeed.zip` | Protel names, drill `.TXT` |
 | **4project.co.il** | any of the above (e.g. the OSH Park zip) | Default "6 mil / 0.3 mm" settings are enough |
 
@@ -69,22 +69,51 @@ Solder jumpers JP2/JP3 have no paste: JP2 is bridged in copper, and JP3 stays op
 A 0.12–0.13 mm (5 mil) stainless or polyimide stencil suits both sides. OSH Stencils
 (oshstencils.com) take these files directly.
 
-## 3. Assembly
+## 3. Hand assembly
 
-1. **Bottom side first:** C1, D1, and the two 1×15 SMD male headers (J1). Use reflow-safe headers,
-   e.g. Samtec TSM-115-01-x-SV. Position the headers with a spare Nano-pitch female socket strip or
-   a jig, so the rows are exactly 15.24 mm apart and perpendicular to the board.
-2. **Top side:** paste with the top stencil, place the Pico W flat on its castellated pads, and
-   reflow. Or hand-solder the castellations with the board supported on its headers. The bottom
-   joints were made first, so for a second reflow pass support the board by the PCB, not by the
-   headers.
-3. **D1 option:** fit a 1206 0 Ω resistor instead of the PMEG6020ER only if the Alvik's VIN output
-   tolerates back-feed (see the main README, "Power design").
-4. **Before inserting into the Alvik:** check there's no short between VSYS / VIN / 3V3 / GND, and do
-   the socket bring-up check described in the main README.
+Parts: U1 Pico W, J1 two 1×15 2.54 mm **SMD** male headers, C1 10 µF 0805, D1 PMEG6020ER (SOD-123W).
+JP2 is already bridged in copper, and JP3 stays open.
+
+The board has parts on **both** sides, and the headers stick about 8 mm out of the bottom, so the
+order matters.
+
+**Option A – soldering iron only (simplest)**
+
+1. **Bottom, small parts:** C1 (not polarised) and **D1**. D1's **cathode bar** goes to the end marked
+   by the silkscreen bar and **VSYS**; the anode goes to the **VIN** side. Tin one pad, place, tack,
+   then solder the other pad.
+2. **Bottom, headers:** plug the two 1×15 headers into a breadboard or a spare female Nano socket
+   strip. That holds the rows exactly 15.24 mm apart and square. Lay the board on top, bottom side
+   down, and solder each SMD foot. Tack the four end pins first, check alignment, then do the rest.
+3. **Top, Pico W:** tin one corner pad on the board. Align the Pico so its castellations sit centred
+   on the pads, with the USB at the board's USB end (silkscreen "USB" on the bottom marks the same
+   end). Tack two diagonal corners, check all 40 pads line up, then solder each castellation with a
+   fine tip and a little extra solder so it fills the half-hole. Support the board on its headers
+   (still in the breadboard) while you work.
+
+**Option B – hot plate / hot air for the Pico (top side first)**
+
+1. **Top first, while the bottom is still bare:** apply paste with the **top stencil** (or a syringe),
+   place the Pico W, and reflow on a hot plate with the bare bottom side down. The board is flat at
+   this stage, so it sits evenly.
+2. **Then the bottom by iron:** C1, D1 and the headers as in Option A, steps 1–2. Hot air works for
+   C1/D1, but keep it away from the Pico on the other side.
+
+The bottom stencil is only worth it if you reflow the bottom with hot air. With an iron, just tin
+the pads.
+
+**Checks before plugging into the Alvik**
+
+* Continuity: no shorts between **VSYS, VIN, 3V3 and GND**. Probe the header pins: VIN = pin 30,
+  3V3 = pin 17, GND = pins 4 and 29.
+* D1 direction: diode test from header pin 30 (VIN, anode) to Pico pin 39 (VSYS, cathode) should read
+  about 0.2–0.4 V forward, and open in reverse.
+* Plug the Pico's USB in with the adapter **out** of the robot: the Pico boots, and header pin 27
+  (VUSB) reads about 5 V, which is expected.
+* Do the Alvik socket bring-up check from the main README ("Power design") before the first insertion.
 
 ## Other files
 
 * `Pico_Alvik_Adapter_BOM.csv`: bill of materials
-* `Pico_Alvik_Adapter_positions.csv`: pick-and-place (U1 top; C1, D1, J1 bottom)
+* `Pico_Alvik_Adapter_positions.csv`: part positions (reference only)
 * `docs/`: schematic and PCB PDFs, renders
