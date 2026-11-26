@@ -33,4 +33,5 @@ for side in top bottom; do
   python3 -c "import cairosvg,sys; cairosvg.svg2png(url=sys.argv[1], write_to=sys.argv[2], output_width=900, background_color='white')" \
       "$F/docs/${P}_$side.svg" "$F/docs/${P}_$side.png"
 done
+python3 tools/render_board.py >/dev/null
 echo "outputs in $F/"
