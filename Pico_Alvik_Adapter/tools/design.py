@@ -115,26 +115,16 @@ def build_nets():
     add("GND", "J1", 29)
     add("GND", "C1", 2)
 
-    # Power (diode-OR, see README "Power design"):
-    #   D2: Pico VBUS (USB) -> Nano VIN   USB charges / powers the Alvik
-    #   D1: Nano VIN -> Pico VSYS         Alvik powers the Pico without USB
+    # Power (same as a real Nano ESP32 on the Alvik):
+    #   Pico VBUS (USB 5V) -> Nano VBUS/VUSB pin, direct: USB powers/charges the Alvik
+    #   Alvik -> Nano VIN -> D1 -> Pico VSYS: Alvik powers the Pico without USB;
+    #   D1 stops the Alvik output fighting USB power (fit a 1206 0R instead if safe)
     #   Pico on-board Schottky: VBUS -> VSYS (USB powers the Pico)
-    #   JP1 (open): optional bypass of D1
-    #   D3: Pico VBUS (USB) -> Nano VUSB pin (on the Nano this pin is raw USB 5V)
-    #   JP4 (open): optional bypass of D3
     add("VBUS", "U1", 40)
-    add("VBUS", "D2", 2)       # anode
-    add("VBUS", "D3", 2)       # anode
-    add("VBUS", "JP4", 1)
-    add("VUSB_NANO", "D3", 1)  # cathode
-    add("VUSB_NANO", "JP4", 2)
-    add("VUSB_NANO", "J1", 27)
-    add("VIN", "D2", 1)        # cathode
+    add("VBUS", "J1", 27)
     add("VIN", "J1", 30)
     add("VIN", "D1", 2)        # anode
-    add("VIN", "JP1", 1)
     add("VSYS", "D1", 1)       # cathode
-    add("VSYS", "JP1", 2)
     add("VSYS", "U1", 39)
     add("VSYS", "C1", 1)
 
@@ -162,7 +152,7 @@ def _no_connect():
 
 NO_CONNECT = _no_connect()
 
-POWER_NETS = {"GND", "VSYS", "VIN", "VBUS", "VUSB_NANO", "+3V3", "3V3_NANO"}
+POWER_NETS = {"GND", "VSYS", "VIN", "VBUS", "+3V3", "3V3_NANO"}
 
 # ---------------------------------------------------------------------------
 # Components
@@ -173,18 +163,10 @@ COMPONENTS = {
            f"{LIB}:RPi_Pico_W_SMD_Castellated", {}),
     "J1": (f"{LIB}:Arduino_Nano_Headers", "Nano footprint headers (2x 1x15 SMD male)",
            f"{LIB}:Arduino_Nano_SMD_Headers_Bottom", {}),
-    "D1": ("Device:D_Schottky", "PMEG6020ER",
-           "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
-    "D2": ("Device:D_Schottky", "PMEG6020ER",
+    "D1": ("Device:D_Schottky", "PMEG6020ER (or 1206 0R)",
            "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
     "C1": ("Device:C", "10uF 10V",
            "Capacitor_SMD:C_0805_2012Metric", {}),
-    "D3": ("Device:D_Schottky", "PMEG6020ER",
-           "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
-    "JP4": ("Jumper:SolderJumper_2_Open", "D3 bypass",
-            "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", {}),
-    "JP1": ("Jumper:SolderJumper_2_Open", "D1 bypass",
-            "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", {}),
     "JP2": ("Jumper:SolderJumper_2_Bridged", "3V3",
             "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm", {}),
     "JP3": ("Jumper:SolderJumper_2_Open", "RST-RUN",
