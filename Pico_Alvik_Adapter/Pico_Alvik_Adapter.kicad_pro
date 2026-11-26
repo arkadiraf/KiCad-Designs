@@ -266,6 +266,10 @@
       {
         "netclass": "Power",
         "pattern": "VSYS"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "VUSB_NANO"
       }
     ]
   },

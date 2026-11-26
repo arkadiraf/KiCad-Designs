@@ -55,6 +55,7 @@ Alvik datasheet block diagram; copies in `Materials/extracted/`):
 | A6 | 25 | GP8 | 11 | ROBOT_CHK (input) | |
 | 3V3 | 17 | 3V3(OUT) | 36 | +3V3_EXT supply of the Alvik | via JP2 (bridged) |
 | VIN | 30 | VSYS / VBUS | 39 / 40 | Alvik powers the controller; USB charges the Alvik | D1 (VIN->VSYS), D2 (VBUS->VIN) |
+| VBUS/VUSB | 27 | VBUS | 40 | raw USB 5V on a Nano (possible charge input, see Power design) | D3 (VBUS->VUSB), JP4 bypass |
 | GND | 4, 29 | GND | 3,8,13,18,23,28,33,38 | | |
 | RST | 3 | RUN | 30 | (not used by the Alvik) | via JP3 (open) |
 
@@ -72,7 +73,7 @@ Alvik datasheet block diagram; copies in `Materials/extracted/`):
 | A3 | 22 | GP5 | 7 | |
 | A7 | 26 | GP9 | 12 | |
 
-Not connected: Nano D8–D12, B0, B1, VUSB. Pico GP0, GP10–GP15, GP18, GP19,
+Not connected: Nano D8–D12, B0, B1. Pico GP0, GP10–GP15, GP18, GP19,
 ADC_VREF and 3V3_EN.
 
 Each group is assigned in the same order on both sides, so its tracks never cross. The Nano-side
@@ -92,10 +93,19 @@ The adapter rebuilds this as a diode-OR, so no supply can back-feed another:
 |---|---|---|
 | USB plugged into the Pico | VBUS -> Pico on-board Schottky -> VSYS | Pico runs from USB |
 | | VBUS -> **D2** -> Nano VIN | Alvik is charged / powered from USB (same as the Nano) |
+| | VBUS -> **D3** -> Nano VUSB pin | USB 5V also on VUSB, as on a Nano (see below) |
 | USB unplugged | Alvik -> Nano VIN -> **D1** -> VSYS | Pico runs from the Alvik |
-| Both present | Higher of the two supplies wins at each node | D2 keeps Alvik power off the USB host; D1 and the Pico diode keep VSYS from driving VIN or VBUS |
+| Both present | Higher of the two supplies wins at each node | D2 and D3 keep Alvik power off the USB host; D1 and the Pico diode keep VSYS from driving VIN or VBUS |
 
-* **D1, D2:** Nexperia PMEG6020ER (2 A / 60 V Schottky, SOD-123W), the same family as the Nano's
+* **Which pin charges the Alvik, VIN or VUSB?** The Alvik datasheet block diagram labels only
+  **VIN** (Nano pin 30) on the header, and nothing on pin 27 (VBUS/VUSB). The Nano schematic
+  confirms that USB power reaches VIN through its diode. The datasheet never shows the charger
+  input, though, so VUSB can't be ruled out. On a real Nano the VUSB pin is raw USB 5V, so the
+  adapter provides USB power on **both** pins: VIN via D2 and VUSB via D3. Charging then works
+  either way, and no Alvik supply can back-feed the USB host. Close JP4 only if the Alvik needs
+  the full, undropped USB voltage on VUSB, which a Nano provides. The Alvik schematic would
+  settle this.
+* **D1, D2, D3:** Nexperia PMEG6020ER (2 A / 60 V Schottky, SOD-123W), the same family as the Nano's
   VUSB diode. D2 carries the charging current, so it's sized at 2 A. The Pico's own
   VBUS diode (MBR120, 1 A) only has to supply the Pico.
 * **JP1 (open):** bypasses D1. Close it only if the diode drop is a problem. The adapter then
@@ -110,7 +120,7 @@ The adapter rebuilds this as a diode-OR, so no supply can back-feed another:
 * C1: 10 µF on VSYS.
 
 **Bring-up check:** with the adapter removed and the Alvik switched on, measure the Alvik's Nano socket.
-VIN (pin 30) should be ≤ 5.5 V. 3V3 (pin 17) should be about 0 V.
+VIN (pin 30) should be ≤ 5.5 V. 3V3 (pin 17) and VUSB (pin 27) should be about 0 V.
 
 ## Mechanical notes
 
@@ -120,7 +130,7 @@ VIN (pin 30) should be ≤ 5.5 V. 3V3 (pin 17) should be about 0 V.
   Vias are tented.
 * The board is 24 mm wide (Nano: 18 mm). Check the clearance inside the Alvik's
   top cover before ordering.
-* Bottom-side parts (C1, D1, D2, jumpers) sit between the header rows and are at most about 1.2 mm high.
+* Bottom-side parts (C1, D1–D3, jumpers) sit between the header rows and are at most about 1.2 mm high.
 * Use male headers with a standard 2.54 mm pin (about 6 mm mating length). Recommended stack:
   SMD header, e.g. Samtec TSM-115-01-x-SV or any generic 1x15 SMD 2.54 mm male header.
 

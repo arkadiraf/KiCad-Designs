@@ -120,8 +120,15 @@ def build_nets():
     #   D1: Nano VIN -> Pico VSYS         Alvik powers the Pico without USB
     #   Pico on-board Schottky: VBUS -> VSYS (USB powers the Pico)
     #   JP1 (open): optional bypass of D1
+    #   D3: Pico VBUS (USB) -> Nano VUSB pin (on the Nano this pin is raw USB 5V)
+    #   JP4 (open): optional bypass of D3
     add("VBUS", "U1", 40)
     add("VBUS", "D2", 2)       # anode
+    add("VBUS", "D3", 2)       # anode
+    add("VBUS", "JP4", 1)
+    add("VUSB_NANO", "D3", 1)  # cathode
+    add("VUSB_NANO", "JP4", 2)
+    add("VUSB_NANO", "J1", 27)
     add("VIN", "D2", 1)        # cathode
     add("VIN", "J1", 30)
     add("VIN", "D1", 2)        # anode
@@ -148,14 +155,14 @@ def build_nets():
 
 def _no_connect():
     used_u = {p for _n, _j, p, _g, _c in SIGNALS} | {3, 8, 13, 18, 23, 28, 33, 38, 30, 36, 39, 40}
-    used_j = {j for _n, j, _p, _g, _c in SIGNALS} | {3, 4, 17, 29, 30}
+    used_j = {j for _n, j, _p, _g, _c in SIGNALS} | {3, 4, 17, 27, 29, 30}
     return {"U1": [p for p in range(1, 41) if p not in used_u],
             "J1": [p for p in range(1, 31) if p not in used_j]}
 
 
 NO_CONNECT = _no_connect()
 
-POWER_NETS = {"GND", "VSYS", "VIN", "VBUS", "+3V3", "3V3_NANO"}
+POWER_NETS = {"GND", "VSYS", "VIN", "VBUS", "VUSB_NANO", "+3V3", "3V3_NANO"}
 
 # ---------------------------------------------------------------------------
 # Components
@@ -172,6 +179,10 @@ COMPONENTS = {
            "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
     "C1": ("Device:C", "10uF 10V",
            "Capacitor_SMD:C_0805_2012Metric", {}),
+    "D3": ("Device:D_Schottky", "PMEG6020ER",
+           "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
+    "JP4": ("Jumper:SolderJumper_2_Open", "D3 bypass",
+            "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", {}),
     "JP1": ("Jumper:SolderJumper_2_Open", "D1 bypass",
             "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", {}),
     "JP2": ("Jumper:SolderJumper_2_Bridged", "3V3",
