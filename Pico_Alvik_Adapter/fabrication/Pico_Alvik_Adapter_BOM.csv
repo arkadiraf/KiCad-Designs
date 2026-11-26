@@ -1,0 +1,8 @@
+References,Qty,Value,Footprint,Populate,Notes
+C1,1,10uF 10V,Capacitor_SMD:C_0805_2012Metric,yes,MLCC 10uF 10V X5R 0805
+D1,1,B5819W (DNP),Diode_SMD:D_SOD-123,no,"Schottky 1A/40V SOD-123 - do not populate (optional, see README)"
+J1,1,Nano footprint headers (2x 1x15 SMD male),PicoAlvik:Arduino_Nano_SMD_Headers_Bottom,yes,"2x 1x15 2.54mm SMD male pin header, e.g. Samtec TSM-115-01-T-SV"
+JP1,1,VIN-VSYS,Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm,yes,"solder jumper, bridged by default (cut to isolate)"
+JP2,1,3V3,Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm,yes,"solder jumper, bridged by default (cut to isolate)"
+JP3,1,RST-RUN,Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm,yes,"solder jumper, open by default"
+U1,1,Raspberry Pi Pico W,PicoAlvik:RPi_Pico_W_SMD_Castellated,yes,"Raspberry Pi Pico W (SC0918), solder by castellated pads, no headers"

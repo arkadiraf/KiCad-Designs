@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "PicoAlvik")(type "KiCad")(uri "${KIPRJMOD}/PicoAlvik.kicad_sym")(options "")(descr "Pico Alvik Adapter project symbols"))
+)
