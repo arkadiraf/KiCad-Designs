@@ -115,12 +115,12 @@ def build_nets():
     add("GND", "J1", 29)
     add("GND", "C1", 2)
 
-    # Power (same as a real Nano ESP32 on the Alvik):
-    #   Pico VBUS (USB 5V) -> Nano VBUS/VUSB pin, direct: USB powers/charges the Alvik
-    #   Nano VIN <-> D1 <-> Pico VSYS.  Default D1 = 1206 0R: exactly like the
-    #   Nano ESP32, whose VIN pin is the regulator input with no diode (its only
-    #   diode is VUSB -> VIN; the Pico's on-board VBUS -> VSYS Schottky is the
-    #   same thing).  Optional: fit a PMEG6020ER to block USB from reaching VIN.
+    # Power (Alvik: VUSB pin = power/charge INPUT from the controller's USB,
+    #               VIN pin  = Alvik power OUTPUT to the controller):
+    #   Pico VBUS (USB 5V) -> Nano VUSB pin, direct: USB powers/charges the Alvik
+    #   Alvik VIN -> D1 (Schottky) -> Pico VSYS: Alvik powers the Pico; D1 keeps
+    #   USB-derived VSYS off the Alvik's VIN output (1206 0R optional)
+    #   Pico on-board Schottky: VBUS -> VSYS (USB powers the Pico)
     add("VBUS", "U1", 40)
     add("VBUS", "J1", 27)
     add("VIN", "J1", 30)
@@ -164,7 +164,7 @@ COMPONENTS = {
            f"{LIB}:RPi_Pico_W_SMD_Castellated", {}),
     "J1": (f"{LIB}:Arduino_Nano_Headers", "Nano footprint headers (2x 1x15 SMD male)",
            f"{LIB}:Arduino_Nano_SMD_Headers_Bottom", {}),
-    "D1": ("Device:D_Schottky", "0R 1206 (opt. PMEG6020ER)",
+    "D1": ("Device:D_Schottky", "PMEG6020ER (opt. 1206 0R)",
            "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
     "C1": ("Device:C", "10uF 10V",
            "Capacitor_SMD:C_0805_2012Metric", {}),

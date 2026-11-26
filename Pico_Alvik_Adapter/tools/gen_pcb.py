@@ -39,7 +39,7 @@ BOTTOM_PARTS = {
     "C1":  (CX,   106.0,  0,   ""),
     "JP2": (CX,   110.4,  0,   "3V3"),
     "JP3": (CX,   130.8,  0,   "RST"),
-    "D1":  (CX,   135.6,  0,   "0R"),
+    "D1":  (CX,   135.6,  0,   "D1"),
 }
 
 
@@ -186,7 +186,7 @@ def place():
 
     tb = board.GetTitleBlock()
     tb.SetTitle("Pico Alvik Adapter")
-    tb.SetRevision("1.4")
+    tb.SetRevision("1.5")
     tb.SetDate("2026-11-26")
     tb.SetCompany("KiCad-Designs")
     tb.SetComment(0, "Raspberry Pi Pico W carrier in Arduino Nano form factor for the Arduino Alvik")
@@ -257,7 +257,7 @@ def place():
         if lbl:
             dx = 3.4 if ref.startswith("D") else 2.9
             add_text(board, lbl, x - dx, y, pcbnew.B_SilkS, 0.6, mirror=True)
-    add_text(board, "PICO-ALVIK v1.4", CX, 120.6, pcbnew.B_SilkS, 0.7, rot=90, mirror=True)
+    add_text(board, "PICO-ALVIK v1.5", CX, 120.6, pcbnew.B_SilkS, 0.7, rot=90, mirror=True)
     add_text(board, "USB", CX, BY0 + 2.0, pcbnew.B_SilkS, 0.8, mirror=True)
 
     pcbnew.SaveBoard(PCB, board)
