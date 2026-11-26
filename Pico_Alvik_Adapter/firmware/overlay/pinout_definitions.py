@@ -2,7 +2,7 @@
 # library (arduino-alvik-mpy) running on a Raspberry Pi Pico W.
 #
 # Drop-in replacement for arduino_alvik/pinout_definitions.py.
-# Mapping = adapter board v1.5 (Pico_Alvik_Adapter/tools/design.py).
+# Mapping = adapter board v1.6 (Pico_Alvik_Adapter/tools/design.py).
 # Use firmware/port_alvik_to_pico.py to install it together with the other
 # RP2040 changes (uart.py, I2C bus id, stm32_flash.py pins).
 
@@ -12,19 +12,17 @@ from machine import Pin
 # Nano pin name -> Pico GPIO (through the adapter board).  None = not wired.
 # ---------------------------------------------------------------------------
 # Pins used by the Alvik
-D0 = 17      # Nano D0/RX0  -> GP17 (UART0 RX)  <- STM32 TX
-D1 = 16      # Nano D1/TX1  -> GP16 (UART0 TX)  -> STM32 RX
-D2 = 20      # Nano D2      -> GP20             -> STM32 BOOT0
-D3 = 21      # Nano D3      -> GP21             -> STM32 NRST
-D4 = 22      # Nano D4      -> GP22             -> STM32 NANO_CHK
+D0 = 21      # Nano D0/RX0  -> GP21 (UART1 RX)  <- STM32 TX
+D1 = 20      # Nano D1/TX1  -> GP20 (UART1 TX)  -> STM32 RX
+D2 = 22      # Nano D2      -> GP22             -> STM32 BOOT0
+D3 = 26      # Nano D3      -> GP26             -> STM32 NRST
+D4 = 27      # Nano D4      -> GP27             -> STM32 NANO_CHK
 A4 = 6       # Nano A4/SDA  -> GP6  (I2C1 SDA)  Alvik I2C bus (Qwiic/Grove/BMS)
 A5 = 7       # Nano A5/SCL  -> GP7  (I2C1 SCL)
 A6 = 8       # Nano A6      -> GP8              <- STM32 ROBOT_CHK
 
 # Spare Nano pins (not used by the Alvik, wired for convenience)
-D5 = 26      # Nano D5      -> GP26 (ADC0)
-D6 = 27      # Nano D6      -> GP27 (ADC1)
-D7 = 28      # Nano D7      -> GP28 (ADC2)
+D5 = 28      # Nano D5      -> GP28 (ADC2)
 D13 = 1      # Nano D13     -> GP1
 A0 = 2       # Nano A0      -> GP2
 A1 = 3       # Nano A1      -> GP3
@@ -33,12 +31,12 @@ A3 = 5       # Nano A3      -> GP5
 A7 = 9       # Nano A7      -> GP9
 
 # Not connected on the adapter (unused by the Alvik)
-D8 = D9 = D10 = D11 = D12 = None
+D6 = D7 = D8 = D9 = D10 = D11 = D12 = None
 
 # ---------------------------------------------------------------------------
 # Peripherals (RP2040 needs the matching hardware block for each pin pair)
 # ---------------------------------------------------------------------------
-UART_ID = 0        # GP16/GP17 = UART0
+UART_ID = 1        # GP20/GP21 = UART1
 TX = D1
 RX = D0
 I2C_ID = 1         # GP6/GP7  = I2C1  (the Nano ESP32 library uses I2C(0, ...))

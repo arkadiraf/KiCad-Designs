@@ -8,8 +8,8 @@ as the main controller of the **Arduino Alvik** robot (AKX00066).
 * The bottom side carries two **1x15 2.54 mm SMD male headers in the Arduino Nano
   footprint**. They plug into the Alvik's Nano socket in place of the Nano ESP32.
 * Every Nano pin the Alvik uses (UART, BOOT0, NRST, NANO_CHK, ROBOT_CHK, I2C,
-  VIN, 3V3, GND) goes to a matching Pico pin: UART0 for the STM32 link and I2C1
-  for the I2C bus. Nine spare Nano pins are wired as well.
+  VIN, 3V3, GND) goes to a matching Pico pin: UART1 for the STM32 link and I2C1
+  for the I2C bus. Seven spare Nano pins are wired as well.
 * The micro-USB connector of the Pico sits at the same end as the Nano's USB-C,
   so it stays reachable through the Alvik's rear opening.
 
@@ -36,7 +36,7 @@ PicoAlvik.kicad_sym, PicoAlvik.pretty/                   project-local symbols &
 sym-lib-table, fp-lib-table                              library tables (use ${KIPRJMOD})
 tools/                                                   generator scripts (design.py is the single source of truth)
 firmware/                                                Alvik MicroPython library port kit for the Pico W
-fabrication/                                             gerbers, drill, BOM, position file, PDFs, renders
+fabrication/                                             OSH Park gerbers (RS-274X) + drill, top/bottom stencils, BOM, positions, PDFs, renders
 Materials/                                               datasheets / pinouts / schematics used for the design
 ```
 
@@ -49,11 +49,11 @@ Alvik datasheet block diagram; copies in `Materials/extracted/`):
 
 | Nano pin | J1 | Pico GPIO | U1 pin | Alvik function | Pico peripheral |
 |---|---|---|---|---|---|
-| D1/TX1 | 1 | GP16 | 21 | UART TX -> STM32 RX (460800 baud) | UART0 TX |
-| D0/RX0 | 2 | GP17 | 22 | UART RX <- STM32 TX | UART0 RX |
-| D2 | 5 | GP20 | 26 | STM32 BOOT0 | |
-| D3 | 6 | GP21 | 27 | STM32 NRST | |
-| D4 | 7 | GP22 | 29 | NANO_CHK (EXT_CHK) | |
+| D1/TX1 | 1 | GP20 | 26 | UART TX -> STM32 RX (460800 baud) | UART1 TX |
+| D0/RX0 | 2 | GP21 | 27 | UART RX <- STM32 TX | UART1 RX |
+| D2 | 5 | GP22 | 29 | STM32 BOOT0 | |
+| D3 | 6 | GP26 | 31 | STM32 NRST | |
+| D4 | 7 | GP27 | 32 | NANO_CHK (EXT_CHK) | |
 | A4/SDA | 23 | GP6 | 9 | I2C SDA (Qwiic / Grove, BMS, IMU...) | I2C1 SDA |
 | A5/SCL | 24 | GP7 | 10 | I2C SCL | I2C1 SCL |
 | A6 | 25 | GP8 | 11 | ROBOT_CHK (input) | |
@@ -67,9 +67,7 @@ Alvik datasheet block diagram; copies in `Materials/extracted/`):
 
 | Nano pin | J1 | Pico GPIO | U1 pin | Note |
 |---|---|---|---|---|
-| D5 | 8 | GP26 | 31 | ADC0 |
-| D6 | 9 | GP27 | 32 | ADC1 |
-| D7 | 10 | GP28 | 34 | ADC2 |
+| D5 | 8 | GP28 | 34 | ADC2 |
 | D13 | 16 | GP1 | 2 | |
 | A0 | 19 | GP2 | 4 | |
 | A1 | 20 | GP3 | 5 | |
@@ -77,7 +75,7 @@ Alvik datasheet block diagram; copies in `Materials/extracted/`):
 | A3 | 22 | GP5 | 7 | |
 | A7 | 26 | GP9 | 12 | |
 
-Not connected: Nano D8–D12, B0, B1. Pico GP0, GP10–GP15, GP18, GP19,
+Not connected: Nano D6–D12, B0, B1. Pico GP0, GP10–GP19,
 ADC_VREF and 3V3_EN.
 
 Each group is assigned in the same order on both sides, so its tracks never cross. The Nano-side
@@ -119,6 +117,17 @@ The adapter:
 **Bring-up check:** with the adapter removed and the Alvik switched on, measure the Alvik's Nano socket.
 VIN (pin 30) should be ≤ 5.5 V. VUSB (pin 27) and 3V3 (pin 17) should be about 0 V.
 
+## Manufacturing
+
+`fabrication/README.md` covers ordering and assembly. In short:
+
+* **PCB:** `fabrication/Pico_Alvik_Adapter_OSHPark.zip`, RS-274X Gerbers with Protel names
+  (`.GTL/.GBL/.GTS/.GBS/.GTO/.GBO/.GKO`) plus Excellon `.XLN`. Designed to OSH Park's rules: copper
+  ≥ 0.4 mm from the board edge, drills ≥ 0.3 mm, silkscreen strokes ≥ 0.15 mm.
+* **Stencils:** `fabrication/Pico_Alvik_Adapter_stencil_top.zip` (Pico W pads, over-pasted to
+  3.8 × 2.2 mm per the Pico W datasheet) and `..._stencil_bottom.zip` (headers, C1, D1). Each comes
+  with the board outline for alignment.
+
 ## Mechanical notes
 
 * The SMD headers keep the top copper flat under the Pico W, because Nano rows (15.24 mm) and
@@ -135,7 +144,7 @@ VIN (pin 30) should be ≤ 5.5 V. VUSB (pin 27) and 3V3 (pin 17) should be about
 
 `firmware/` holds a port kit for Arduino's Alvik MicroPython library: updated
 `pinout_definitions.py` and `uart.py`, plus `port_alvik_to_pico.py`, which patches a stock
-library copy. The patches cover UART0 on GP16/GP17, I2C1 on GP6/GP7, the STM32 firmware updater's
+library copy. The patches cover UART1 on GP20/GP21, I2C1 on GP6/GP7, the STM32 firmware updater's
 pins, and the LED. See `firmware/README.md` for usage and limitations (one extra thread on the
 RP2040). `tools/check_firmware.py` verifies the firmware pin map against `design.py`.
 

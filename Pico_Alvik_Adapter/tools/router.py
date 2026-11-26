@@ -26,7 +26,7 @@ BUILD = os.path.join(os.path.dirname(HERE), "build")
 
 G = 0.2            # grid pitch, mm
 CLR = 0.2          # copper clearance, mm
-EDGE = 0.3         # copper to board edge, mm
+EDGE = 0.4         # copper to board edge, mm (OSH Park min 15 mil = 0.381)
 VIA_COST = 2.0     # mm-equivalent cost of a via
 TURN_COST = 0.2    # per 45 degree direction change
 WIDTH = {"signal": 0.25, "power": 0.5, "GND": 0.4}
@@ -110,10 +110,10 @@ class Board:
                 if n in s:
                     foreign &= (o != g)
             dist[l] = ndimage.distance_transform_edt(~foreign) * G
-        free = {l: (dist[l] >= w / 2 + CLR + G / 2) & (self.dist_edge >= w / 2 + EDGE + G / 2)
+        free = {l: (dist[l] >= w / 2 + CLR + G / 2) & (self.dist_edge >= w / 2 + EDGE + G)
                 for l in LAYERS}
         via_ok = ((dist["F"] >= d / 2 + CLR + G / 2) & (dist["B"] >= d / 2 + CLR + G / 2) &
-                  (self.dist_edge >= d / 2 + EDGE + G / 2) &
+                  (self.dist_edge >= d / 2 + EDGE + G) &
                   (self.dist_pad >= d / 2 + 0.15))
         return free, via_ok
 

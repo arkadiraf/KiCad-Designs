@@ -4,14 +4,47 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 P=Pico_Alvik_Adapter
 F=fabrication
-rm -rf "$F"; mkdir -p "$F/gerbers" "$F/docs"
+rm -rf "$F"; mkdir -p "$F/docs"
 
-LAYERS="F.Cu,B.Cu,F.Paste,B.Paste,F.Silkscreen,B.Silkscreen,F.Mask,B.Mask,Edge.Cuts"
-kicad-cli pcb export gerbers --layers "$LAYERS" --subtract-soldermask \
-    -o "$F/gerbers/" "$P.kicad_pcb"
-kicad-cli pcb export drill --format excellon --excellon-separate-th \
-    --generate-map --map-format gerberx2 -o "$F/gerbers/" "$P.kicad_pcb"
-(cd "$F/gerbers" && zip -q "../${P}_gerbers.zip" ./*)
+# ---------------------------------------------------------------------------
+# PCB production: OSH Park style RS-274X gerbers (Protel extensions, plain
+# RS-274X without X2 attributes, 4.6 mm coordinates) + one Excellon drill file
+# ---------------------------------------------------------------------------
+O="$F/production_oshpark"
+T="$F/.tmp"
+mkdir -p "$O" "$T"
+kicad-cli pcb export gerbers \
+    --layers "F.Cu,B.Cu,F.Mask,B.Mask,F.Silkscreen,B.Silkscreen,Edge.Cuts" \
+    --no-x2 --no-netlist --subtract-soldermask --precision 6 \
+    -o "$T/" "$P.kicad_pcb" >/dev/null
+kicad-cli pcb export drill --format excellon --excellon-units in \
+    --excellon-zeros-format decimal --drill-origin absolute \
+    -o "$T/" "$P.kicad_pcb" >/dev/null
+mv "$T/$P-F_Cu.gtl"         "$O/$P.GTL"   # top copper
+mv "$T/$P-B_Cu.gbl"         "$O/$P.GBL"   # bottom copper
+mv "$T/$P-F_Mask.gts"       "$O/$P.GTS"   # top solder mask
+mv "$T/$P-B_Mask.gbs"       "$O/$P.GBS"   # bottom solder mask
+mv "$T/$P-F_Silkscreen.gto" "$O/$P.GTO"   # top silkscreen
+mv "$T/$P-B_Silkscreen.gbo" "$O/$P.GBO"   # bottom silkscreen
+mv "$T/$P-Edge_Cuts.gm1"    "$O/$P.GKO"   # board outline
+mv "$T/$P.drl"              "$O/$P.XLN"   # drill (all holes plated)
+rm -rf "$T"
+rm -f "$O"/*.gbrjob
+(cd "$O" && zip -q "../${P}_OSHPark.zip" ./*)
+
+# ---------------------------------------------------------------------------
+# SMT stencils: paste layer + board outline (for alignment), one set per side
+# ---------------------------------------------------------------------------
+for side in top bottom; do
+  if [ $side = top ]; then L=F.Paste; X=gtp; N=GTP; else L=B.Paste; X=gbp; N=GBP; fi
+  D="$F/stencil_$side"; mkdir -p "$D"
+  kicad-cli pcb export gerbers --layers "$L,Edge.Cuts" --no-x2 --no-netlist \
+      --precision 6 -o "$D/" "$P.kicad_pcb" >/dev/null
+  mv "$D/$P-${L/./_}.$X" "$D/${P}_stencil_$side.$N"
+  mv "$D/$P-Edge_Cuts.gm1" "$D/${P}_outline.GKO"
+  rm -f "$D"/*.gbrjob
+  (cd "$D" && zip -q "../${P}_stencil_$side.zip" ./*)
+done
 
 kicad-cli pcb export pos --side both --format csv --units mm \
     -o "$F/${P}_positions.csv" "$P.kicad_pcb"
@@ -34,4 +67,5 @@ for side in top bottom; do
       "$F/docs/${P}_$side.svg" "$F/docs/${P}_$side.png"
 done
 python3 tools/render_board.py >/dev/null
+cp tools/fabrication_README.md "$F/README.md"
 echo "outputs in $F/"

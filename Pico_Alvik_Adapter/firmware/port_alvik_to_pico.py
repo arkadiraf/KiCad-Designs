@@ -13,7 +13,7 @@ What it does
   * pinout_definitions.py, uart.py  -> replaced by firmware/overlay/*
   * arduino_alvik.py   I2C(0, ...)   -> I2C(I2C_ID, ...)   (GP6/GP7 are I2C1)
   * stm32_flash.py     ESP32 pins/UART for the STM32 firmware updater
-                       -> adapter pins (A6=GP8, D2=GP20, D3=GP21, UART0 GP16/17)
+                       -> adapter pins (A6=GP8, D2=GP22, D3=GP26, UART1 GP20/21)
 Every edit must match exactly; if the upstream library changed, the script
 stops without touching anything.
 """
@@ -30,11 +30,11 @@ TESTED_VERSION = "1.1.4"
 PATCHES = [
     ("arduino_alvik.py", r"\bI2C\(0,", "I2C(I2C_ID,", 10),
     ("stm32_flash.py", r"(?m)^A6 = 13\b.*$", "A6 = 8      # Pico Alvik Adapter: nano A6 -> GP8", 1),
-    ("stm32_flash.py", r"(?m)^_D2 = 5\b.*$", "_D2 = 20    # Pico Alvik Adapter: nano D2 -> GP20", 1),
-    ("stm32_flash.py", r"(?m)^_D3 = 6\b.*$", "_D3 = 21    # Pico Alvik Adapter: nano D3 -> GP21", 1),
-    ("stm32_flash.py", r"(?m)^_UART_ID = 1\b.*$", "_UART_ID = 0  # Pico Alvik Adapter: UART0", 1),
-    ("stm32_flash.py", r"(?m)^_TX_PIN = 43\b.*$", "_TX_PIN = 16  # Pico Alvik Adapter: GP16", 1),
-    ("stm32_flash.py", r"(?m)^_RX_PIN = 44\b.*$", "_RX_PIN = 17  # Pico Alvik Adapter: GP17", 1),
+    ("stm32_flash.py", r"(?m)^_D2 = 5\b.*$", "_D2 = 22    # Pico Alvik Adapter: nano D2 -> GP22", 1),
+    ("stm32_flash.py", r"(?m)^_D3 = 6\b.*$", "_D3 = 26    # Pico Alvik Adapter: nano D3 -> GP26", 1),
+    ("stm32_flash.py", r"(?m)^_UART_ID = 1\b.*$", "_UART_ID = 1  # Pico Alvik Adapter: UART1 (GP20/GP21)", 1),
+    ("stm32_flash.py", r"(?m)^_TX_PIN = 43\b.*$", "_TX_PIN = 20  # Pico Alvik Adapter: GP20", 1),
+    ("stm32_flash.py", r"(?m)^_RX_PIN = 44\b.*$", "_RX_PIN = 21  # Pico Alvik Adapter: GP21", 1),
 ]
 MARKER = "# ported to Pico W by Pico_Alvik_Adapter/firmware/port_alvik_to_pico.py\n"
 
@@ -72,7 +72,7 @@ def main():
         shutil.copyfile(os.path.join(OVERLAY, fname), os.path.join(pkg, fname))
     print(f"arduino_alvik {ver} ported to the Pico Alvik Adapter:")
     print("  replaced pinout_definitions.py, uart.py")
-    print("  patched  arduino_alvik.py (I2C bus 1), stm32_flash.py (pins, UART0)")
+    print("  patched  arduino_alvik.py (I2C bus 1), stm32_flash.py (pins, UART1 GP20/21)")
 
 
 if __name__ == "__main__":

@@ -115,11 +115,11 @@ def fp_pico():
     for p in range(1, 21):
         y = -24.13 + 2.54 * (p - 1)
         items.append(f'  (pad "{p}" smd roundrect (at {-px:g} {y:g}) (size 3.2 1.6) '
-                     f'(layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.125) (tstamp {uid(f"pico{p}")}))')
+                     f'(layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.125) (solder_paste_margin 0.3) (tstamp {uid(f"pico{p}")}))')
     for p in range(21, 41):
         y = 24.13 - 2.54 * (p - 21)
         items.append(f'  (pad "{p}" smd roundrect (at {px:g} {y:g}) (size 3.2 1.6) '
-                     f'(layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.125) (tstamp {uid(f"pico{p}")}))')
+                     f'(layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.125) (solder_paste_margin 0.3) (tstamp {uid(f"pico{p}")}))')
     # USB connector shell solder-relief pads A..D (no net, no paste)
     for n, (x, y, w, h) in enumerate([(-2.725, -24.0, 1.1, 1.8), (2.725, -24.0, 1.1, 1.8),
                                        (-2.425, -20.97, 1.05, 1.45), (2.425, -20.97, 1.05, 1.45)]):
@@ -136,10 +136,10 @@ def fp_pico():
         text("user", "ANTENNA KEEP-OUT", 0, 21.0, "F.Fab", size=0.8, thick=0.12),
         text("user", "USB", 0, -19.0, "F.Fab", size=0.8, thick=0.12),
         # silkscreen: short edges only (long edges are covered by pads)
-        line(-8.0, -25.3, -4.3, -25.3, "F.SilkS", 0.12),
-        line(4.3, -25.3, 8.0, -25.3, "F.SilkS", 0.12),
-        line(-10.3, 25.3, -7.6, 25.3, "F.SilkS", 0.12),
-        line(7.6, 25.3, 10.3, 25.3, "F.SilkS", 0.12),
+        line(-8.0, -25.3, -4.3, -25.3, "F.SilkS", 0.15),
+        line(4.3, -25.3, 8.0, -25.3, "F.SilkS", 0.15),
+        line(-10.3, 25.3, -7.6, 25.3, "F.SilkS", 0.15),
+        line(7.6, 25.3, 10.3, 25.3, "F.SilkS", 0.15),
         # pin-1 marker
         line(-11.5, -25.3, -9.0, -25.3, "F.SilkS", 0.2),
         # courtyard
@@ -188,10 +188,10 @@ def fp_nano():
         rect(-8.89, -19.05, -6.35, 19.05, "F.Fab", 0.1),
         rect(6.35, -19.05, 8.89, 19.05, "F.Fab", 0.1),
         # silkscreen: header end lines + key pin names
-        line(-8.89, -19.2, -6.35, -19.2, "F.SilkS", 0.12),
-        line(-8.89, 19.2, -6.35, 19.2, "F.SilkS", 0.12),
-        line(6.35, -19.2, 8.89, -19.2, "F.SilkS", 0.12),
-        line(6.35, 19.2, 8.89, 19.2, "F.SilkS", 0.12),
+        line(-8.89, -19.2, -6.35, -19.2, "F.SilkS", 0.15),
+        line(-8.89, 19.2, -6.35, 19.2, "F.SilkS", 0.15),
+        line(6.35, -19.2, 8.89, -19.2, "F.SilkS", 0.15),
+        line(6.35, 19.2, 8.89, 19.2, "F.SilkS", 0.15),
         text("user", "TX1", -7.62, 18.4, "F.Fab", size=0.7, thick=0.12),
         text("user", "VIN", 7.62, 18.4, "F.Fab", size=0.7, thick=0.12),
         text("user", "D12", -7.62, -18.4, "F.Fab", size=0.7, thick=0.12),

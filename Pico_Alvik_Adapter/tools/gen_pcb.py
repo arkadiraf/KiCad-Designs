@@ -54,9 +54,9 @@ def write_project():
                     "copper_line_width": 0.2,
                     "copper_text_size_h": 1.5, "copper_text_size_v": 1.5,
                     "copper_text_thickness": 0.3,
-                    "silk_line_width": 0.12,
+                    "silk_line_width": 0.15,
                     "silk_text_size_h": 0.8, "silk_text_size_v": 0.8,
-                    "silk_text_thickness": 0.12,
+                    "silk_text_thickness": 0.15,
                 },
                 "rules": {
                     "min_clearance": 0.15,
@@ -66,7 +66,7 @@ def write_project():
                     "min_through_hole_diameter": 0.3,
                     "min_hole_to_hole": 0.25,
                     "min_hole_clearance": 0.25,
-                    "min_copper_edge_clearance": 0.25,
+                    "min_copper_edge_clearance": 0.4,     # OSH Park: 15 mil
                     "min_silk_clearance": 0.0,
                     "min_text_height": 0.6,
                     "min_text_thickness": 0.1,
@@ -146,14 +146,14 @@ def add_text(board, txt, x, y, layer, size=0.8, rot=0, mirror=False):
     t.SetPosition(V(x, y))
     t.SetLayer(layer)
     t.SetTextSize(V(size, size))
-    t.SetTextThickness(mm(0.12 if size < 1 else 0.15))
+    t.SetTextThickness(mm(0.15))                 # >= 5 mil silk for OSH Park
     if rot:
         t.SetTextAngle(pcbnew.EDA_ANGLE(rot, pcbnew.DEGREES_T))
     t.SetMirrored(mirror)
     board.Add(t)
 
 
-def add_poly(board, pts, layer, w=0.12, fill=True):
+def add_poly(board, pts, layer, w=0.15, fill=True):
     sh = pcbnew.PCB_SHAPE(board)
     sh.SetShape(pcbnew.SHAPE_T_POLY)
     sh.SetPolyPoints([V(x, y) for x, y in pts])
@@ -214,7 +214,7 @@ def place():
 
     tb = board.GetTitleBlock()
     tb.SetTitle("Pico Alvik Adapter")
-    tb.SetRevision("1.5")
+    tb.SetRevision("1.6")
     tb.SetDate("2026-11-26")
     tb.SetCompany("KiCad-Designs")
     tb.SetComment(0, "Raspberry Pi Pico W carrier in Arduino Nano form factor for the Arduino Alvik")
@@ -285,7 +285,7 @@ def place():
         if lbl:
             dx = 3.4 if ref.startswith("D") else 2.9
             add_text(board, lbl, x - dx, y, pcbnew.B_SilkS, 0.6, mirror=True)
-    add_text(board, "PICO-ALVIK v1.5", CX, 120.6, pcbnew.B_SilkS, 0.7, rot=90, mirror=True)
+    add_text(board, "PICO-ALVIK v1.6", CX, 120.6, pcbnew.B_SilkS, 0.7, rot=90, mirror=True)
     # component markings: diode direction and capacitor value
     d1 = board.FindFootprintByReference("D1")
     diode_mark(board, d1, pcbnew.ToMM(d1.GetPosition().y) + 2.0)
@@ -453,12 +453,10 @@ def import_routes(board):
 
 
 def finish():
+    # Always start from a freshly placed board: removing tracks/zones from an
+    # already finished board corrupts object types in the KiCad 7 SWIG bindings.
+    place()
     board = pcbnew.LoadBoard(PCB)
-    for t in list(board.GetTracks()):
-        board.Remove(t)
-    for z in list(board.Zones()):
-        if not z.GetIsRuleArea():
-            board.Remove(z)
     if os.path.exists(ROUTES):
         import_routes(board)
     else:

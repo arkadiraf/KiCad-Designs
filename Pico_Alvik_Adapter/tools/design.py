@@ -75,18 +75,16 @@ NANO_PINS = {
 SIGNALS = [
     # net name        Nano  Pico  GPIO  function on the Alvik / Pico peripheral
     # --- pins used by the Alvik (required) ---
-    ("D1_TX",         1,    21,   "GP16", "Alvik: UART TX -> STM32 RX | Pico UART0 TX"),
-    ("D0_RX",         2,    22,   "GP17", "Alvik: UART RX <- STM32 TX | Pico UART0 RX"),
-    ("D2_BOOT0",      5,    26,   "GP20", "Alvik: STM32 BOOT0"),
-    ("D3_NRST",       6,    27,   "GP21", "Alvik: STM32 NRST"),
-    ("D4_NANO_CHK",   7,    29,   "GP22", "Alvik: NANO_CHK (EXT_CHK)"),
+    ("D1_TX",         1,    26,   "GP20", "Alvik: UART TX -> STM32 RX | Pico UART1 TX"),
+    ("D0_RX",         2,    27,   "GP21", "Alvik: UART RX <- STM32 TX | Pico UART1 RX"),
+    ("D2_BOOT0",      5,    29,   "GP22", "Alvik: STM32 BOOT0"),
+    ("D3_NRST",       6,    31,   "GP26", "Alvik: STM32 NRST"),
+    ("D4_NANO_CHK",   7,    32,   "GP27", "Alvik: NANO_CHK (EXT_CHK)"),
     ("A4_SDA",        23,   9,    "GP6",  "Alvik: I2C SDA (Qwiic/Grove) | Pico I2C1 SDA"),
     ("A5_SCL",        24,   10,   "GP7",  "Alvik: I2C SCL (Qwiic/Grove) | Pico I2C1 SCL"),
     ("A6_ROBOT_CHK",  25,   11,   "GP8",  "Alvik: ROBOT_CHK input"),
     # --- spare Nano pins, not used by the Alvik (bonus, aligned) ---
-    ("D5",            8,    31,   "GP26", "Pico ADC0"),
-    ("D6",            9,    32,   "GP27", "Pico ADC1"),
-    ("D7",            10,   34,   "GP28", "Pico ADC2"),
+    ("D5",            8,    34,   "GP28", "Pico ADC2"),
     ("D13",           16,   2,    "GP1",  ""),
     ("A0",            19,   4,    "GP2",  ""),
     ("A1",            20,   5,    "GP3",  ""),
