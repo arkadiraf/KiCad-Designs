@@ -138,6 +138,12 @@ FC = dict(
         ("U3", LIB, "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
         ("C2", "Capacitor_SMD", "C_0402_1005Metric", "100n", (-6.0, 2.1), 0),
     ],
+    # J9 SWD, NOT POPULATED: JST-SH 3 (Raspberry Pi 3-pin debug connector style: SWCLK, GND,
+    # SWDIO) on the FC bottom at the rear edge, wired from the Pico's SWD pads. Its opening faces
+    # the rear edge, so the cable (to the Pi's GPIO for OpenOCD, or a Debug Probe) leaves
+    # backwards under the FC, clear of the frame and the landing gear. [ref, footprint, value,
+    # (x, y) of the footprint origin, i.e. the mounting-pad line + 1.875]
+    swd=("J9", "JST_SH_SM03B-SRSS-TB_1x03-1MP_P1.00mm_Horizontal", "SWD (DNP): SWCLK, GND, SWDIO", (-24.8, 0.0)),
 )
 
 # Crazyflie 2.x deck connector pinout (docs/cf2_exp_pinout.png in the Bitcraze
@@ -186,20 +192,16 @@ B2B = dict(
 )
 B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of pins 1..10
 
-# Board-to-board pin budget (20 pins), decided 2026-11-26:
+# Board-to-board pin budget (20 pins), 2026-11-26:
 #  - the Pi Zero 2 W is the Pico's USB host (programming with picotool, serial link, boot /
-#    shutdown handshake), so USB D+/D- replace the Pi UART;
-#  - SWD crosses too, for recovery from the Pi (J9 on the frame, not fitted by default);
-#  - to fit, the motor switches' ON lines are paired: ON_A = front pair, ON_B = rear pair
-#    (design doc: one GPIO may drive all four; turn-on stays staggered pair by pair with each
-#    channel's CT soft-start; the four PG lines still name a faulted ESC);
-#  - no PI_STATUS line (dropped 2026-11-26): the boot / shutdown handshake runs over USB
-#    (enumeration = Pi up; shutdown command, then the USB link stopping = safe to cut, plus a
-#    grace period and timeout); the freed pin is a third GND.
+#    shutdown handshake over USB; no PI_STATUS line), so USB D+/D- cross to the frame (J7);
+#  - SWD does NOT cross: it goes to J9 on the FC itself (to the Pi's GPIO or a debugger);
+#  - so the four motor-switch ON lines stay separate (staggered turn-on, a faulted ESC can
+#    be switched off alone), and three GND.
 B2B_SIGNALS = ["VSYS", "GND", "GND", "GND",
-               "ON_A", "ON_B", "PG1", "PG2", "PG3", "PG4",
+               "ON1", "ON2", "ON3", "ON4", "PG1", "PG2", "PG3", "PG4",
                "DSHOT1", "DSHOT2", "DSHOT3", "DSHOT4",
-               "BOOST_EN", "CHG_PG", "USB_DP", "USB_DM", "SWCLK", "SWDIO"]
+               "BOOST_EN", "CHG_PG", "USB_DP", "USB_DM"]
 assert len(B2B_SIGNALS) == 2 * B2B["pins"]
 
 # Frame-top connectors to the Pi Zero 2 W (design doc: 5.1 V separately, UART + status on
@@ -211,8 +213,4 @@ FRAME_CONN = [
     # confused with the 3-pin SWD connector J9.
     ("J7", "Connector_JST", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
      "Pi USB: GND, D-, D+, GND", (5.0, 18.3), 180),
-    # J9 SWD, NOT POPULATED: Raspberry Pi 3-pin debug connector style (SWCLK, GND, SWDIO), for
-    # recovery from the Pi's GPIO (OpenOCD) or a Raspberry Pi Debug Probe.
-    ("J9", "Connector_JST", "JST_SH_SM03B-SRSS-TB_1x03-1MP_P1.00mm_Horizontal",
-     "SWD (DNP): SWCLK, GND, SWDIO", (12.5, 18.3), 180),
 ]

@@ -100,11 +100,9 @@ run into the FC standoffs at y = ±17.5. The frame's old 30.5 mm FC holes are go
 * **Mated:** 2.0 + 2.1 = 4.1 mm + 0.9 mm air on the 5 mm standoff. The pins enter the sockets about
   1.9 mm, and nothing passes through the frame.
 * **Pin budget (`B2B_SIGNALS` in `design.py`), 20 pins:** 16 signals + VSYS + 3 × GND.
-  * ON_A, ON_B (the motor switches' ON lines in pairs, front and rear), PG1–4, DSHOT1–4, BOOST_EN,
-    CHG_PG, USB_DP, USB_DM, SWCLK, SWDIO. No PI_STATUS: the Pi handshake runs over USB.
-  * Pairing the ON lines frees the pins for USB and SWD; the design doc allows one GPIO for all four.
-    Turn-on stays staggered pair by pair with each channel's CT soft-start, and the four PG lines still
-    name a faulted ESC.
+  * ON1–4, PG1–4, DSHOT1–4, BOOST_EN, CHG_PG, USB_DP, USB_DM.
+  * No PI_STATUS: the Pi handshake runs over USB.
+  * No SWD: it stays on the FC (J9).
   * Pins are assigned in stage 2.
 
 **Connectors to the Pi Zero 2 W, on the frame top:**
@@ -119,8 +117,6 @@ run into the FC standoffs at y = ±17.5. The frame's old 30.5 mm FC holes are go
     * shutdown = a command over USB serial, then the USB link stopping (the Pi's USB stops at the
       end of shutdown, after the filesystems are read-only), plus a grace period and a timeout;
     * disable USB autosuspend on the Pi.
-* **J9, SWD (not fitted):** JST-SH 3 (SM03B-SRSS-TB), Raspberry Pi debug-connector style (SWCLK, GND,
-  SWDIO), at (12.5, 18.3). For recovery from the Pi's GPIO with OpenOCD, or a Raspberry Pi Debug Probe.
 * **J8, Pi 5.1 V:** JST-PH 2 (B2B-PH-K vertical) on the scad's two PH holes. The holes are 0.75 mm,
   JST's drill as in the KiCad footprint.
 
@@ -168,6 +164,7 @@ cross-checked from open designs and STEP models):
 | U2, C1 | bottom | BMI088 `Bosch_LGA-16_3x4.5mm_P0.5mm` + 100 nF | see above |
 | U3, C2 | bottom | BMP388 `Bosch_LGA-10_2x2mm_P0.5mm` + 100 nF | see above |
 | J1, J2 | top | 1×10 2.00 mm male headers to the frame (Bitcraze short pins, see above) | |
+| J9 | bottom | SWD, JST-SH 3, not fitted (see below) | |
 | H1–H4 | ears | M2, on the shared cover holes | same holes as frame H_CV1–4 (`check_mating.py`) |
 
 * **Flow deck v2 (verified):** Bitcraze datasheet and mechanical drawing (bitcraze/hardware).
@@ -196,7 +193,10 @@ cross-checked from open designs and STEP models):
   1.2 mm under the frame, with the rear landing-gear beam behind it.
   * The Pico footprint carries its underside **TP1 / TP2 / TP3** (GND, USB DM, USB DP; datasheet
     §2.1) and **SWD** pads (SWCLK, GND, SWDIO; §3.9) as solder pads.
-  * USB and SWD cross J1/J2 to the frame: J7 (Pi USB) and J9 (SWD).
+  * USB crosses J1/J2 to the frame (J7, Pi USB).
+  * SWD goes to **J9 on the FC**: JST-SH 3 (SM03B-SRSS-TB), Raspberry Pi debug-connector style
+    (SWCLK, GND, SWDIO), not fitted, on the rear bottom edge with its opening facing the edge. Its
+    cable leaves backwards under the FC to the Pi's GPIO (OpenOCD) or a Raspberry Pi Debug Probe.
   * BOOTSEL is only for the first flash: do it on the bench through the micro-USB, before the FC
     goes in.
   * **Check** which underside pad is which (Fig. 5's order is assumed) before routing. These pads

@@ -555,6 +555,28 @@ def build_fc():
         fp.Reference().SetLayer(pcbnew.F_Fab)      # no room for it on the trimmed outline
     text(board, f"FC hangs on the 4 cover screws on {B2B['standoff']:g} mm M2 standoffs; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
 
+    # --- J9 SWD (DNP) on the BOTTOM at the rear edge, opening towards the edge (-x) ---
+    ref, fpn, val, (x, y) = FC["swd"]
+    fp = load_fp("Connector_JST", fpn)
+    fp.SetReference(ref)
+    fp.SetValue(val)
+    fp.SetAttributes(fp.GetAttributes() | pcbnew.FP_EXCLUDE_FROM_BOM)
+    board.Add(fp)
+    fp.Flip(fp.GetPosition(), True)
+    for rot in (0, 90, 180, 270):
+        fp.SetOrientationDegrees(rot)
+        fp.SetPosition(VS(x, y))
+        sig = [p.GetPosition() for p in fp.Pads() if p.GetNumber() != "MP"]
+        mp = [p.GetPosition() for p in fp.Pads() if p.GetNumber() == "MP"]
+        mx = sum(v.x for v in mp) / len(mp)
+        sx = sum(v.x for v in sig) / len(sig)
+        if mx < sx and abs(mp[0].x - mp[1].x) < mm(0.01):     # mounting pads (the opening) nearer the rear edge
+            break
+    else:
+        raise AssertionError("J9: no orientation puts its opening at the rear edge")
+    fp.Reference().SetLayer(pcbnew.B_Fab)
+    fp.Value().SetVisible(False)
+
     # --- guides ---
     poly(board, rect_s(dcx, dcy, *FC["deck_board"]), bot, 0.15)
     text(board, "Flow deck v2 (below, on P1/P2)", VS(dcx, dcy + 5), bot, 0.8)
