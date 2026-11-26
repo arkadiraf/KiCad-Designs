@@ -586,8 +586,9 @@ def build_fc():
     seg(board, VS(-6, -13), VS(6, -13), top, 0.3)
     seg(board, VS(6, -13), VS(4, -11.5), top, 0.3)
     seg(board, VS(6, -13), VS(4, -14.5), top, 0.3)
-    text(board, f"FC r{REVISION}   FRONT >", VS(0, 13.0), pcbnew.F_SilkS, 0.7, 0.15)   # strip between Pico and J1
-    text(board, f"1S Pico2W FC r{REVISION} bottom", VS(-18.5, -5.5), pcbnew.B_SilkS, 0.7, 0.12, rot=90)
+    text(board, FC["silk_name"], VS(0, 13.0), pcbnew.F_SilkS, 0.8, 0.15)   # strip between the Pico and J1
+    text(board, FC["silk_name"], VS(-18.5, 0), pcbnew.B_SilkS, 0.8, 0.15, rot=90)
+    text(board, "< FRONT", VS(17.5, -10.0), pcbnew.B_SilkS, 0.8, 0.15)    # reads from below: front is to the left
     return finish(board, pcb, name)
 
 

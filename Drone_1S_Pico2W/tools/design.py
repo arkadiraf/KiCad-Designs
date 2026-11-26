@@ -109,6 +109,7 @@ CRAD = SCAD["crad_hole"]
 FC = dict(
     project="Drone_1S_FC",
     title="1S Pico 2 W drone - flight controller module",
+    silk_name="Pico 2W Flight Controller V01",
     thickness=1.6,
     holes=[(sx * CRAD[0], sy * CRAD[1]) for sx, sy in ((1, 1), (1, -1), (-1, -1), (-1, 1))],
     hole_d=SCAD["crad_hole_d"],  # 2.2 mm, M2
