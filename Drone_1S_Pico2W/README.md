@@ -99,21 +99,26 @@ run into the FC standoffs at y = ±17.5. The frame's old 30.5 mm FC holes are go
 
 * **Mated:** 2.0 + 2.1 = 4.1 mm + 0.9 mm air on the 5 mm standoff. The pins enter the sockets about
   1.9 mm, and nothing passes through the frame.
-* **Pin budget (`B2B_SIGNALS` in `design.py`), 20 pins:** 17 signals + VSYS + 2 × GND.
+* **Pin budget (`B2B_SIGNALS` in `design.py`), 20 pins:** 16 signals + VSYS + 3 × GND.
   * ON_A, ON_B (the motor switches' ON lines in pairs, front and rear), PG1–4, DSHOT1–4, BOOST_EN,
-    CHG_PG, USB_DP, USB_DM, SWCLK, SWDIO, PI_STATUS.
+    CHG_PG, USB_DP, USB_DM, SWCLK, SWDIO. No PI_STATUS: the Pi handshake runs over USB.
   * Pairing the ON lines frees the pins for USB and SWD; the design doc allows one GPIO for all four.
     Turn-on stays staggered pair by pair with each channel's CT soft-start, and the four PG lines still
     name a faulted ESC.
   * Pins are assigned in stage 2.
 
 **Connectors to the Pi Zero 2 W, on the frame top:**
-* **J7, Pi USB:** JST-SH 4 (SM04B-SRSS-TB), at (5, 18.3). Carries GND, USB D−, USB D+, PI_STATUS.
+* **J7, Pi USB:** JST-SH 4 (SM04B-SRSS-TB), at (5, 18.3). Carries GND, USB D−, USB D+, GND. Four pins so
+  it can't be confused with the 3-pin SWD connector.
   * The Pi is the Pico's USB host (`dtoverlay=dwc2,dr_mode=host`). It flashes the Pico with
     `picotool reboot -f -u` then `picotool load -x`, talks to it over USB serial, and runs the
     boot / shutdown handshake.
   * No VBUS: the Pico runs from VSYS, and VBUS would back-feed VSYS through the Pico's Schottky.
-  * PI_STATUS (gpio-poweroff) is the definitive "safe to cut"; the USB link stopping backs it up.
+  * **Handshake, over USB only:**
+    * enumeration = Pi up;
+    * shutdown = a command over USB serial, then the USB link stopping (the Pi's USB stops at the
+      end of shutdown, after the filesystems are read-only), plus a grace period and a timeout;
+    * disable USB autosuspend on the Pi.
 * **J9, SWD (not fitted):** JST-SH 3 (SM03B-SRSS-TB), Raspberry Pi debug-connector style (SWCLK, GND,
   SWDIO), at (12.5, 18.3). For recovery from the Pi's GPIO with OpenOCD, or a Raspberry Pi Debug Probe.
 * **J8, Pi 5.1 V:** JST-PH 2 (B2B-PH-K vertical) on the scad's two PH holes. The holes are 0.75 mm,

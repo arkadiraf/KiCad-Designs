@@ -193,11 +193,13 @@ B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of p
 #  - to fit, the motor switches' ON lines are paired: ON_A = front pair, ON_B = rear pair
 #    (design doc: one GPIO may drive all four; turn-on stays staggered pair by pair with each
 #    channel's CT soft-start; the four PG lines still name a faulted ESC);
-#  - PI_STATUS kept (gpio-poweroff "safe to cut"), two GND.
-B2B_SIGNALS = ["VSYS", "GND", "GND",
+#  - no PI_STATUS line (dropped 2026-11-26): the boot / shutdown handshake runs over USB
+#    (enumeration = Pi up; shutdown command, then the USB link stopping = safe to cut, plus a
+#    grace period and timeout); the freed pin is a third GND.
+B2B_SIGNALS = ["VSYS", "GND", "GND", "GND",
                "ON_A", "ON_B", "PG1", "PG2", "PG3", "PG4",
                "DSHOT1", "DSHOT2", "DSHOT3", "DSHOT4",
-               "BOOST_EN", "CHG_PG", "USB_DP", "USB_DM", "SWCLK", "SWDIO", "PI_STATUS"]
+               "BOOST_EN", "CHG_PG", "USB_DP", "USB_DM", "SWCLK", "SWDIO"]
 assert len(B2B_SIGNALS) == 2 * B2B["pins"]
 
 # Frame-top connectors to the Pi Zero 2 W (design doc: 5.1 V separately, UART + status on
@@ -205,9 +207,10 @@ assert len(B2B_SIGNALS) == 2 * B2B["pins"]
 FRAME_CONN = [
     # J7 Pi USB: the Pi Zero 2 W is the USB host for the Pico (programming with picotool,
     # USB serial link, boot/shutdown handshake). No VBUS: the Pico runs from VSYS, and VBUS
-    # would back-feed VSYS through the Pico's Schottky. PI_STATUS optional (gpio-poweroff).
+    # would back-feed VSYS through the Pico's Schottky. 4 pins (GND, D-, D+, GND) so it cannot be
+    # confused with the 3-pin SWD connector J9.
     ("J7", "Connector_JST", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
-     "Pi USB: GND, D-, D+, PI_STATUS (opt.)", (5.0, 18.3), 180),
+     "Pi USB: GND, D-, D+, GND", (5.0, 18.3), 180),
     # J9 SWD, NOT POPULATED: Raspberry Pi 3-pin debug connector style (SWCLK, GND, SWDIO), for
     # recovery from the Pi's GPIO (OpenOCD) or a Raspberry Pi Debug Probe.
     ("J9", "Connector_JST", "JST_SH_SM03B-SRSS-TB_1x03-1MP_P1.00mm_Horizontal",
