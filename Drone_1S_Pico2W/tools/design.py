@@ -91,23 +91,40 @@ TAB_PAD_SIZE = (SCAD["tab_pad"], 10.0)   # battery tab pads, from pcb() in the s
 TAB_PAD_X = SCAD["bat_len"] / 2 + SCAD["tab_pad"] / 2 - 0.5
 
 # ---------------------------------------------------------------------------
-# FC module board (replaces the Bolt; same 30.5 mm M2.5 pattern as the frame)
+# FC module board - a new design (not the Bolt). The frame will be rewired to
+# suit it; the 30.5 mm M2.5 pattern is kept only until the frame is redone.
+#   TOP side    (faces the frame): Pico 2 W, castellated SMD, nothing else.
+#   BOTTOM side (faces the ground): sensor / support ICs and the Crazyflie deck
+#               connectors, so the Flow deck v2 plugs in from below exactly as
+#               it does under a Crazyflie.
 # ---------------------------------------------------------------------------
-# Size: 56 x 35.4. The width matches the Bolt (35.4) and fits the landing-gear
-# opening (scad: gear inner ~69 x 37 mm). The length takes the 51 mm Pico 2 W
-# along x with its micro-USB at the rear edge (programming access), and the
-# antenna end towards the front over a 14 x 9 mm notch (the Pico W datasheet
-# says no material near the antenna; Pico 2 W has the same 51 x 21 mm layout,
-# same notch as Pico_Alvik_Adapter).
+LIB = "Drone_1S"            # project footprint library (../Drone_1S.pretty, gen_libs.py)
+
 FC = dict(
     project="Drone_1S_FC",
     title="1S Pico 2 W drone - flight controller module",
     thickness=1.6,
-    size=(56.0, 35.4),
+    size=(56.0, 35.4),          # 35.4 = old Bolt width (fits the printed landing gear)
     corner_r=2.0,
     holes=SCAD["fc_holes"], hole_d=SCAD["fc_hole_d"],
     pico_size=(51.0, 21.0),
-    pico_c=(-2.5, 0.0),            # Pico spans x -28 .. 23; USB end at x = -28
-    notch=(14.0, 9.0),             # (across y, depth along x) at the antenna end
-    deck_rows=17.0,                # Crazyflie deck connectors (1x10, 17 mm apart), for the Flow deck v2
+    pico_c=(-2.5, 0.0),          # Pico spans x -28 .. 23; micro-USB at the rear edge (x = -28)
+    notch=(14.0, 9.0),           # Pico 2 W datasheet 2.2.1: 14 x 9 mm antenna cut-out
+    # Crazyflie deck interface (Bitcraze deck template c8f9a2e): two 1x10 rows,
+    # 2.00 mm pitch, 22.0 mm apart, pin 1 of both rows at the FRONT. Deck board
+    # 25.2 x 27.3 mm centred on the connector pair. Centred on the FC = frame centre.
+    deck_c=(0.0, 0.0),
+    deck_rows=22.0,
+    deck_board=(25.2, 27.3),     # x (along the rows) by y
 )
+
+# Crazyflie 2.x deck connector pinout (docs/cf2_exp_pinout.png in the Bitcraze
+# template). Viewed from the top of the drone, front up: LEFT row (scad +y) and
+# RIGHT row (scad -y), pin 1 at the front.
+DECK_LEFT = ["VCC_3V", "UART1_RX", "UART1_TX", "I2C_SDA", "I2C_SCL",
+             "IO_1", "IO_2", "IO_3", "IO_4", "GND"]
+DECK_RIGHT = ["UART2_RX", "UART2_TX", "SPI_SCK", "SPI_MISO", "SPI_MOSI",
+              "NRF_IO_1", "NRF_WKUP", "NRF_OW", "VCOM", "VUSB"]
+# Flow deck v2 use (to verify against the Flow deck v2 schematic before stage 2):
+# SPI + a chip select on an IO pin for the PMW3901, I2C for the VL53L1x, and its
+# supply from VCOM / VCC_3V.

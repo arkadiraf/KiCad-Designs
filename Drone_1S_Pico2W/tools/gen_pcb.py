@@ -18,7 +18,8 @@ import sys
 import pcbnew
 
 import dxf_import
-from design import (FC, FRAME, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
+from gen_libs import PICO_TP, PICO_SWD
+from design import (FC, FRAME, LIB, DECK_LEFT, DECK_RIGHT, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
                     REVISION, DATE, to_kicad, uid, ORIGIN_X, ORIGIN_Y)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -147,6 +148,32 @@ def load_fp(lib, name):
         raise RuntimeError(f"footprint {lib}:{name} not found")
     fp.SetFPID(pcbnew.LIB_ID(lib, name))
     return fp
+
+
+def load_prj_fp(name):
+    fp = pcbnew.FootprintLoad(os.path.join(ROOT, f"{LIB}.pretty"), name)
+    if fp is None:
+        raise RuntimeError(f"footprint {LIB}:{name} not found - run gen_libs.py")
+    fp.SetFPID(pcbnew.LIB_ID(LIB, name))
+    return fp
+
+
+def rule_area(board, pts, layer, name):
+    """Keep-out: no tracks, vias, pads or pours on `layer`."""
+    z = pcbnew.ZONE(board)
+    z.SetIsRuleArea(True)
+    z.SetLayer(layer)
+    z.SetDoNotAllowTracks(True)
+    z.SetDoNotAllowVias(True)
+    z.SetDoNotAllowPads(True)
+    z.SetDoNotAllowCopperPour(True)
+    z.SetDoNotAllowFootprints(False)
+    z.SetZoneName(name)
+    o = z.Outline()
+    o.NewOutline()
+    for p in pts:
+        o.Append(p.x, p.y)
+    board.Add(z)
 
 
 def new_fp(board, ref, value, pos, name):
@@ -386,24 +413,63 @@ def build_fc():
         fp.SetReference(f"H{n}")
         fp.SetValue("M2.5 to frame")
         fp.SetPosition(VS(sx * FC["holes"] / 2, sy * FC["holes"] / 2))
+        fp.Reference().SetLayer(pcbnew.F_Fab)     # silk would hang off the board edge
         board.Add(fp)
 
     top, bot = pcbnew.Dwgs_User, pcbnew.Cmts_User
     pcx, pcy = FC["pico_c"]
-    pl, pw = FC["pico_size"]
-    poly(board, rect_s(pcx, pcy, pl, pw), top, 0.15)
-    text(board, "Pico 2 W 51 x 21 (placement guide)", VS(pcx - 4, 0), top, 1.0)
-    text(board, "USB", VS(x0 + 3, 0), top, 1.0, rot=90)
-    text(board, "antenna keep-out (notch)", VS(nx - 3, 0), top, 0.8, rot=90)
-    for sy in (-1, 1):
-        y = sy * FC["deck_rows"] / 2
-        poly(board, rect_s(0, y, 25.4, 2.54), bot, 0.1)
-    text(board, "Crazyflie deck rows 2 x 1x10, 17 mm (Flow deck v2, bottom)", VS(0, -W_ / 2 + 1.8), bot, 0.8)
+
+    # --- U1 Pico 2 W on TOP, micro-USB to the rear (-x), antenna over the notch ---
+    u1 = load_prj_fp("RPi_Pico_2_W_SMD_Castellated")
+    u1.SetReference("U1")
+    u1.SetValue("RPi_Pico_2_W")
+    u1.SetPosition(VS(pcx, pcy))
+    u1.SetOrientationDegrees(90)      # footprint USB (-Y) -> board -X (rear)
+    board.Add(u1)
+    usb = [p for p in u1.Pads() if p.GetNumber() == ""]
+    assert all(p.GetPosition().x < VS(pcx - 20, 0).x for p in usb), "USB must face the rear edge"
+    pad = {p.GetNumber(): p for p in u1.Pads()}
+    # pin 1 at the USB end; with USB to the rear the pin 1..20 row is on the right (-y)
+    assert pad["1"].GetPosition().x < VS(pcx - 20, 0).x and pad["1"].GetPosition().y > VS(0, 0).y
+    # keep top copper away from the module's underside test points / SWD pads
+    # (datasheet: OK to void copper under unused test points)
+    ang = math.radians(90)
+    def mod2scad(fx, fy):       # footprint coords (KiCad, y down) -> scad, after the 90 deg rotation
+        kx = fx * math.cos(ang) + fy * math.sin(ang)
+        ky = -fx * math.sin(ang) + fy * math.cos(ang)
+        return pcx + kx, pcy - ky
+    for i, (fx, fy) in enumerate(PICO_TP + PICO_SWD):
+        x, y = mod2scad(fx, fy)
+        rule_area(board, rect_s(x, y, 2.4, 2.4), pcbnew.F_Cu, f"KEEPOUT_PICO_{'TP%d' % (i + 1) if i < 3 else 'SWD%d' % (i - 2)}")
+
+    # --- P1 / P2 Crazyflie deck rows on the BOTTOM: pin 1 at the front (+x) ---
+    dcx, dcy = FC["deck_c"]
+    for ref, sy, names in (("P1", 1, DECK_LEFT), ("P2", -1, DECK_RIGHT)):
+        fp = load_prj_fp("CF_Deck_1x10_P2.00mm_SMD")
+        fp.SetReference(ref)
+        fp.SetValue("CF deck " + ("left" if sy > 0 else "right"))
+        fp.SetPosition(VS(dcx, dcy + sy * FC["deck_rows"] / 2))
+        board.Add(fp)
+        fp.Flip(fp.GetPosition(), True)       # to B.Cu: mirrors x (pin 1 -> +x, the front)
+        for p in fp.Pads():
+            k = int(p.GetNumber())
+            want = VS(dcx + 9 - 2 * (k - 1), 0).x
+            assert abs(p.GetPosition().x - want) < mm(0.01), (ref, k, pcbnew.ToMM(p.GetPosition().x))
+            assert p.IsOnLayer(pcbnew.B_Cu)
+        fp.Value().SetVisible(False)
+
+    # --- guides ---
+    poly(board, rect_s(dcx, dcy, *FC["deck_board"]), bot, 0.15)
+    text(board, "Flow deck v2 (below, on P1/P2)", VS(dcx, dcy + 5), bot, 0.8)
+    poly(board, rect_s(dcx, dcy, 14, 14), bot, 0.1)
+    text(board, "BMI088 here (bottom, centre = CG)", VS(dcx, dcy - 1), bot, 0.7)
+    text(board, "bottom: ICs + deck", VS(-19, 0), bot, 0.8, rot=90)
     seg(board, VS(-6, -13), VS(6, -13), top, 0.3)
     seg(board, VS(6, -13), VS(4, -11.5), top, 0.3)
     seg(board, VS(6, -13), VS(4, -14.5), top, 0.3)
-    text(board, f"1S Pico2W FC r{REVISION}", VS(-4, 12.8), pcbnew.F_SilkS, 1.0, 0.15)
-    text(board, "FRONT >", VS(-4, -12.8), pcbnew.F_SilkS, 1.0, 0.15)
+    text(board, f"1S Pico2W FC r{REVISION}", VS(-4, 13.6), pcbnew.F_SilkS, 1.0, 0.15)
+    text(board, "FRONT >", VS(-4, -13.6), pcbnew.F_SilkS, 1.0, 0.15)
+    text(board, f"1S Pico2W FC r{REVISION} bottom", VS(-24.5, 0), pcbnew.B_SilkS, 0.8, 0.12, rot=90)
     return finish(board, pcb, name)
 
 
