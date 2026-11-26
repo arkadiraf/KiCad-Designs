@@ -17,6 +17,10 @@ Designed in KiCad (files saved in KiCad 7 format; they open in KiCad 7, 8 and 9)
 
 ![Board render](fabrication/docs/Pico_Alvik_Adapter_render.png)
 
+![Angled render](fabrication/docs/Pico_Alvik_Adapter_render_angled.png)
+
+Individual renders are in `fabrication/docs/render_*.png`.
+
 | | |
 |---|---|
 | Board size | 24.0 x 51.0 mm, 2 layers, 1.6 mm FR4 |
@@ -149,7 +153,7 @@ python3 check_netlist.py ../build/net.net     # schematic == design.py ?
 python3 router.py                   # 2-layer A* grid router -> build/routes.json
 /usr/bin/python3 gen_pcb.py finish  # import routes, GND pours, zone fill, DRC report
 bash export_fab.sh                  # gerbers, drill, BOM, PDFs
-python3 render_board.py             # fabrication/docs/Pico_Alvik_Adapter_render.png
+python3 render_board.py             # renders in fabrication/docs/ (flat + angled)
 ```
 
 Status of the checked-in board: all nets routed, **KiCad DRC: 0 violations, 0 unconnected

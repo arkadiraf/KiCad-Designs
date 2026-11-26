@@ -12,7 +12,7 @@ import tempfile
 
 import cairosvg
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 from scipy import ndimage
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -140,6 +140,27 @@ def draw_pico(im):
     return Image.alpha_composite(im.convert("RGBA"), ov).convert("RGB")
 
 
+def draw_headers(im):
+    """Two 1x15 SMD male headers (bottom side; rows are symmetric so mirroring is moot)."""
+    ov = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    sh = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    ds = ImageDraw.Draw(sh)
+    d = ImageDraw.Draw(ov)
+    y0, y1 = 104.14 - 1.27, 139.70 + 1.27
+    for x in (104.38, 119.62):
+        ds.rectangle([mm(x - 1.27 + 0.4, y0 + 0.5), mm(x + 1.27 + 0.4, y1 + 0.5)], fill=(0, 0, 0, 130))
+    sh = sh.filter(ImageFilter.GaussianBlur(PX * 0.4))
+    for x in (104.38, 119.62):
+        d.rectangle([mm(x - 1.27, y0), mm(x + 1.27, y1)], fill=(28, 28, 30, 255))
+        for k in range(15):
+            y = 104.14 + 2.54 * k
+            d.line([mm(x - 1.27, y + 1.27), mm(x + 1.27, y + 1.27)], fill=(55, 55, 58, 255), width=2)
+            d.rectangle([mm(x - 0.42, y - 0.42), mm(x + 0.42, y + 0.42)], fill=(225, 190, 95, 255))
+            d.rectangle([mm(x - 0.42, y - 0.42), mm(x + 0.42, y - 0.2)], fill=(250, 225, 140, 255))
+    out = Image.alpha_composite(im.convert("RGBA"), sh)
+    return Image.alpha_composite(out, ov).convert("RGB")
+
+
 def label(im, text):
     pad = 70
     out = Image.new("RGB", (im.width, im.height + pad), BG)
@@ -154,6 +175,49 @@ def label(im, text):
     return out
 
 
+def find_coeffs(dst, src):
+    """Perspective coefficients mapping output (dst) points to input (src) points."""
+    A, B = [], []
+    for (x, y), (u, v) in zip(dst, src):
+        A.append([x, y, 1, 0, 0, 0, -u * x, -u * y]); B.append(u)
+        A.append([0, 0, 0, x, y, 1, -v * x, -v * y]); B.append(v)
+    return np.linalg.solve(np.array(A, float), np.array(B, float)).tolist()
+
+
+def angled(im, board, thick_px=26, tilt=0.30, skew=0.18):
+    """Pseudo-3D view: tilt the board back, add PCB edge thickness and a shadow."""
+    w, h = im.size
+    rgba = im.convert("RGBA")
+    alpha = Image.fromarray((board * 255).astype(np.uint8))
+    if alpha.size != im.size:
+        alpha = alpha.resize(im.size)
+    rgba.putalpha(alpha)
+    # output quad (top edge narrower -> perspective)
+    W, H = int(w * 1.5), int(h * 0.95)
+    ox, oy = int(W * 0.18), int(H * 0.08)
+    top_w = w * (1 - skew)
+    dst = [(ox + (w - top_w) / 2 + w * 0.10, oy), (ox + (w + top_w) / 2 + w * 0.10, oy),
+           (ox + w, oy + h * (1 - tilt)), (ox, oy + h * (1 - tilt))]
+    src = [(0, 0), (w, 0), (w, h), (0, h)]
+    co = find_coeffs(dst, src)
+    face = rgba.transform((W, H), Image.PERSPECTIVE, co, Image.BICUBIC)
+    a = np.asarray(face)[:, :, 3] > 40
+    canvas = Image.new("RGBA", (W, H), BG + (255,))
+    sh = Image.fromarray((a * 150).astype(np.uint8)).filter(ImageFilter.GaussianBlur(18))
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    shadow.putalpha(ImageChops.offset(sh, 30, 45))
+    canvas = Image.alpha_composite(canvas, shadow)
+    edge = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ea = Image.fromarray((a * 255).astype(np.uint8))
+    for k in range(thick_px, 0, -1):
+        layer_c = Image.new("RGBA", (W, H), (178, 160, 110, 255) if k > 3 else (14, 70, 36, 255))
+        layer_c.putalpha(ImageChops.offset(ea, 0, k))
+        edge = Image.alpha_composite(edge, layer_c)
+    canvas = Image.alpha_composite(canvas, edge)
+    canvas = Image.alpha_composite(canvas, face)
+    return canvas.convert("RGB").crop(Image.fromarray((np.asarray(canvas.convert("L")) != BG[0]).astype(np.uint8) * 255).getbbox())
+
+
 def main():
     with tempfile.TemporaryDirectory() as tmp:
         L = {n: layer(n, tmp) for n in ("F.Cu", "B.Cu", "F.Mask", "B.Mask",
@@ -163,8 +227,9 @@ def main():
     top = compose("F", L)
     bottom = compose("B", L)
     fitted = draw_pico(top)
+    bottom_hdr = draw_headers(bottom)
     panels = [label(top, "Top (bare board)"), label(fitted, "Top with Pico W fitted"),
-              label(bottom, "Bottom (Nano headers side)")]
+              label(bottom, "Bottom (bare)"), label(bottom_hdr, "Bottom with Nano headers")]
     gap = 40
     W = sum(p.width for p in panels) + gap * (len(panels) + 1)
     H = max(p.height for p in panels) + gap * 2
@@ -175,6 +240,23 @@ def main():
         x += p.width + gap
     sheet.save(OUT)
     print(OUT, sheet.size)
+    d = os.path.dirname(OUT)
+    top.save(os.path.join(d, "render_top.png"))
+    bottom.save(os.path.join(d, "render_bottom.png"))
+    bottom_hdr.save(os.path.join(d, "render_bottom_with_headers.png"))
+    fitted.save(os.path.join(d, "render_top_with_pico.png"))
+    # angled views (pico: board outline incl. USB overhang via non-background pixels)
+    fit_mask = np.asarray(fitted.convert("RGB")).astype(int)
+    fit_mask = np.abs(fit_mask - np.array(BG)).sum(axis=2) > 10
+    a1 = angled(fitted, fit_mask)
+    a2 = angled(bottom_hdr, np.abs(np.asarray(bottom_hdr.convert("RGB")).astype(int) - np.array(BG)).sum(axis=2) > 10)
+    a1.save(os.path.join(d, "render_angled_top.png"))
+    a2.save(os.path.join(d, "render_angled_bottom.png"))
+    g = 40
+    pair = Image.new("RGB", (a1.width + a2.width + 3 * g, max(a1.height, a2.height) + 2 * g), BG)
+    pair.paste(a1, (g, g)); pair.paste(a2, (a1.width + 2 * g, g))
+    pair.save(os.path.join(d, "Pico_Alvik_Adapter_render_angled.png"))
+    print("angled renders written")
 
 
 if __name__ == "__main__":
