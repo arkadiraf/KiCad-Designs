@@ -423,10 +423,12 @@ def build_frame():
         fp.Value().SetVisible(False)
 
     # --- connectors to the Pi Zero 2 W on the frame top ---
-    for ref, lib, fpn, val, (x, y), rot in FRAME_CONN:          # J7 Pi UART (JST-SH 4)
+    for ref, lib, fpn, val, (x, y), rot in FRAME_CONN:          # J7 Pi USB, J9 SWD (DNP)
         fp = load_fp(lib, fpn)
         fp.SetReference(ref)
         fp.SetValue(val)
+        if "DNP" in val:
+            fp.SetAttributes(fp.GetAttributes() | pcbnew.FP_EXCLUDE_FROM_BOM | getattr(pcbnew, "FP_DNP", 0))
         fp.SetPosition(VS(x, y))
         fp.SetOrientationDegrees(rot)
         board.Add(fp)
@@ -515,16 +517,8 @@ def build_fc():
     pad = {p.GetNumber(): p for p in u1.Pads()}
     # pin 1 at the USB end; with USB to the rear the pin 1..20 row is on the right (-y)
     assert pad["1"].GetPosition().x < VS(pcx - 20, 0).x and pad["1"].GetPosition().y > VS(0, 0).y
-    # keep top copper away from the module's underside test points / SWD pads
-    # (datasheet: OK to void copper under unused test points)
-    ang = math.radians(90)
-    def mod2scad(fx, fy):       # footprint coords (KiCad, y down) -> scad, after the 90 deg rotation
-        kx = fx * math.cos(ang) + fy * math.sin(ang)
-        ky = -fx * math.sin(ang) + fy * math.cos(ang)
-        return pcx + kx, pcy - ky
-    for i, (fx, fy) in enumerate(PICO_SWD):        # TP1-3 are pads now (USB to J3); only SWD stays clear
-        x, y = mod2scad(fx, fy)
-        rule_area(board, rect_s(x, y, 2.4, 2.4), pcbnew.F_Cu, f"KEEPOUT_PICO_SWD{i + 1}")
+    # The module's underside TP1-3 (USB) and SWD pads are solder pads in its footprint now:
+    # USB and SWD go up through J1/J2 to the frame (J7 Pi USB, J9 SWD), no keep-outs needed.
 
     # --- P1 / P2 Crazyflie deck rows on the BOTTOM, pin 1 at the front (+x) ---
     # The Flow deck v2 carries the Bitcraze female deck connectors (SMD, 2.1 mm high) on its

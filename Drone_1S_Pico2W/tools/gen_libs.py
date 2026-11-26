@@ -67,7 +67,10 @@ PICO_TP = [(8 - 10.5, 25.5 - y) for y in (41.5, 39.0, 36.5)]           # 1.5 x 1
 # the micro-USB port". Taken here in Fig. 5's order from the USB end (41.5, 39, 36.5) - TO CHECK
 # against the Pico 2 W bottom silkscreen before routing.
 PICO_TP_NAMES = ["TP1", "TP2", "TP3"]
-PICO_SWD = [(x - 10.5, 25.5 - 19.8) for x in (11.0841, 13.6241, 16.1641)]  # 1.5748 mm
+PICO_SWD = [(x - 10.5, 25.5 - 19.8) for x in (11.0841, 13.6241, 16.1641)]  # 1.5748 mm (E square, F/G round)
+# The 3-pin SWD debug port as SMT pads (datasheet 3.9: SWCLK, GND, SWDIO). Order E, F, G = SWCLK,
+# GND, SWDIO assumed - TO CHECK against the Pico 2 W bottom silkscreen before routing.
+PICO_SWD_NAMES = ["SWCLK", "SWD_GND", "SWDIO"]
 
 
 def fp_pico():
@@ -85,6 +88,10 @@ def fp_pico():
     for name, (x, y) in zip(PICO_TP_NAMES, PICO_TP):
         pads.append(f'  (pad "{name}" smd roundrect (at {x:g} {y:g}) (size 1.5 1.5) '
                     f'(layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.2) (tstamp {uid(f"picotp{name}")}))')
+    # SWD pads E/F/G as solder pads, to bring SWD to the frame (J9) for recovery from the Pi
+    for name, (x, y), shape in zip(PICO_SWD_NAMES, PICO_SWD, ("rect", "circle", "circle")):
+        pads.append(f'  (pad "{name}" smd {shape} (at {x:g} {y:g}) (size 1.5748 1.5748) '
+                    f'(layers "F.Cu" "F.Paste" "F.Mask") (tstamp {uid(f"picoswd{name}")}))')
     # USB connector shell solder-relief pads A..D (no net, no paste), datasheet Fig. 5
     for n, (x, y, w, h) in enumerate([(-2.725, -24.0, 1.1, 1.8), (2.725, -24.0, 1.1, 1.8),
                                       (-2.425, -20.97, 1.05, 1.45), (2.425, -20.97, 1.05, 1.45)]):

@@ -137,10 +137,6 @@ FC = dict(
         ("C1", "Capacitor_SMD", "C_0402_1005Metric", "100n", (0.0, 2.6), 0),
         ("U3", LIB, "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
         ("C2", "Capacitor_SMD", "C_0402_1005Metric", "100n", (-6.0, 2.1), 0),
-        # J3: USB programming pads, NOT POPULATED. VBUS from Pico pin 40, D-/D+/GND from the
-        # Pico's TP2/TP3/TP1 (datasheet 2.1) through pads on the FC top. At the rear edge, so
-        # a soldered pigtail leaves backwards under the FC, clear of the frame and the gear.
-        ("J3", LIB, "USB_Prog_Pads_1x4_P2.54mm_SMD", "USB_PROG (DNP)", (-25.0, 0.0), 90),
     ],
 )
 
@@ -190,16 +186,30 @@ B2B = dict(
 )
 B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of pins 1..10
 
-# Board-to-board pin budget (20 pins): 17 signals + VSYS + 2 x GND. Assigned in stage 2.
+# Board-to-board pin budget (20 pins), decided 2026-11-26:
+#  - the Pi Zero 2 W is the Pico's USB host (programming with picotool, serial link, boot /
+#    shutdown handshake), so USB D+/D- replace the Pi UART;
+#  - SWD crosses too, for recovery from the Pi (J9 on the frame, not fitted by default);
+#  - to fit, the motor switches' ON lines are paired: ON_A = front pair, ON_B = rear pair
+#    (design doc: one GPIO may drive all four; turn-on stays staggered pair by pair with each
+#    channel's CT soft-start; the four PG lines still name a faulted ESC);
+#  - PI_STATUS kept (gpio-poweroff "safe to cut"), two GND.
 B2B_SIGNALS = ["VSYS", "GND", "GND",
-               "ON1", "ON2", "ON3", "ON4", "PG1", "PG2", "PG3", "PG4",
+               "ON_A", "ON_B", "PG1", "PG2", "PG3", "PG4",
                "DSHOT1", "DSHOT2", "DSHOT3", "DSHOT4",
-               "BOOST_EN", "CHG_PG", "PI_TX", "PI_RX", "PI_STATUS"]
+               "BOOST_EN", "CHG_PG", "USB_DP", "USB_DM", "SWCLK", "SWDIO", "PI_STATUS"]
 assert len(B2B_SIGNALS) == 2 * B2B["pins"]
 
 # Frame-top connectors to the Pi Zero 2 W (design doc: 5.1 V separately, UART + status on
 # a 4-pin JST-SH with 1 k series resistors). [ref, lib, footprint, value, (x, y), rotation]
 FRAME_CONN = [
+    # J7 Pi USB: the Pi Zero 2 W is the USB host for the Pico (programming with picotool,
+    # USB serial link, boot/shutdown handshake). No VBUS: the Pico runs from VSYS, and VBUS
+    # would back-feed VSYS through the Pico's Schottky. PI_STATUS optional (gpio-poweroff).
     ("J7", "Connector_JST", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
-     "Pi UART: GND, TX, RX, PI_STATUS", (5.0, 18.3), 180),
+     "Pi USB: GND, D-, D+, PI_STATUS (opt.)", (5.0, 18.3), 180),
+    # J9 SWD, NOT POPULATED: Raspberry Pi 3-pin debug connector style (SWCLK, GND, SWDIO), for
+    # recovery from the Pi's GPIO (OpenOCD) or a Raspberry Pi Debug Probe.
+    ("J9", "Connector_JST", "JST_SH_SM03B-SRSS-TB_1x03-1MP_P1.00mm_Horizontal",
+     "SWD (DNP): SWCLK, GND, SWDIO", (12.5, 18.3), 180),
 ]
