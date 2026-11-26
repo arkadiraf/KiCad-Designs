@@ -18,8 +18,9 @@ import sys
 import pcbnew
 
 import dxf_import
-from gen_libs import PICO_TP, PICO_SWD
-from design import (FC, FRAME, LIB, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, FRAME_CONN, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
+from gen_libs import gen_lib                      # shared library generator (Libraries/tools)
+PICO_TP, PICO_SWD = gen_lib.PICO_TP, gen_lib.PICO_SWD
+from design import (FC, FRAME, SHARED_LIBS, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, FRAME_CONN, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
                     REVISION, DATE, to_kicad, uid, ORIGIN_X, ORIGIN_Y)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -143,18 +144,12 @@ def text(board, txt, p, layer, size=1.0, thick=0.15, rot=0):
 
 
 def load_fp(lib, name):
-    fp = pcbnew.FootprintLoad(os.path.join(KFP, f"{lib}.pretty"), name)
+    """Stock KiCad library, or a shared KD_* library (KiCad-Designs/Libraries)."""
+    base = os.path.join(ROOT, SHARED_LIBS) if lib.startswith("KD_") else KFP
+    fp = pcbnew.FootprintLoad(os.path.join(base, f"{lib}.pretty"), name)
     if fp is None:
-        raise RuntimeError(f"footprint {lib}:{name} not found")
+        raise RuntimeError(f"footprint {lib}:{name} not found" + (" - run Libraries/tools/gen_lib.py" if lib.startswith("KD_") else ""))
     fp.SetFPID(pcbnew.LIB_ID(lib, name))
-    return fp
-
-
-def load_prj_fp(name):
-    fp = pcbnew.FootprintLoad(os.path.join(ROOT, f"{LIB}.pretty"), name)
-    if fp is None:
-        raise RuntimeError(f"footprint {LIB}:{name} not found - run gen_libs.py")
-    fp.SetFPID(pcbnew.LIB_ID(LIB, name))
     return fp
 
 
@@ -182,7 +177,7 @@ def place_b2b(board, lib, name, ref, value, row_sign, bottom, row_y=None):
     orientations and keeps the one that matches (asserted)."""
     y = row_sign * (B2B["row_y"] if row_y is None else row_y)
     want = {str(k + 1): VS(B2B_PIN_X[k], y) for k in range(B2B["pins"])}
-    fp = load_prj_fp(name) if lib == LIB else load_fp(lib, name)
+    fp = load_fp(lib, name)
     fp.SetReference(ref)
     fp.SetValue(value)
     board.Add(fp)                       # KiCad 7: Flip() needs the parent board
@@ -246,7 +241,7 @@ def fc_outline_pts():
 
 def new_fp(board, ref, value, pos, name):
     fp = pcbnew.FOOTPRINT(board)
-    fp.SetFPID(pcbnew.LIB_ID("Drone_1S", name))
+    fp.SetFPID(pcbnew.LIB_ID("Drone_1S_Board", name))   # drawn by this script, no library
     fp.SetReference(ref)
     fp.SetValue(value)
     fp.SetPosition(pos)
@@ -418,7 +413,7 @@ def build_frame():
 
     # --- J5 / J6 female sockets on the BOTTOM: the FC module's J1 / J2 plug in ---
     for ref, sy in (("J5", 1), ("J6", -1)):
-        fp = place_b2b(board, LIB, "Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", ref,
+        fp = place_b2b(board, "KD_Connectors", "Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", ref,
                        "Bitcraze female deck connector 1x10 2.00mm (FC " + ("J1" if sy > 0 else "J2") + ")", sy, bottom=True)
         fp.Value().SetVisible(False)
 
@@ -506,7 +501,7 @@ def build_fc():
     pcx, pcy = FC["pico_c"]
 
     # --- U1 Pico 2 W on TOP, micro-USB to the rear (-x), antenna over the notch ---
-    u1 = load_prj_fp("RPi_Pico_2_W_SMD_Castellated")
+    u1 = load_fp("KD_Modules", "RPi_Pico_2_W_SMD_Castellated")
     u1.SetReference("U1")
     u1.SetValue("RPi_Pico_2_W")
     u1.SetPosition(VS(pcx, pcy))
@@ -537,7 +532,7 @@ def build_fc():
     # up with the drone's; BMP388 behind it, sheltered from prop wash and light by the deck
     # above (design doc: shield the baro from airflow and light). Decoupling as Bolt 1.1.
     for ref, lib, fpn, val, (x, y), rot in FC["sensors"]:
-        fp = load_prj_fp(fpn) if lib == LIB else load_fp(lib, fpn)
+        fp = load_fp(lib, fpn)
         fp.SetReference(ref)
         fp.SetValue(val)
         board.Add(fp)

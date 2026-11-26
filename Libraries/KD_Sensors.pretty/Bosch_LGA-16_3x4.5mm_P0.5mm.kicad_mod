@@ -1,6 +1,6 @@
 (footprint "Bosch_LGA-16_3x4.5mm_P0.5mm" (version 20221018) (generator pcbnew)
   (layer "F.Cu")
-  (descr "Bosch BMI088 LGA-16, 4.5 x 3.0 x 1.0 mm, 0.5 mm pitch (pads as ArduPilot NxtPX4v2 / bit-bots; see gen_libs.py)")
+  (descr "Bosch BMI088 LGA-16, 4.5 x 3.0 x 1.0 mm, 0.5 mm pitch (pads as ArduPilot NxtPX4v2 / bit-bots; see Libraries/README.md)")
   (tags "Bosch BMI088 IMU LGA")
   (attr smd)
   (fp_text reference "REF**" (at 0 -2.4 0) (layer "F.SilkS")

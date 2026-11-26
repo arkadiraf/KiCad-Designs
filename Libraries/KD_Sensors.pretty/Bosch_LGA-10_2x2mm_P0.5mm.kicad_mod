@@ -1,6 +1,6 @@
 (footprint "Bosch_LGA-10_2x2mm_P0.5mm" (version 20221018) (generator pcbnew)
   (layer "F.Cu")
-  (descr "Bosch BMP388 LGA-10, 2.0 x 2.0 x 0.75 mm, 0.5 mm pitch (pads as OpenAXES / KiCad generator from BST-BMP388-DS001; see gen_libs.py)")
+  (descr "Bosch BMP388 LGA-10, 2.0 x 2.0 x 0.75 mm, 0.5 mm pitch (pads as OpenAXES / KiCad generator from BST-BMP388-DS001; see Libraries/README.md)")
   (tags "Bosch BMP388 barometer LGA")
   (attr smd)
   (fp_text reference "REF**" (at 0 -1.7 0) (layer "F.SilkS")

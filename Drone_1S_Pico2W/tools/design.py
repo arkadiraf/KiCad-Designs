@@ -98,7 +98,9 @@ TAB_PAD_X = SCAD["bat_len"] / 2 + SCAD["tab_pad"] / 2 - 0.5
 #               connectors, so the Flow deck v2 plugs in from below exactly as
 #               it does under a Crazyflie.
 # ---------------------------------------------------------------------------
-LIB = "Drone_1S"            # project footprint library (../Drone_1S.pretty, gen_libs.py)
+# Custom parts come from the repository's shared libraries (KiCad-Designs/Libraries, KD_*): see
+# Libraries/README.md. Stock KiCad libraries for everything else.
+SHARED_LIBS = "../Libraries"   # relative to the project root Drone_1S_Pico2W/ (KiCad-Designs/Libraries)
 
 # The FC hangs on the SAME four M2 holes that hold the printed battery cover (and the
 # Pi Zero on it): one bolt stack per hole, top to bottom:
@@ -134,9 +136,9 @@ FC = dict(
     # [ref, lib, footprint, value, (x, y) scad, rotation] - all on the FC BOTTOM, between the
     # deck rows (|x| <= 9, |y| <= 8.6 clear of the deck header pads), under the Flow deck.
     sensors=[
-        ("U2", LIB, "Bosch_LGA-16_3x4.5mm_P0.5mm", "BMI088", (0.0, 0.0), 0),
+        ("U2", "KD_Sensors", "Bosch_LGA-16_3x4.5mm_P0.5mm", "BMI088", (0.0, 0.0), 0),
         ("C1", "Capacitor_SMD", "C_0402_1005Metric", "100n", (0.0, 2.6), 0),
-        ("U3", LIB, "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
+        ("U3", "KD_Sensors", "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
         ("C2", "Capacitor_SMD", "C_0402_1005Metric", "100n", (-6.0, 2.1), 0),
     ],
     # J9 SWD, NOT POPULATED: JST-SH 3 (Raspberry Pi 3-pin debug connector style: SWCLK, GND,
@@ -214,4 +216,58 @@ FRAME_CONN = [
     # confused with the 3-pin SWD connector J9.
     ("J7", "Connector_JST", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
      "Pi USB: GND, D-, D+, GND", (5.0, 18.3), 180),
+]
+
+
+# ---------------------------------------------------------------------------
+# Frame (power board) bill of materials - the electrical parts still to place.
+# Already on the board: BT1 tabs, J1-J4 ESC headers, J5/J6 FC sockets, J7 Pi USB,
+# J8 Pi 5.1 V, mounting holes. Values from the design doc (Materials/); the ones
+# marked "TO CHECK" need the TI datasheet (not downloadable from this environment).
+# [refs, value, symbol, footprint, role]
+# ---------------------------------------------------------------------------
+_R, _C = "Resistor_SMD:R_0603_1608Metric", "Capacitor_SMD:C_0603_1608Metric"
+_C08 = "Capacitor_SMD:C_0805_2012Metric"
+FRAME_BOM = [
+    # --- charger: BQ25606 from USB-C ---
+    ("J10", "USB-C receptacle (GCT USB4105-GF-A)", "Connector:USB_C_Receptacle_USB2.0_16P",
+     "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal", "charging input, USB 2.0 D+/D- to the charger"),
+    ("U1", "BQ25606", "KD_Power:BQ25606",
+     "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias", "1S 3 A standalone charger, power path"),
+    ("L1", "1uH, Isat >= 3.6 A (Coilcraft XAL4020-102)", "Device:L", "Inductor_SMD:L_Coilcraft_XAL4020-XXX", "charger buck inductor"),
+    ("R1 R2", "5.1k", "Device:R", _R, "USB-C CC1 / CC2 pull-downs (sink)"),
+    ("R3", "226", "Device:R", _R, "ICHG: 3.0 A charge current (doc)"),
+    ("R4", "150", "Device:R", _R, "ILIM: 3.2 A input limit (doc)"),
+    ("R5 R6", "TS divider, TO CHECK", "Device:R", _R, "TS bias for the 103AT NTC (REGN divider per datasheet)"),
+    ("TH1", "10k NTC 103AT-2", "Device:Thermistor_NTC", "Connector_Wire:SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm",
+     "cell temperature, wire-leaded NTC taped to the 18650"),
+    ("C1", "10uF 16V", "Device:C", _C08, "VBUS input"),
+    ("C2", "10uF 16V", "Device:C", _C08, "PMID"),
+    ("C3 C4", "10uF 10V", "Device:C", _C08, "SYS"),
+    ("C5", "10uF 10V", "Device:C", _C08, "BAT"),
+    ("C6", "4.7uF 10V", "Device:C", _C, "REGN"),
+    ("C7", "47nF", "Device:C", _C, "BTST bootstrap"),
+    ("D1", "LED red 0603", "Device:LED", "LED_SMD:LED_0603_1608Metric", "STAT charge indicator (optional, from REGN)"),
+    ("R7", "2.2k", "Device:R", _R, "STAT LED series resistor"),
+    # --- logic rail: TPS22810 + slide switch ---
+    ("U2", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, 2.54 V UVLO"),
+    ("SW1", "SPDT slide (C&K PCM12)", "Switch:SW_SPDT", "Button_Switch_SMD:SW_SPDT_PCM12", "power switch on EN/UVLO (signal only)"),
+    ("C8 C9", "1uF 10V", "Device:C", _C, "TPS22810 VIN / VOUT"),
+    ("R8 R9 R10", "156k / 100k / 1.27M (DNP option)", "Device:R", _R,
+     "external 2.70 / 3.30 V UVLO divider instead of the internal lockout (doc open item)"),
+    # --- motor switches: 4 x TPS22997 ---
+    ("U3 U4 U5 U6", "TPS22997", "KD_Power:TPS22997", "KD_Power:Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm",
+     "per-ESC high-side switch, ~7.5 A"),
+    ("C10 C11 C12 C13", "10uF 10V", "Device:C", _C08, "TPS22997 VIN, at the pins"),
+    ("C14 C15 C16 C17", "CT soft-start, TO CHECK (few ms)", "Device:C", _C, "limits inrush into the ESC capacitors"),
+    ("R11 R12 R13 R14", "100k", "Device:R", _R, "ON pull-downs: Pico off = motors off"),
+    ("R15 R16 R17 R18", "47k (or Pico internal pull-ups)", "Device:R", _R,
+     "PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE)"),
+    # --- optional 5.1 V boost for the Pi Zero ---
+    ("U7", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5.1 V boost, true disconnect"),
+    ("L2", "1uH (TO CHECK vs datasheet)", "Device:L", "Inductor_SMD:L_Coilcraft_XAL4020-XXX", "boost inductor"),
+    ("C18 C19", "10uF 10V", "Device:C", _C08, "boost input"),
+    ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C08, "boost output"),
+    ("R19", "100k", "Device:R", _R, "BOOST_EN pull-down: Pico off = Pi off"),
+    ("R20", "current limit ~2.5 A, TO CHECK", "Device:R", _R, "boost output current limit set resistor"),
 ]

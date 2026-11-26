@@ -205,6 +205,53 @@ cross-checked from open designs and STEP models):
 * **Routing note:** the Pico's lands (top) and the deck pads (bottom) overlap in plan along both
   long edges. Pico signals have to leave their pads inward or outward on top before they via down.
 
+
+### Frame components (stage 2: parts pulled, not yet placed)
+
+Custom parts come from the shared repository libraries in [../Libraries](../Libraries/README.md)
+(`KD_Power`, `KD_Sensors`, `KD_Modules`, `KD_Connectors`), so other designs can reuse them. Everything
+else comes from the stock KiCad libraries. The list lives in `FRAME_BOM` in `tools/design.py`.
+`check_bom.py` checks that every symbol and footprint in it resolves. Values come from the design
+doc. Items marked TO CHECK need the TI datasheet.
+
+| Refs | Part | Footprint | Role |
+|---|---|---|---|
+| J10 | USB-C receptacle (GCT USB4105-GF-A) | `USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal` | charging input, USB 2.0 D+/D- to the charger |
+| U1 | BQ25606 | `Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias` | 1S 3 A standalone charger, power path |
+| L1 | 1uH, Isat >= 3.6 A (Coilcraft XAL4020-102) | `L_Coilcraft_XAL4020-XXX` | charger buck inductor |
+| R1 R2 | 5.1k | `R_0603_1608Metric` | USB-C CC1 / CC2 pull-downs (sink) |
+| R3 | 226 | `R_0603_1608Metric` | ICHG: 3.0 A charge current (doc) |
+| R4 | 150 | `R_0603_1608Metric` | ILIM: 3.2 A input limit (doc) |
+| R5 R6 | TS divider, TO CHECK | `R_0603_1608Metric` | TS bias for the 103AT NTC (REGN divider per datasheet) |
+| TH1 | 10k NTC 103AT-2 | `SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm` | cell temperature, wire-leaded NTC taped to the 18650 |
+| C1 | 10uF 16V | `C_0805_2012Metric` | VBUS input |
+| C2 | 10uF 16V | `C_0805_2012Metric` | PMID |
+| C3 C4 | 10uF 10V | `C_0805_2012Metric` | SYS |
+| C5 | 10uF 10V | `C_0805_2012Metric` | BAT |
+| C6 | 4.7uF 10V | `C_0603_1608Metric` | REGN |
+| C7 | 47nF | `C_0603_1608Metric` | BTST bootstrap |
+| D1 | LED red 0603 | `LED_0603_1608Metric` | STAT charge indicator (optional, from REGN) |
+| R7 | 2.2k | `R_0603_1608Metric` | STAT LED series resistor |
+| U2 | TPS22810DBV | `SOT-23-6` | Pico VSYS switch, 2.54 V UVLO |
+| SW1 | SPDT slide (C&K PCM12) | `SW_SPDT_PCM12` | power switch on EN/UVLO (signal only) |
+| C8 C9 | 1uF 10V | `C_0603_1608Metric` | TPS22810 VIN / VOUT |
+| R8 R9 R10 | 156k / 100k / 1.27M (DNP option) | `R_0603_1608Metric` | external 2.70 / 3.30 V UVLO divider instead of the internal lockout (doc open item) |
+| U3 U4 U5 U6 | TPS22997 | `Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm` | per-ESC high-side switch, ~7.5 A |
+| C10 C11 C12 C13 | 10uF 10V | `C_0805_2012Metric` | TPS22997 VIN, at the pins |
+| C14 C15 C16 C17 | CT soft-start, TO CHECK (few ms) | `C_0603_1608Metric` | limits inrush into the ESC capacitors |
+| R11 R12 R13 R14 | 100k | `R_0603_1608Metric` | ON pull-downs: Pico off = motors off |
+| R15 R16 R17 R18 | 47k (or Pico internal pull-ups) | `R_0603_1608Metric` | PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE) |
+| U7 | TPS61235P | `Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm` | 5.1 V boost, true disconnect |
+| L2 | 1uH (TO CHECK vs datasheet) | `L_Coilcraft_XAL4020-XXX` | boost inductor |
+| C18 C19 | 10uF 10V | `C_0805_2012Metric` | boost input |
+| C20 C21 C22 | 22uF 10V (TO CHECK) | `C_0805_2012Metric` | boost output |
+| R19 | 100k | `R_0603_1608Metric` | BOOST_EN pull-down: Pico off = Pi off |
+| R20 | current limit ~2.5 A, TO CHECK | `R_0603_1608Metric` | boost output current limit set resistor |
+
+Already on the board: BT1 tab pads, J1–J4 ESC headers, J5/J6 FC sockets, J7 Pi USB (JST-SH 4), J8 Pi
+5.1 V (JST-PH 2), mounting holes. Placement on the frame is the next step, reviewed through renders
+before any routing.
+
 ## 3D review (OpenSCAD)
 
 Placement is reviewed in 3D **before routing**. `tools/export_scad.py` writes the KiCad boards into
@@ -290,7 +337,8 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 
 ```sh
 cd tools
-python3 gen_libs.py                   # Drone_1S.pretty + fp-lib-tables
+python3 gen_libs.py                   # shared ../Libraries (KD_*) + sym/fp-lib-tables of both boards
+/usr/bin/python3 check_bom.py         # every FRAME_BOM symbol/footprint resolves, prints BOM OK
 python3 dxf_import.py                 # outline + hole summary from the DXF
 /usr/bin/python3 gen_pcb.py           # both boards + DRC (build/*_drc.txt), prints DRC OK
 /usr/bin/python3 check_import.py      # frame holes == DXF, prints IMPORT OK
@@ -302,6 +350,6 @@ python3 render.py                     # docs/*.png
 When the OpenSCAD frame changes, export `part="pcb_outline"` to DXF, copy it to
 `Materials/extracted/1S_PiZero_PCB_outline.dxf`, update `SCAD` in `design.py`, and regenerate.
 
-Current results: Frame 15 footprints / 74 pads, FC 9 footprints / 88 pads. `MATING OK`. DRC **0 violations, 0 unconnected,
+Current results: see the last `gen_pcb.py` run (both boards print footprint/pad counts). `BOM OK`. `MATING OK`. DRC **0 violations, 0 unconnected,
 0 footprint errors** on both boards. `IMPORT OK`. The boards haven't been opened in the KiCad GUI (KiCad
 7.0.11 in the container). The `.kicad_pcb` files are KiCad 7 format and open in 8 and 9.
