@@ -122,9 +122,8 @@ def main():
 
 kc_frame_t = {FRAME['thickness']:g};     // frame PCB thickness
 kc_fc_t    = {FC['thickness']:g};     // FC module PCB thickness
-kc_b2b_standoff = {B2B['standoff']:g}; // FC top to frame bottom = landing gear + M2 standoff = mated header + socket
+kc_b2b_standoff = {B2B['standoff']:g}; // FC top to frame bottom = M2 standoff = mated header + socket
 
-kc_gear_t  = {B2B['gear_t']:g};  // printed landing gear clamped between frame and the FC standoffs
 kc_fc_size = [{max(p[0] for p in fc_poly) - min(p[0] for p in fc_poly):.2f}, {max(p[1] for p in fc_poly) - min(p[1] for p in fc_poly):.2f}];  // outline bounding box x, y
 kc_fc_outline = [{", ".join(f"[{x:g}, {y:g}]" for x, y in fc_poly)}];
 

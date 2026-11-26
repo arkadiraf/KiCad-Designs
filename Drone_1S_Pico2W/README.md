@@ -66,23 +66,23 @@ The FC module sits **under the frame** (the frame top over the centre carries th
 cover). It **plugs into the frame through male/female headers**. Nothing is soldered between the
 boards, so the FC can be pulled off and replaced.
 
-**One set of four M2 holes holds everything** at (±24, ±17.5): the printed battery cover (which
-also carries the Pi Zero 2 W posts), the frame, the landing gear and the FC. One bolt stack per hole,
-top to bottom:
+**The battery cover and the FC share four M2 holes** at (±24, ±17.5). The printed battery cover
+also carries the Pi Zero 2 W posts. One bolt stack per hole, top to bottom:
 
 | Layer | Thickness | |
 |---|---|---|
-| M2 × 10 screw, head on the cover boss | | into the standoff, 2.0 mm of thread |
+| M2 × 8 screw, head on the cover boss | | into the standoff, 2.0 mm of thread |
 | printed battery cover boss + rail | 4 mm | |
 | frame PCB | 2.0 mm | H_CV1–4 |
-| printed landing gear (flat pad, clamped) | 2 mm | `B2B["gear_t"]` |
-| M2 × 4 standoff, female-female, 4 mm hex | 4 mm | |
+| M2 × 6 standoff, female-female, 4 mm hex | 6 mm | = mated header + socket |
 | FC module | 1.6 mm | H1–H4 (ears) |
-| M2 × 3 screw from below | | 1.4 mm of thread |
+| M2 × 4 screw from below | | 2.4 mm of thread |
 
-The gear's heat-set inserts are gone. The frame's separate 30.5 mm FC holes are gone too, from the
-scad and from the KiCad frame. Gear + standoff = 6 mm = the mated header/socket height, so the scad
-asserts that its `gear_t` equals KiCad's.
+**The landing gear has its own four M2 holes** (H_LG1–4) at (±35, ±18.5), near the front and rear
+ends of the centre plate and outside the cover rails, so it swaps without touching the cover or the
+FC. It is two identical printed skids (front, rear). Each skid is a cross-beam with an M2 heat-set
+insert boss and a leg at each end, held by M2 × 4 screws from the frame top. A one-piece frame would
+run into the FC standoffs at y = ±17.5. The frame's old 30.5 mm FC holes are gone.
 
 | Board | Ref | Side | Part |
 |---|---|---|---|
@@ -120,18 +120,53 @@ built with KiCad's polygon engine). It is the union of:
 The 14 × 9 mm antenna notch is subtracted and all corners are filleted 1 mm. Bounding box
 55.3 × 41.5 mm.
 
-The rest of the sensors go in the bottom space that is left:
-* the BMI088 in the centre between the deck rows, at the CG;
-* the BMP388 and the other ICs in the rear part of the band (x −27…−12), outlined on Cmts.User.
+**Sensors (the Crazyflie set, from Bitcraze's open designs).** The Crazyflie 2.1 / Bolt 1.1 use
+exactly these sensors, so their open schematics (bitcraze/hardware, CC-BY-NC-SA 4.0) are the
+reference circuits:
+* **BMI088** on SPI (PS to GND), separate accel/gyro chip selects. INT1 → INT_ACC; INT2 and INT3 →
+  INT_GYR. 100 nF decoupling, supply from a filtered analog rail (Bolt: LDO + 1 µH + 4.7 µF).
+* **BMP388** on I2C (CSB and SDO to VDD, address 0x77), 100 nF.
+
+**Placement**, on the FC bottom, in the cavity between the deck rows under the Flow deck:
+* **U2 BMI088 at (0, 0):** the frame centre, near the CG and on the Flow deck axis. Its long side
+  runs along x so the package axes line up with the drone's (axis remap in firmware).
+* **U3 BMP388 at (−6, 0):** under the deck board, so it is sheltered from prop wash and light, as
+  the design doc asks.
+* **C1, C2:** 100 nF 0402 next to each.
+* The parts are 1.0 mm (BMI088) and 0.75 mm (BMP388) tall, well under the 4.1 mm deck connector
+  stack.
+* The rear part of the Pico band (x −27…−12) stays free for support ICs (IMU supply filter, etc.).
+
+Package sources (the Bosch site and distributors are blocked from this container, so the data was
+cross-checked from open designs and STEP models):
+* **BMI088:** 4.5 × 3.0 × 1.0 mm, from Bosch's STEP model (via bit-bots). LGA-16 pads 0.35 × 0.59 mm,
+  identical in ArduPilot (HKUST NxtPX4v2) and bit-bots. **Check pin 1 against the Bosch datasheet
+  before routing.**
+* **BMP388:** 2.0 × 2.0 × 0.75 mm, from its STEP model (LCSC via atopile). Pads as OpenAXES and the
+  KiCad generator footprint made from BST-BMP388-DS001.
 
 | Ref | Side | Part | Source |
 |---|---|---|---|
 | U1 | top | `RPi_Pico_2_W_SMD_Castellated` at x = −2.5, micro-USB at the rear edge, antenna forward over the **14 × 9 mm notch** | Pico 2 W datasheet Fig. 5 (SMT footprint) and §2.2.1 (keep-out). Fig. 5 has the same dimensions as the Pico W |
-| P1, P2 | bottom | `CF_Deck_1x10_P2.00mm_SMD`: Crazyflie deck rows, **2.00 mm pitch, 22.0 mm apart**, centred (= frame centre / CG), pin 1 at the front | Bitcraze [crazyflie2-exp-template-electronics](https://github.com/bitcraze/crazyflie2-exp-template-electronics) (c8f9a2e, CC-BY 3.0). Copies in `Materials/extracted/` |
+| P1, P2 | bottom | **male** 1×10 2.00 mm SMD headers (`PinHeader_1x10_P2.00mm_Vertical_SMD_Pin1Left`), pins down into the Flow deck's female connectors; rows **22.0 mm apart**, centred, pin 1 at the front | Rows: Bitcraze deck template (c8f9a2e). The Flow deck carries the Bitcraze female deck connector (20.5 × 2.0 × 2.1 mm, datasheet in bitcraze/hardware) |
+| U2, C1 | bottom | BMI088 `Bosch_LGA-16_3x4.5mm_P0.5mm` + 100 nF | see above |
+| U3, C2 | bottom | BMP388 `Bosch_LGA-10_2x2mm_P0.5mm` + 100 nF | see above |
 | J1, J2 | top | 1×10 2.00 mm male headers to the frame (see above) | |
-| H1–H4 | ears | M2, on the shared cover / gear holes | same holes as frame H_CV1–4 (`check_mating.py`) |
+| H1–H4 | ears | M2, on the shared cover holes | same holes as frame H_CV1–4 (`check_mating.py`) |
 
-* **Why the deck connectors are SMD:** the rows (y = ±11 mm) fall right under the Pico's edge lands
+* **Flow deck v2 (verified):** Bitcraze datasheet and mechanical drawing (bitcraze/hardware).
+  * Size 21.079 × 27.940 mm, 4 mm overall, 1.6 g.
+  * The FRONT arrow runs along the connector rows, with pin 1 of both rows at the front, as placed.
+  * It carries the female sockets on its top, so the FC needs male pins.
+  * Pin use, from its schematic (rev A):
+    * PMW3901 on SPI (SCK / MISO / MOSI = right pins 3–5, CS = IO_3 = left pin 8);
+    * VL53L1x on I2C (left pins 4–5);
+    * VCC (left 1) feeds both sensors; VCOM (right 9) feeds the PMW3901's 1.8 V LDO; GND (left 10);
+    * 1-wire ID memory on OW (right 8);
+    * RESET / MOTION / GPIO1 not fitted.
+  * Crazyflie VCC is 2.8 V, and ours is the Pico's 3.3 V. Check the PMW3901 and VL53L1x supply
+    ranges before stage 2.
+* **Why the deck headers are SMD:** the rows (y = ±11 mm) fall right under the Pico's edge lands
   (22.58 mm wide). Through-hole pins would come up into the Pico's pads. `gen_pcb.py` asserts that
   P1/P2 are on B.Cu with pin 1 at the front.
 * **Deck pinout** (`DECK_LEFT` / `DECK_RIGHT` in `design.py`, from `crazyflie_deck_pinout.png`), top
@@ -143,9 +178,7 @@ The rest of the sensors go in the bottom space that is left:
   there too.
 * **Keep-outs** on top copper under the Pico's TP1–3 and SWD pads (rule areas), so no via or track
   touches them.
-* **Bottom guides:** the Flow deck v2 board outline (25.2 × 27.3 mm), and the BMI088 spot in the
-  centre between the deck rows, close to the CG. ICs there must stay lower than the deck connector
-  stack.
+* **Bottom guides:** the Flow deck v2 outline (21.079 × 27.94 mm) and the support-IC area at the rear.
 * **Routing note:** the Pico's lands (top) and the deck pads (bottom) overlap in plan along both
   long edges. Pico signals have to leave their pads inward or outward on top before they via down.
 
@@ -170,9 +203,13 @@ gear, the ESCs and the screws/standoffs.
 
 Model values still to confirm with real parts (marked "to check" in the scad):
 * Pico micro-USB height (2.7 mm) and top-side parts envelope (1.2 mm);
-* header plastic 1.5 mm + socket 4.5 mm on 6 mm standoffs;
-* Flow deck v2 21 × 28 mm on an 8 mm connector stack;
-* FC underside IC envelope 1.5 mm.
+* board-to-board header plastic 1.5 mm + socket 4.5 mm on 6 mm standoffs;
+* deck header plastic 2.0 mm (+ the Bitcraze socket 2.1 mm = 4.1 mm stack), deck PCB 0.8 mm;
+* sensor positions on the deck (from the product photo);
+* PMW3901 / VL53L1x fields of view (42° / 27°, nominal).
+
+The verify script also checks that nothing (landing gear, ESCs, screws, FC, prop guard) sits in
+the Flow deck sensors' view cones down to the ground.
 
 ## Design summary (from the design doc)
 

@@ -176,11 +176,11 @@ def rule_area(board, pts, layer, name):
     board.Add(z)
 
 
-def place_b2b(board, lib, name, ref, value, row_sign, bottom):
+def place_b2b(board, lib, name, ref, value, row_sign, bottom, row_y=None):
     """Place a 1x10 board-to-board part so that pad k sits at scad
     (B2B_PIN_X[k-1], row_sign * row_y), on the given side. Tries the four
     orientations and keeps the one that matches (asserted)."""
-    y = row_sign * B2B["row_y"]
+    y = row_sign * (B2B["row_y"] if row_y is None else row_y)
     want = {str(k + 1): VS(B2B_PIN_X[k], y) for k in range(B2B["pins"])}
     fp = load_fp(lib, name)
     fp.SetReference(ref)
@@ -384,23 +384,28 @@ def build_frame():
         fp_poly(fp, rect_s(cx, cy, SCAD["esc_l"], SCAD["esc_w"], ang), pcbnew.B_Fab, 0.1)
         fp_poly(fp, rect_s(cx, cy, SCAD["esc_l"] + 4.2, SCAD["esc_w"] + 1.0, ang), pcbnew.F_CrtYd)
 
-    # --- mounting holes (library footprints) ---
-    lib_hole = {"fc_mount": ("MountingHole", "MountingHole_2.7mm_M2.5", "H_FC"),
-                "m2": ("MountingHole", "MountingHole_2.2mm_M2", "H_CV")}   # cover + gear + FC standoffs
+    # --- mounting holes (library footprints), sorted by position ---
     cnt = {}
     for h in holes:
         if h["kind"] == "m2" and min(math.hypot(h["x"] - mx, h["y"] - my) for mx, my in MOTORS) < 6:
             continue          # motor screw, already in the motor footprint
-        if h["kind"] not in lib_hole:
+        if h["kind"] != "m2":
             continue
-        lib, fpn, pre = lib_hole[h["kind"]]
+        ax, ay = abs(h["x"]), abs(h["y"])
+        if math.hypot(ax - SCAD["crad_hole"][0], ay - SCAD["crad_hole"][1]) < 0.1:
+            pre, val = "H_CV", "Cover + FC standoff M2"
+        elif math.hypot(ax - SCAD["gear_hole"][0], ay - SCAD["gear_hole"][1]) < 0.1:
+            pre, val = "H_LG", "Landing gear M2"
+        else:
+            raise AssertionError(f"unexpected M2 hole {h}")
         cnt[pre] = cnt.get(pre, 0) + 1
-        fp = load_fp(lib, fpn)
+        fp = load_fp("MountingHole", "MountingHole_2.2mm_M2")
         fp.SetReference(f"{pre}{cnt[pre]}")
-        fp.SetValue("FC M2.5" if pre == "H_FC" else "Cover/gear/FC M2")
+        fp.SetValue(val)
         fp.SetPosition(VS(h["x"], h["y"]))
+        fp.Reference().SetLayer(pcbnew.F_Fab)     # close to the board edge
         board.Add(fp)
-    assert cnt == {"H_CV": 4}, cnt      # the 4 shared cover / gear / FC holes (no separate FC holes)
+    assert cnt == {"H_CV": 4, "H_LG": 4}, cnt      # cover + FC standoffs, and the landing-gear skids
     dropped = [h for h in holes if h["kind"] == "jst_ph"]
 
     # --- battery tab pads (scad pcb(): tab_pad x 10 mm at both cell ends, top copper) ---
@@ -429,7 +434,7 @@ def build_frame():
     text(board, "Pi Zero 2 W (on the battery cover, above the cell)", VS(0, SCAD["pi_w"] / 2 - 2.5), top, 1.0)
     text(board, "18650 cell on top, tabs soldered to BT1", VS(0, -5), top, 1.0)
     poly(board, [VS(x, y) for x, y in fc_outline_pts()], bot, 0.15)
-    text(board, "FC module below (gear + M2 standoffs on H_CV1-4), plugs into J5/J6", VS(0, -23), bot, 1.0)
+    text(board, "FC module below (6 mm M2 standoffs on H_CV1-4), plugs into J5/J6", VS(0, -23), bot, 1.0)
     pcx, pcy = FC["pico_c"]
     poly(board, rect_s(pcx, pcy, *FC["pico_size"]), bot, 0.1)
     text(board, "Pico 2 W below (~4 mm tall): only low parts here", VS(pcx, pcy - 3), bot, 0.8)
@@ -503,22 +508,32 @@ def build_fc():
         x, y = mod2scad(fx, fy)
         rule_area(board, rect_s(x, y, 2.4, 2.4), pcbnew.F_Cu, f"KEEPOUT_PICO_{'TP%d' % (i + 1) if i < 3 else 'SWD%d' % (i - 2)}")
 
-    # --- P1 / P2 Crazyflie deck rows on the BOTTOM: pin 1 at the front (+x) ---
+    # --- P1 / P2 Crazyflie deck rows on the BOTTOM, pin 1 at the front (+x) ---
+    # The Flow deck v2 carries the Bitcraze female deck connectors (SMD, 2.1 mm high) on its
+    # top, so the FC gets MALE 1x10 2.00 mm SMD headers pointing down (SMD: no tails up into
+    # the Pico's lands on the top side).
     dcx, dcy = FC["deck_c"]
     for ref, sy, names in (("P1", 1, DECK_LEFT), ("P2", -1, DECK_RIGHT)):
-        fp = load_prj_fp("CF_Deck_1x10_P2.00mm_SMD")
-        fp.SetReference(ref)
-        fp.SetValue("CF deck " + ("left" if sy > 0 else "right"))
-        fp.SetPosition(VS(dcx, dcy + sy * FC["deck_rows"] / 2))
-        board.Add(fp)
-        fp.Flip(fp.GetPosition(), True)       # to B.Cu: mirrors x (pin 1 -> +x, the front)
-        for p in fp.Pads():
-            k = int(p.GetNumber())
-            want = VS(dcx + 9 - 2 * (k - 1), 0).x
-            assert abs(p.GetPosition().x - want) < mm(0.01), (ref, k, pcbnew.ToMM(p.GetPosition().x))
-            assert p.IsOnLayer(pcbnew.B_Cu)
+        fp = place_b2b(board, "Connector_PinHeader_2.00mm", "PinHeader_1x10_P2.00mm_Vertical_SMD_Pin1Left", ref,
+                       "Flow deck " + ("left (P1)" if sy > 0 else "right (P2)") + ", male 1x10 2.00mm SMD", sy,
+                       bottom=True, row_y=FC["deck_rows"] / 2)
         fp.Value().SetVisible(False)
-        fp.Reference().SetPosition(VS(dcx - 12.3, dcy + sy * FC["deck_rows"] / 2))   # rear end of the row
+        fp.Reference().SetLayer(pcbnew.B_Fab)
+
+    # --- sensors on the BOTTOM, in the cavity between the deck rows under the Flow deck ---
+    # BMI088 at the centre (CG, Flow deck axis), its long side along x so the package axes line
+    # up with the drone's; BMP388 behind it, sheltered from prop wash and light by the deck
+    # above (design doc: shield the baro from airflow and light). Decoupling as Bolt 1.1.
+    for ref, lib, fpn, val, (x, y), rot in FC["sensors"]:
+        fp = load_prj_fp(fpn) if lib == LIB else load_fp(lib, fpn)
+        fp.SetReference(ref)
+        fp.SetValue(val)
+        board.Add(fp)
+        fp.Flip(fp.GetPosition(), True)
+        fp.SetOrientationDegrees(rot)
+        fp.SetPosition(VS(x, y))
+        fp.Reference().SetLayer(pcbnew.B_Fab)
+        assert all(p.IsOnLayer(pcbnew.B_Cu) for p in fp.Pads())
 
     # --- J1 / J2 male headers on TOP: plug up into the frame's J5 / J6 ---
     for ref, sy in (("J1", 1), ("J2", -1)):
@@ -526,14 +541,13 @@ def build_fc():
                        "Header 1x10 2.00mm male (to frame " + ("J5" if sy > 0 else "J6") + ")", sy, bottom=False)
         fp.Value().SetVisible(False)
         fp.Reference().SetLayer(pcbnew.F_Fab)      # no room for it on the trimmed outline
-    text(board, "FC hangs on the 4 cover screws: frame + gear + M2 standoffs; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
+    text(board, "FC hangs on the 4 cover screws on 6 mm M2 standoffs; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
 
     # --- guides ---
     poly(board, rect_s(dcx, dcy, *FC["deck_board"]), bot, 0.15)
     text(board, "Flow deck v2 (below, on P1/P2)", VS(dcx, dcy + 5), bot, 0.8)
-    poly(board, rect_s(dcx, dcy, 14, 14), bot, 0.1)
-    text(board, "BMI088 here (bottom, centre = CG)", VS(dcx, dcy - 1), bot, 0.7)
-    text(board, "bottom: BMP388 + ICs", VS(-19.5, 0), bot, 0.8, rot=90)
+    text(board, "BMI088 + BMP388 under the Flow deck", VS(dcx, dcy - 4), bot, 0.7)
+    text(board, "bottom: support ICs (LDO, filters)", VS(-19.5, 0), bot, 0.8, rot=90)
     poly(board, rect_s(-19.5, 0, 15, 22), bot, 0.1)
     seg(board, VS(-6, -13), VS(6, -13), top, 0.3)
     seg(board, VS(6, -13), VS(4, -11.5), top, 0.3)

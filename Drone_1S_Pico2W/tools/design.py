@@ -57,7 +57,8 @@ SCAD = dict(
     esc_l=16.2, esc_w=11.0, esc_radius=47.0, esc_pins_in=4, esc_pins_out=3,
     pin_hole=1.0,
     center_l=80.0, center_w=44.0,
-    crad_hole=(24.0, 9.45 + 6.0 + 2.05), crad_hole_d=2.2,   # rail_in + rail_w + 2.05
+    crad_hole=(24.0, 9.45 + 6.0 + 2.05), crad_hole_d=2.2,   # rail_in + rail_w + 2.05 (cover + FC standoffs)
+    gear_hole=(35.0, 18.5),                                 # landing-gear skids, own M2 holes
     ph_hole=0.8,
     bat_d=18.4, bat_len=65.2, tab_pad=3.0,
     pi_l=65.0, pi_w=30.0, pi_hole_x=58.0, pi_hole_y=23.0,
@@ -100,8 +101,9 @@ TAB_PAD_X = SCAD["bat_len"] / 2 + SCAD["tab_pad"] / 2 - 0.5
 LIB = "Drone_1S"            # project footprint library (../Drone_1S.pretty, gen_libs.py)
 
 # The FC hangs on the SAME four M2 holes that hold the printed battery cover (and the
-# Pi Zero on it) and the landing gear: one bolt stack per hole, top to bottom:
-#   cover boss - frame - landing gear (2 mm) - M2 standoff - FC - M2 screw from below.
+# Pi Zero on it): one bolt stack per hole, top to bottom:
+#   cover boss - frame - M2 standoff (6 mm) - FC - M2 screw from below.
+# The landing gear has its own four holes (SCAD gear_hole) so it swaps on its own.
 # Hole positions come from the scad (crad_hole = 24, rail_in + rail_w + 2.05).
 CRAD = SCAD["crad_hole"]
 FC = dict(
@@ -127,7 +129,15 @@ FC = dict(
     # 2.00 mm pitch, 22.0 mm apart, pin 1 of both rows at the FRONT.
     deck_c=(0.0, 0.0),
     deck_rows=22.0,
-    deck_board=(21.0, 28.0),     # Flow deck v2, x (along the rows) by y - to check
+    deck_board=(21.079, 27.94),  # Flow deck v2, x (along the rows) by y: Bitcraze mechanical drawing
+    # [ref, lib, footprint, value, (x, y) scad, rotation] - all on the FC BOTTOM, between the
+    # deck rows (|x| <= 9, |y| <= 8.6 clear of the deck header pads), under the Flow deck.
+    sensors=[
+        ("U2", LIB, "Bosch_LGA-16_3x4.5mm_P0.5mm", "BMI088", (0.0, 0.0), 0),
+        ("C1", "Capacitor_SMD", "C_0402_1005Metric", "100n", (0.0, 2.6), 0),
+        ("U3", LIB, "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
+        ("C2", "Capacitor_SMD", "C_0402_1005Metric", "100n", (-6.0, 2.1), 0),
+    ],
 )
 
 # Crazyflie 2.x deck connector pinout (docs/cf2_exp_pinout.png in the Bitcraze
@@ -162,7 +172,6 @@ B2B = dict(
     # 1.5 mm header on 6 mm standoffs. Pico 2 W on the FC top is ~4 mm tall at the
     # micro-USB, so 6 mm leaves ~2 mm under the frame: keep tall frame-bottom parts
     # out of the area above the Pico. To confirm with the chosen part datasheets.
-    standoff=6.0,                # FC top to frame bottom = landing gear (2 mm) + M2 standoff (4 mm)
-    gear_t=2.0,                  # printed landing-gear frame, clamped between frame and standoffs
+    standoff=6.0,                # FC top to frame bottom = M2 standoff (the landing gear has its own holes)
 )
 B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of pins 1..10

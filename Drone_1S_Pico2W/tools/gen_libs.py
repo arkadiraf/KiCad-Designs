@@ -9,6 +9,18 @@ Footprints
   to the Pico W figure used by Pico_Alvik_Adapter (pads 3.2 x 1.6 mm, 0.79 mm
   outside the module edge, rows 17.78 mm, footprint 22.58 mm wide, USB shell
   pads A-D, test points TP1-3, SWD pads E-G).
+* Bosch_LGA-16_3x4.5mm_P0.5mm (BMI088): body 4.5 x 3.0 mm, 1.0 mm high (Bosch STEP
+  model, via bit-bots/bitbots_imu_dxl). Pads 0.35 x 0.59 mm, 7 per long side at
+  y = +-1.165, 1 per short side at x = +-1.915: identical in ArduPilot/Schematics
+  (HKUST NxtPX4v2) and bit-bots; a third copy (Bosch_LGA-16_3x4.5mm_P0.5mm, cites
+  BST-BMI088-DS000-19) has the same centres with smaller pads. Pin 1 at (-1.5, -1.165):
+  1-7 along the -y edge towards +x, 8 at +x, 9-15 along +y back towards -x, 16 at -x, as
+  ArduPilot / bit-bots. Check pin 1 against the Bosch datasheet before routing.
+  Pin functions as the Crazyflie Bolt 1.1 schematic (Bitcraze, CC-BY-NC-SA 4.0).
+* Bosch_LGA-10_2x2mm_P0.5mm (BMP388): body 2.0 x 2.0 mm, 0.75 mm high (STEP model,
+  atopile/packages, LCSC). Pads 0.25 x 0.275 mm at +-0.7625 (OpenAXES; same pad centres
+  as the KiCad generator footprint made from BST-BMP388-DS001), pin numbering as OpenAXES
+  and the LCSC part: 1-2 on the -y side, 3-5 on -x, 6-7 on +y, 8-10 on +x.
 * CF_Deck_1x10_P2.00mm_SMD: one Crazyflie 2.x deck connector row, SMD.
   Geometry from Bitcraze crazyflie2-exp-template-electronics (c8f9a2e),
   ecad/libs/CF2-DECK-SMD-HOLES.kicad_mod, CC-BY 3.0, keeping only its SMD
@@ -120,6 +132,43 @@ def fp_deck():
                      "Crazyflie deck connector 2.00mm", "smd", g, pads)
 
 
+def fp_bmi088():
+    pads = []
+    pos = [(-1.5 + 0.5 * k, -1.165) for k in range(7)] + [(1.915, 0.0)] + \
+          [(1.5 - 0.5 * k, 1.165) for k in range(7)] + [(-1.915, 0.0)]
+    for n, (x, y) in enumerate(pos, 1):
+        w, h = (0.59, 0.35) if n in (8, 16) else (0.35, 0.59)
+        pads.append(f'  (pad "{n}" smd rect (at {x:g} {y:g}) (size {w:g} {h:g}) '
+                    f'(layers "F.Cu" "F.Paste" "F.Mask") (tstamp {uid(f"bmi{n}")}))')
+    g = [text("reference", "REF**", 0, -2.4, "F.SilkS", size=0.6, thick=0.1),
+         text("value", "BMI088", 0, 2.4, "F.Fab", size=0.5, thick=0.08),
+         rect(-2.25, -1.5, 2.25, 1.5, "F.Fab", 0.1),
+         line(-2.25, -1.0, -1.75, -1.5, "F.Fab", 0.1),                 # pin-1 corner
+         line(-2.45, -1.7, -1.8, -1.7, "F.SilkS", 0.15),
+         rect(-2.6, -1.85, 2.6, 1.85, "F.CrtYd", 0.05)]
+    return footprint("Bosch_LGA-16_3x4.5mm_P0.5mm", "Bosch BMI088 LGA-16, 4.5 x 3.0 x 1.0 mm, 0.5 mm pitch "
+                     "(pads as ArduPilot NxtPX4v2 / bit-bots; see gen_libs.py)", "Bosch BMI088 IMU LGA", "smd", g, pads)
+
+
+def fp_bmp388():
+    pads = []
+    pos = [(0.25, -0.7625), (-0.25, -0.7625), (-0.7625, -0.5), (-0.7625, 0.0), (-0.7625, 0.5),
+           (-0.25, 0.7625), (0.25, 0.7625), (0.7625, 0.5), (0.7625, 0.0), (0.7625, -0.5)]
+    for n, (x, y) in enumerate(pos, 1):
+        w, h = (0.25, 0.275) if abs(y) > 0.7 else (0.275, 0.25)
+        pads.append(f'  (pad "{n}" smd rect (at {x:g} {y:g}) (size {w:g} {h:g}) '
+                    f'(layers "F.Cu" "F.Paste" "F.Mask") (tstamp {uid(f"bmp{n}")}))')
+    g = [text("reference", "REF**", 0, -1.7, "F.SilkS", size=0.6, thick=0.1),
+         text("value", "BMP388", 0, 1.7, "F.Fab", size=0.5, thick=0.08),
+         rect(-1.0, -1.0, 1.0, 1.0, "F.Fab", 0.1),
+         line(0.5, -1.0, 1.0, -0.5, "F.Fab", 0.1),                     # pin-1 corner
+         line(0.6, -1.25, 1.2, -1.25, "F.SilkS", 0.15),
+         rect(-1.25, -1.25, 1.25, 1.25, "F.CrtYd", 0.05)]
+    return footprint("Bosch_LGA-10_2x2mm_P0.5mm", "Bosch BMP388 LGA-10, 2.0 x 2.0 x 0.75 mm, 0.5 mm pitch "
+                     "(pads as OpenAXES / KiCad generator from BST-BMP388-DS001; see gen_libs.py)",
+                     "Bosch BMP388 barometer LGA", "smd", g, pads)
+
+
 def write_tables():
     for board in ("Frame", "FC"):
         with open(os.path.join(ROOT, board, "fp-lib-table"), "w") as f:
@@ -129,7 +178,8 @@ def write_tables():
 
 if __name__ == "__main__":
     os.makedirs(PRETTY, exist_ok=True)
-    for name, txt in (("RPi_Pico_2_W_SMD_Castellated", fp_pico()), ("CF_Deck_1x10_P2.00mm_SMD", fp_deck())):
+    for name, txt in (("RPi_Pico_2_W_SMD_Castellated", fp_pico()), ("CF_Deck_1x10_P2.00mm_SMD", fp_deck()),
+                      ("Bosch_LGA-16_3x4.5mm_P0.5mm", fp_bmi088()), ("Bosch_LGA-10_2x2mm_P0.5mm", fp_bmp388())):
         with open(os.path.join(PRETTY, f"{name}.kicad_mod"), "w") as f:
             f.write(txt)
         print("wrote", name)
