@@ -55,7 +55,7 @@ Alvik datasheet block diagram; copies in `Materials/extracted/`):
 | A6 | 25 | GP8 | 11 | ROBOT_CHK (input) | |
 | 3V3 | 17 | 3V3(OUT) | 36 | +3V3_EXT supply of the Alvik | via JP2 (bridged) |
 | VBUS/VUSB | 27 | VBUS | 40 | USB 5V to the Alvik (power / battery charging) | direct |
-| VIN | 30 | VSYS | 39 | Alvik powers the controller | D1 (VIN->VSYS), or 0 Ω |
+| VIN | 30 | VSYS | 39 | Alvik powers the controller (and sees USB via the Pico diode, as with a Nano) | D1 = 0 Ω (opt. Schottky) |
 | GND | 4, 29 | GND | 3,8,13,18,23,28,33,38 | | |
 | RST | 3 | RUN | 30 | (not used by the Alvik) | via JP3 (open) |
 
@@ -81,35 +81,44 @@ order is kept on the Pico's right edge (TX/RX/D2–D4) and left edge (A4–A6).
 
 ## Power design
 
-The adapter copies how a Nano ESP32 shares power with the Alvik:
+From the Nano ESP32 schematic (`Materials/Arduino_Nano_ESP32_ABX00083_schematics.pdf`; crops in
+`Materials/extracted/`):
 
-* **USB -> Alvik:** the Nano's VBUS/VUSB pin carries raw USB 5V to the Alvik, to power the robot and
-  charge its 18650 cell. The adapter connects **Pico VBUS directly to Nano VBUS (pin 27)**, with no
-  diode, exactly like the Nano.
-* **Alvik -> controller:** the Alvik powers the controller back through **VIN (pin 30)**. On the Pico
-  this goes **VIN -> D1 -> VSYS**.
-* **USB -> Pico:** VBUS -> the Pico's own on-board Schottky -> VSYS.
+* The USB-C VBUS pins go straight to net `VUSB` (only the ESD array is on it). `VUSB` goes directly to
+  the header's **VBUS/VUSB pin**, which is raw USB 5V.
+* `VUSB -> D2 (PMEG6020AELRX, 2 A) -> VIN node -> MP2322 buck (IN, EN)`. The header's **VIN pin is
+  that node itself**: there is **no diode between VIN and the regulator**.
+* So a Nano on the Alvik puts USB 5V out on VUSB, and about 4.65 V out on VIN through D2. With USB
+  unplugged, it takes its power from the Alvik through VIN. The Alvik must therefore tolerate VIN being
+  driven from the controller side.
 
-| Situation | Path |
+The Pico W has the same structure (`VBUS -> on-board Schottky -> VSYS -> buck-boost`), so the adapter
+reproduces the Nano exactly:
+
+| Nano ESP32 | Adapter (D1 = 0 Ω, default) |
 |---|---|
-| USB plugged into the Pico | VBUS -> Nano VBUS pin -> Alvik (powers/charges the robot); VBUS -> Pico diode -> VSYS (Pico) |
-| USB unplugged | Alvik -> Nano VIN -> **D1** -> VSYS (Pico runs from the Alvik) |
+| USB VBUS -> VUSB header pin, direct | Pico VBUS -> Nano VBUS/VUSB pin (27), direct |
+| VUSB -> PMEG6020 (2 A) -> VIN node -> regulator | VBUS -> Pico on-board Schottky (MBR120, 1 A) -> VSYS |
+| VIN pin = regulator input (no diode) | Nano VIN (30) -> **D1 = 0 Ω** -> VSYS |
 
-* **D1** (Nexperia PMEG6020ER, 2 A Schottky, SOD-123W) keeps the Alvik's VIN output from fighting
-  the USB supply on VSYS, in case the Alvik has no diode of its own on that output. If you confirm the
-  Alvik output is already diode-protected (or simply never drives VIN while USB is present), fit a
-  **1206 0 Ω resistor** on the D1 pads instead to avoid the ~0.35 V drop.
-* **VSYS range is 1.8–5.5 V.** The Alvik VIN (5 V boost rail, or the 3.0–4.2 V cell) minus the diode
-  drop is inside that range.
-* **JP2 (bridged):** Pico 3V3(OUT) -> Nano 3V3 pin. On the Nano, 3V3 is the output of its regulator,
-  and on the Alvik it feeds `+3V3_EXT` (the I2C switch supply). Keep the 3V3 load under 300 mA. If you
-  ever measure about 3.3 V on the Alvik's 3V3 socket pin with no controller fitted, cut JP2.
+* **D1 default: 1206 0 Ω**, on SOD-123W pads (a 1206 resistor fits them). This behaves like a Nano:
+  USB reaches the Alvik on both VUSB and VIN, and the Alvik powers the Pico through VIN when USB is
+  unplugged.
+* **Option: fit a Nexperia PMEG6020ER** (anode = VIN) instead. The Alvik can still power the Pico, but
+  Pico USB power no longer goes out on VIN. Only do this if you find the Alvik must not see USB on VIN.
+  A Nano does drive it, so this shouldn't be necessary.
+* **Current limit:** the Pico's VBUS->VSYS diode is rated 1 A, against 2 A on the Nano. If the Alvik
+  draws its charge current through VIN, that diode carries it together with the Pico's own load.
+* **VSYS range is 1.8–5.5 V.** The Alvik VIN (5 V boost rail or the 3.0–4.2 V cell) is inside it.
+* **JP2 (bridged):** Pico 3V3(OUT) -> Nano 3V3 pin. On the Nano, 3V3 is the output of its MP2322
+  (through SJ1), and on the Alvik it feeds `+3V3_EXT` (the I2C switch supply). Keep the 3V3 load under
+  300 mA. If you ever measure about 3.3 V on the Alvik's 3V3 socket pin with no controller fitted,
+  cut JP2.
 * **JP3 (open):** optional, Nano RST -> Pico RUN.
 * C1: 10 µF on VSYS.
 
 **Bring-up check:** with the adapter removed and the Alvik switched on, measure the Alvik's Nano socket.
-VIN (pin 30) should be ≤ 5.5 V. VBUS (pin 27) and 3V3 (pin 17) should be about 0 V, since the Alvik should
-not drive the pin that connects straight to the USB host.
+VIN (pin 30) should be ≤ 5.5 V. VBUS (pin 27) and 3V3 (pin 17) should be about 0 V.
 
 ## Mechanical notes
 
