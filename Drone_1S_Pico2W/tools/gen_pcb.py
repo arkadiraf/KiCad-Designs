@@ -453,7 +453,7 @@ def build_frame():
     text(board, "Pi Zero 2 W (on the battery cover, above the cell)", VS(0, SCAD["pi_w"] / 2 - 2.5), top, 1.0)
     text(board, "18650 cell on top, tabs soldered to BT1", VS(0, -5), top, 1.0)
     poly(board, [VS(x, y) for x, y in fc_outline_pts()], bot, 0.15)
-    text(board, "FC module below (6 mm M2 standoffs on H_CV1-4), plugs into J5/J6", VS(0, -23), bot, 1.0)
+    text(board, f"FC module below ({B2B['standoff']:g} mm M2 standoffs on H_CV1-4), plugs into J5/J6", VS(0, -23), bot, 1.0)
     pcx, pcy = FC["pico_c"]
     poly(board, rect_s(pcx, pcy, *FC["pico_size"]), bot, 0.1)
     text(board, "Pico 2 W below (~4 mm tall): only low parts here", VS(pcx, pcy - 3), bot, 0.8)
@@ -522,9 +522,9 @@ def build_fc():
         kx = fx * math.cos(ang) + fy * math.sin(ang)
         ky = -fx * math.sin(ang) + fy * math.cos(ang)
         return pcx + kx, pcy - ky
-    for i, (fx, fy) in enumerate(PICO_TP + PICO_SWD):
+    for i, (fx, fy) in enumerate(PICO_SWD):        # TP1-3 are pads now (USB to J3); only SWD stays clear
         x, y = mod2scad(fx, fy)
-        rule_area(board, rect_s(x, y, 2.4, 2.4), pcbnew.F_Cu, f"KEEPOUT_PICO_{'TP%d' % (i + 1) if i < 3 else 'SWD%d' % (i - 2)}")
+        rule_area(board, rect_s(x, y, 2.4, 2.4), pcbnew.F_Cu, f"KEEPOUT_PICO_SWD{i + 1}")
 
     # --- P1 / P2 Crazyflie deck rows on the BOTTOM, pin 1 at the front (+x) ---
     # The Flow deck v2 carries the Bitcraze female deck connectors (SMD, 2.1 mm high) on its
@@ -559,7 +559,7 @@ def build_fc():
                        "Header 1x10 2.00mm male (to frame " + ("J5" if sy > 0 else "J6") + ")", sy, bottom=False)
         fp.Value().SetVisible(False)
         fp.Reference().SetLayer(pcbnew.F_Fab)      # no room for it on the trimmed outline
-    text(board, "FC hangs on the 4 cover screws on 6 mm M2 standoffs; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
+    text(board, f"FC hangs on the 4 cover screws on {B2B['standoff']:g} mm M2 standoffs; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
 
     # --- guides ---
     poly(board, rect_s(dcx, dcy, *FC["deck_board"]), bot, 0.15)
@@ -571,7 +571,7 @@ def build_fc():
     seg(board, VS(6, -13), VS(4, -11.5), top, 0.3)
     seg(board, VS(6, -13), VS(4, -14.5), top, 0.3)
     text(board, f"FC r{REVISION}   FRONT >", VS(0, 13.0), pcbnew.F_SilkS, 0.7, 0.15)   # strip between Pico and J1
-    text(board, f"1S Pico2W FC r{REVISION} bottom", VS(-26.3, 0), pcbnew.B_SilkS, 0.8, 0.12, rot=90)
+    text(board, f"1S Pico2W FC r{REVISION} bottom", VS(-18.5, -5.5), pcbnew.B_SilkS, 0.7, 0.12, rot=90)
     return finish(board, pcb, name)
 
 

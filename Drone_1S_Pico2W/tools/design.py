@@ -137,6 +137,10 @@ FC = dict(
         ("C1", "Capacitor_SMD", "C_0402_1005Metric", "100n", (0.0, 2.6), 0),
         ("U3", LIB, "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
         ("C2", "Capacitor_SMD", "C_0402_1005Metric", "100n", (-6.0, 2.1), 0),
+        # J3: USB programming pads, NOT POPULATED. VBUS from Pico pin 40, D-/D+/GND from the
+        # Pico's TP2/TP3/TP1 (datasheet 2.1) through pads on the FC top. At the rear edge, so
+        # a soldered pigtail leaves backwards under the FC, clear of the frame and the gear.
+        ("J3", LIB, "USB_Prog_Pads_1x4_P2.54mm_SMD", "USB_PROG (DNP)", (-25.0, 0.0), 90),
     ],
 )
 

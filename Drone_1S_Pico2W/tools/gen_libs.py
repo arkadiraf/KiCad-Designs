@@ -62,7 +62,11 @@ def footprint(name, descr, tags, attr, graphics, pads):
 # Pico 2 W test points / SWD pads on the module underside, in footprint
 # coordinates (origin at module centre, USB at -Y, pin 1 at -X).
 # Datasheet origin is the module's bottom-left corner: fx = x - 10.5, fy = 25.5 - y.
-PICO_TP = [(8 - 10.5, 25.5 - y) for y in (41.5, 39.0, 36.5)]           # 1.5 x 1.5 mm
+PICO_TP = [(8 - 10.5, 25.5 - y) for y in (41.5, 39.0, 36.5)]           # 1.5 x 1.5 mm, 0.3 mm corner radius
+# Datasheet 2.1: TP1 = GND, TP2 = USB DM, TP3 = USB DP, "can be used to access USB signals instead of
+# the micro-USB port". Taken here in Fig. 5's order from the USB end (41.5, 39, 36.5) - TO CHECK
+# against the Pico 2 W bottom silkscreen before routing.
+PICO_TP_NAMES = ["TP1", "TP2", "TP3"]
 PICO_SWD = [(x - 10.5, 25.5 - 19.8) for x in (11.0841, 13.6241, 16.1641)]  # 1.5748 mm
 
 
@@ -77,6 +81,10 @@ def fp_pico():
         y = 24.13 - 2.54 * (p - 21)
         pads.append(f'  (pad "{p}" smd roundrect (at {px:g} {y:g}) (size 3.2 1.6) '
                     f'(layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.125) (solder_paste_margin 0.3) (tstamp {uid(f"pico{p}")}))')
+    # TP1-TP3 (GND, USB DM, USB DP) as solder pads, to bring USB to J3 on the FC bottom
+    for name, (x, y) in zip(PICO_TP_NAMES, PICO_TP):
+        pads.append(f'  (pad "{name}" smd roundrect (at {x:g} {y:g}) (size 1.5 1.5) '
+                    f'(layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.2) (tstamp {uid(f"picotp{name}")}))')
     # USB connector shell solder-relief pads A..D (no net, no paste), datasheet Fig. 5
     for n, (x, y, w, h) in enumerate([(-2.725, -24.0, 1.1, 1.8), (2.725, -24.0, 1.1, 1.8),
                                       (-2.425, -20.97, 1.05, 1.45), (2.425, -20.97, 1.05, 1.45)]):
@@ -190,6 +198,25 @@ def fp_bitcraze_female():
                      "Bitcraze Crazyflie deck female socket 2.00mm", "smd", g, pads)
 
 
+def fp_usb_prog():
+    """J3, USB programming pads on the FC bottom (DNP): 4 SMD pads 1.5 x 3.0 mm, 2.54 mm pitch,
+    USB order VBUS, D-, D+, GND, for soldered wires or a 2.54 mm SMD right-angle header."""
+    names = ["VBUS", "D-", "D+", "GND"]
+    pads, g = [], []
+    for n in range(4):
+        x = -3.81 + 2.54 * n
+        pads.append(f'  (pad "{n + 1}" smd roundrect (at {x:g} 0) (size 1.5 3) '
+                    f'(layers "F.Cu" "F.Mask") (roundrect_rratio 0.15) (tstamp {uid(f"usbp{n}")}))')
+        g.append(text("user", names[n], x, -3.6, "F.SilkS", size=0.6, thick=0.12, ang=90))
+    g += [text("reference", "REF**", -6.2, 0, "F.SilkS", size=0.8, thick=0.12, ang=90),
+          text("value", "USB_PROG_DNP", 0, 2.6, "F.Fab", size=0.6, thick=0.1),
+          text("user", "USB DNP", 0, 2.4, "F.SilkS", size=0.7, thick=0.12),
+          rect(-5.3, -5.1, 5.3, 1.75, "F.CrtYd", 0.05)]
+    return footprint("USB_Prog_Pads_1x4_P2.54mm_SMD",
+                     "USB programming pads (not populated): VBUS, D-, D+, GND, 2.54 mm, SMD",
+                     "USB programming DNP pads", "smd exclude_from_bom", g, pads)
+
+
 def write_tables():
     for board in ("Frame", "FC"):
         with open(os.path.join(ROOT, board, "fp-lib-table"), "w") as f:
@@ -201,7 +228,8 @@ if __name__ == "__main__":
     os.makedirs(PRETTY, exist_ok=True)
     for name, txt in (("RPi_Pico_2_W_SMD_Castellated", fp_pico()), ("CF_Deck_1x10_P2.00mm_SMD", fp_deck()),
                       ("Bosch_LGA-16_3x4.5mm_P0.5mm", fp_bmi088()), ("Bosch_LGA-10_2x2mm_P0.5mm", fp_bmp388()),
-                      ("Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", fp_bitcraze_female())):
+                      ("Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", fp_bitcraze_female()),
+                      ("USB_Prog_Pads_1x4_P2.54mm_SMD", fp_usb_prog())):
         with open(os.path.join(PRETTY, f"{name}.kicad_mod"), "w") as f:
             f.write(txt)
         print("wrote", name)

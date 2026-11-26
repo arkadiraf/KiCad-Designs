@@ -153,6 +153,7 @@ cross-checked from open designs and STEP models):
 | U2, C1 | bottom | BMI088 `Bosch_LGA-16_3x4.5mm_P0.5mm` + 100 nF | see above |
 | U3, C2 | bottom | BMP388 `Bosch_LGA-10_2x2mm_P0.5mm` + 100 nF | see above |
 | J1, J2 | top | 1×10 2.00 mm male headers to the frame (Bitcraze short pins, see above) | |
+| J3 | bottom | USB programming pads, DNP (see below) | |
 | H1–H4 | ears | M2, on the shared cover holes | same holes as frame H_CV1–4 (`check_mating.py`) |
 
 * **Flow deck v2 (verified):** Bitcraze datasheet and mechanical drawing (bitcraze/hardware).
@@ -177,8 +178,17 @@ cross-checked from open designs and STEP models):
 * **Correction:** the OpenSCAD Bolt drawing has `fc_deck_rows = 17` (and draws 2.54 mm headers). The
   Bitcraze template says 22.0 mm and 2.00 mm. The scad only uses this for its drawing, so update it
   there too.
-* **Keep-outs** on top copper under the Pico's TP1–3 and SWD pads (rule areas), so no via or track
-  touches them.
+* **Programming in place (USB on the FC bottom).** With the FC mounted, the Pico's micro-USB is out
+  of reach: 1.2 mm under the frame, with the rear landing-gear beam behind it.
+  * **TP1 / TP2 / TP3** (GND, USB DM, USB DP; datasheet §2.1: "can be used to access USB signals
+    instead of using the micro-USB port") are solder pads in the Pico footprint (1.5 × 1.5 mm, r 0.3).
+  * **J3 `USB_Prog_Pads_1x4_P2.54mm_SMD`, not populated:** 4 SMD pads at 2.54 mm, VBUS (Pico pin 40),
+    D−, D+, GND, at the rear bottom edge (−25, 0). Solder a pigtail to make a USB adapter.
+  * BOOTSEL is only for the first flash: do that on the bench through the micro-USB, before
+    the FC goes in.
+  * **Check** which underside pad is TP1 / TP2 / TP3 (Fig. 5's order from the USB end is assumed) before
+    routing. The TP pads under the module need paste and reflow or hot air.
+* **Keep-outs** on top copper under the Pico's SWD pads (rule areas), so no via or track touches them.
 * **Bottom guides:** the Flow deck v2 outline (21.079 × 27.94 mm) and the support-IC area at the rear.
 * **Routing note:** the Pico's lands (top) and the deck pads (bottom) overlap in plan along both
   long edges. Pico signals have to leave their pads inward or outward on top before they via down.
