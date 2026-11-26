@@ -152,8 +152,8 @@ reference circuits:
 Package sources (the Bosch site and distributors are blocked from this container, so the data was
 cross-checked from open designs and STEP models):
 * **BMI088:** 4.5 × 3.0 × 1.0 mm, from Bosch's STEP model (via bit-bots). LGA-16 pads 0.35 × 0.59 mm,
-  identical in ArduPilot (HKUST NxtPX4v2) and bit-bots. **Check pin 1 against the Bosch datasheet
-  before routing.**
+  identical in ArduPilot (HKUST NxtPX4v2) and bit-bots. Pin numbers confirmed by the Crazyflie Bolt
+  1.1 schematic (see "Validation" below). The pad-1 corner still needs the Bosch drawing.
 * **BMP388:** 2.0 × 2.0 × 0.75 mm, from its STEP model (LCSC via atopile). Pads as OpenAXES and the
   KiCad generator footprint made from BST-BMP388-DS001.
 
@@ -191,8 +191,9 @@ cross-checked from open designs and STEP models):
   there too.
 * **Programming in place, from the Pi.** With the FC mounted, the Pico's micro-USB is out of reach:
   1.2 mm under the frame, with the rear landing-gear beam behind it.
-  * The Pico footprint carries its underside **TP1 / TP2 / TP3** (GND, USB DM, USB DP; datasheet
-    §2.1) and **SWD** pads (SWCLK, GND, SWDIO; §3.9) as solder pads.
+  * The Pico footprint carries its underside **TP1 / TP2 / TP3** (GND, USB DM, USB DP), **TP6**
+    (BOOTSEL) and **SWD** pads (SWCLK, GND, SWDIO) as solder pads. Positions and names are confirmed
+    on the module's bottom silkscreen (see "Validation" below).
   * USB crosses J1/J2 to the frame (J7, Pi USB).
   * SWD goes to **J9 on the FC**: JST-SH 3 (SM03B-SRSS-TB), Raspberry Pi debug-connector style
     (SWCLK, GND, SWDIO), not fitted, on the rear bottom edge with its opening facing the edge. Its
@@ -252,6 +253,46 @@ Already on the board: BT1 tab pads, J1–J4 ESC headers, J5/J6 FC sockets, J7 Pi
 5.1 V (JST-PH 2), mounting holes. Placement on the frame is the next step, reviewed through renders
 before any routing.
 
+## Validation against uploaded documents
+
+The documents are in `Materials/`, with text extracts in `Materials/extracted/`.
+
+* **Pico 2 W underside** (`extracted/pico2w_top_bottom_photo.jpg`) plus datasheet Fig. 5:
+  * **Bug fixed:** Fig. 5 draws two groups of test points. The pair at the USB edge, (9.5, 49.8) and
+    (11.5, 49.8), with (10.5, 46.5) behind them, is **TP3, TP2 and TP1**. The column at x = 8 is
+    **TP4–TP6**. The footprint had put TP1–3 on the TP4–6 column, which would have wired USB to
+    WL_GPIO1, the SMPS PS pin. It is now corrected (`Libraries/tools/gen_lib.py`).
+  * TP6 (BOOTSEL) is now a solder pad. TP4 and TP5 get no copper, as the datasheet allows.
+  * SWD silkscreen: square pad = SWCLK, then GND, then SWDIO. This matches the footprint.
+  * The Pico 2 datasheet (`RPi_Pico_2_datasheet.pdf`) shows the same TP1–3 positions. Its other test
+    points and its SWD header differ, so it is a cross-check only.
+* **Crazyflie Bolt 1.1 schematic, rev H** (`crazyflie_bolt_1_1_revh_schematic.pdf`):
+  * BMI088 pin numbers confirmed: 8 SCK, 9 SDI, 15 SDO1 + 10 SDO2 tied, 14 CS_ACC, 5 CS_GYR, 7 PS to
+    GND (SPI), 3 VDD + 11 VDDIO, 4 GND_IO + 6 GND, INT1 → INT_ACC, INT2 + INT3 → INT_GYR, 100 nF.
+    The symbol's ground names now follow the Bolt.
+  * BMP388: I2C on 2/4, SDO (5) and CSB (6) tied to VDDIO (address 0x77), 100 nF. Confirmed.
+  * IMU supply: a dedicated LP2985-30 (3.0 V) LDO, then **1 µH (MLZ1608, 0603) + 4.7 µF** placed near
+    the IMU ("filter the supply at 73 kHz", against motor PWM). **Proposal for the FC:** feed the
+    sensors from the Pico 3V3 through a 0603 1 µH inductor and 4.7 µF, in the free rear Pico band.
+  * Motors: the Bolt switches each ESC **low side** with an FDMA410 N-FET (10 k gate pull-down) and
+    puts **100 Ω in series** with each motor signal. Its ESC connector is +BATT, signal, switched GND.
+    We keep high-side TPS22997s, and should add the 100 Ω series resistors on the DShot lines.
+  * Bolt datasheet: deck VCC 3.0 V, 100 mA max; VCOM = VBAT (or 5 V) at 400 mA; 8 A per motor
+    through the MOSFET and connector.
+* **Flow deck v2 schematic, rev A** (`flow_deck_v2_reva_schematic.pdf`, bitcraze/hardware @ 8207400):
+  * VCC (left 1) feeds PMW3901 VCCIO and the VL53L1x.
+  * VCOM (right 9) feeds a TLV70218 1.8 V LDO for the PMW3901 core.
+  * PMW3901 on SPI (right 3–5), chip select on IO_3 (left 8). VL53L1x on I2C (left 4–5).
+  * DS28E05 ID chip on OW (right 8). GND on left 10.
+  * Correction: right pins 1–2 are TX2, RX2 (`DECK_RIGHT` fixed).
+  * The FC must supply VCC (Pico 3V3) and VCOM (VSYS) to the deck.
+* **Raspberry Pi Zero 2 W product brief:** input 5 V DC, 2.5 A (the recommended supply). The boost is
+  rated 3 A at 5 V, with its limit planned at about 2.5 A. At 2.5 A out, the cell supplies about
+  4.3 A at 3.3 V.
+* **DYS XSD7A** (vendor images, `extracted/esc/`): 16.2 × 11.0 × 4 mm (matches the scad), 1–2 S,
+  7 A continuous, 9 A burst (10 s), no BEC. Power end: big pads − and + at the corners, small round
+  pads −, S between them. The three motor-phase pads are at the other end.
+
 ## 3D review (OpenSCAD)
 
 Placement is reviewed in 3D **before routing**. `tools/export_scad.py` writes the KiCad boards into
@@ -303,7 +344,8 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
   * VSET floats (4.208 V). 10 k NTC on TS. 1 µH inductor.
   * SYS feeds the TPS22810 only. The motors stay on BAT. PG goes to the header.
 * **Boost (optional):** TPS61235P, 5.1 V for the Pi Zero, enabled by a Pico GPIO (100 k pull-down).
-  * Pico ↔ Pi link: JST-SH 4 on the FC (GND, TX, RX, PI_STATUS) with 1 k series resistors.
+  * Pico ↔ Pi link: the doc had a JST-SH 4 UART with PI_STATUS. Superseded: the Pi talks to the
+    Pico over USB (J7), with no PI_STATUS line.
 * **Header:** the frame ↔ FC header is 2 × 10, 2.54 mm. It carries VSYS, 4 × ON, 4 × PG,
   4 × DShot, BOOST_EN, CHG_PG and GND.
 * **Firmware protection:**
@@ -320,13 +362,15 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 
 ### Open items from stage 1
 
-* [ ] ESC header pin functions (pads 1–4: which is BAT+, GND, signal) need the XSD7A pad layout.
+* [ ] ESC header pin functions: the XSD7A's power end (from its silkscreen) has big pads − and +
+      at the corners and small round signal pads −, S between them. Map them to J1–J4 pads 1–4
+      while placing the frame, once the ESC orientation under the arm is fixed.
 * [ ] Pick the header/socket pair and standoff length (6 mm planned) from real datasheets. The OpenSCAD
       model already uses 2.0 mm frame, 6 mm standoffs, 22 mm / 2.00 mm deck rows (from KiCad).
 * [ ] The 20-pin assignment of J1/J2 ↔ J5/J6. The doc's bus fits: VSYS, 4 × ON, 4 × PG, 4 × DShot,
       BOOST_EN, CHG_PG, GND.
-* [ ] Deck connector gender and height, to mate the Flow deck v2's own headers (check the Flow deck v2
-      docs and schematic), and the Flow deck v2 pin use (CS pin, supply pin).
+* [x] Deck connector gender and height (male SMD headers on the FC into the Flow deck's female
+      sockets). Flow deck v2 pin use is verified from its schematic (see "Validation" below).
 * [ ] The Pico 2 W antenna faces up at the frame. Keep frame copper out above the antenna area, or
       move the antenna out from under the frame.
 * [ ] Battery tab polarity (BT1 pad 1 is at the front).

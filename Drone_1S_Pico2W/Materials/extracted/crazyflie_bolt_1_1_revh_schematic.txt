@@ -1,0 +1,895 @@
+                                                  1                                                                                                            2                                                                                                  3                                                                                         4                                                                                                                                         5                                                                                                          6
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             U1
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          E_SCL                      1
+                                                                                                                                                                                                                                                                  U2                                                                                                                                                                                                                                                                           scl
+                                                                               Sheet: pm_radio                                                                                                                                                                                                                                                                                                                                                                                                            E_SDA                      3
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               sda
+                                                                                                                                                                                                            M1_OVERIDE                              14
+                                                                                                                                                                                                                                                                  PA0/ADC123_IN0                               PB0/ADC12_IN8
+                                                                                                                                                                                                                                                                                                                                                 26        IMU_CS_GYR
+                                                                                         NRF_FLOW_CTRL                                        NRF_FLOW_CTRL
+                                                                                                                                                                                                               MOTOR1                               15
+                                                                                                                                                                                                                                                                  PA1/ADC123_IN1                               PB1/ADC12_IN9
+                                                                                                                                                                                                                                                                                                                                                 27        IMU_CS_ACC                                                                                                                                                                5
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               wp
+                                                                                                 NRF_RX                                           NRF_RX
+                                                                                                                                                                                                               E_TX2                                16
+                                                                                                                                                                                                                                                                  PA2/ADC123_IN2                                  PB2/BOOT1
+                                                                                                                                                                                                                                                                                                                                                 28                                                                                                                                                          VCC
+
+                                                                                                 NRF_TX                                           NRF_TX                                                                                                                                                                                                                                                                                                                                                                             4
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               vcc          vss
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      2
+                                          E_OW/WKUP                                 E_OW/WKUP                                                                                                                  E_RX2                                17
+                                                                                                                                                                                                                                                                  PA3/ADC123_IN3                                PB3/JDO-SWO
+                                                                                                                                                                                                                                                                                                                                                 55         STM_SWO                                                                                                    VCC
+
+                                          E_NRF_IO1                                                                                                                                                    NRF_FLOW_CTRL                                20                                                                                           56            E_CS1                                                                                                                                                                                 24AA64FT
+                                                                                    E_NRF_IO1                                                                                                                                                                     PA4/ADC12_IN4                                    PB4/NJRST
+A                                         E_NRF_IO2                                 E_NRF_IO2 NRF_SWDIO                                          NRF_SWIO                                                      E_SCK                                21
+                                                                                                                                                                                                                                                                  PA5/ADC12_IN5                                          PB5
+                                                                                                                                                                                                                                                                                                                                                 57            E_CS2                                                                                                                                                                                                                                             A
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      I2C address 1010000b
+                                                                                            NRF_SWDCLK                                          NRF_SWCLK                                                      E_MISO                               22
+                                                                                                                                                                                                                                                                  PA6/ADC12_IN6                                          PB6
+                                                                                                                                                                                                                                                                                                                                                 58            E_SCL
+                                          VCOM_EXP                                                                                                                                                             E_MOSI                               23                                                                                           59            E_SDA
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                2.2k
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                2.2k
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 R1
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 R2
+                                                                                    VCOM_EXP                                                                                                                                                                      PA7/ADC12_IN7                                          PB7
+                                                                                    VUSB                                                                                                                                   IMU_SCL                  41                                                                                           61                     E_CS3                                                                                                                             Sheet: imu
+                                                                                                                                                      STM_NRST                                                                                                    PA8                                                         PB8
+                                                                                               STM_NRST                                                                                                                    VUSB                     42                                                                                           62
+                                                                                                                                                     STM_BOOT0                                                                                                    PA9/OTG_FS_VBUS                                             PB9
+                                                                                              STM_BOOT0                                                                                                                                             43                                                                                           29         MOTOR4                                                                                                                      IMU_SCL                                                                       INT_ACC
+              P1                                                                                                                                                                                                                                                  PA10/OTG_FS_ID                                             PB10                                                                                                                                                                           IMU_SCL                                    INT_ACC
+                                                                                                                                                                                                                                                    44
+                                                                                                                                                                                                                                                                  PA11/OTG_FS_DM                                             PB11
+                                                                                                                                                                                                                                                                                                                                                 30         MOTOR2
+                                                                               File: pm_radio.sch                                                                                                                                                                                                                                                                                                                                                                                       IMU_SDA             IMU_SDA                                    INT_GYR        INT_GYR
+                                                                                                                                                                                                                                                    45                                                                                           33         M2_OVERIDE
+    MICRO-B-USB
+
+
+
+
+                                      1                                                                                                                                                                                                                           PA12/OTG_FS_DP                                             PB12
+                  VCC                                                                                                                                                                                            STM_SWIO                           46                                                                                           34           IMU_SCK
+                                      2                                                USB_DM                                                                                                                                                                     PA13/JTMS-SWIO                                             PB13                                                                                                                                                                           IMU_SCK
+                    D-                                                                                                                                                                                           STM_SWCLK                          49                                                                                           35          IMU_MISO
+                                      3                                                USB_DP                                                                                                                                                                     PA14/JTCK-SWCLK                                            PB14                                                                                                                                                                           IMU_SDO
+                   D+                                                                                                                                                                                            MOTOR3                             50                                                                                           36          IMU_MOSI
+                                      4                                                USB_ID                                                                                                                                                                     PA15/JTDI                                                  PB15                                                                                                                                                                           IMU_SDI
+                    ID
+                  GND
+                                      5                                                                                                                                                                                                                                                                                                                                                                                                                                IMU_CS_ACC                           IMU_CS_ACC
+                                                                                                                                                                                                                  INT_ACC                               2
+                                                                                                                                                                                                                                                                  PC13                                        PC0/ADC12_IN10
+                                                                                                                                                                                                                                                                                                                                                 8            LED_RED_L
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       IMU_CS_GYR                           IMU_CS_GYR
+                                                                                                                                                                                                                  INT_GYR                               3
+                                                                                                                                                                                                                                                                  PC14                                        PC1/ADC12_IN11
+                                                                                                                                                                                                                                                                                                                                                 9          LED_GREEN_L
+                                                                                                                                                                                                                 M4_OVERIDE                             4
+                                                                                                                                                                                                                                                                  PC15                                        PC2/ADC12_IN12
+                                                                                                                                                                                                                                                                                                                                                 10         LED_GREEN_R                                                                                                                                   File: imu.sch
+                                                                                                                                                                                                                                                                                                                                                 11           LED_RED_R
+                                                                                                                                                                                                                                                                                                              PC3/ADC12_IN13                                                                                             TP1                     TP2          TP3
+                                                                                                                                                                                                              LED_BLUE_L                            54
+                                                                                                                                                                                                                                                                  PD2                                         PC4/ADC12_IN14
+                                                                                                                                                                                                                                                                                                                                                 24
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             STM debug
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                             1
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                     1
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              1
+                                                                                                                                                                                                                                                                                                              PC5/ADC12_IN15
+                                                                                                                                                                                                                                                                                                                                                 25                                                                                                                                                                                                     NRF debug
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      CONN_STM_SWD
+                                                                                                                                                                                                                                                        5
+                                                                                                                                                                                                                                                                  PH0/OSC_IN                                             PC6
+                                                                                                                                                                                                                                                                                                                                                 37                NRF_RX                                                                                              STM_SWO
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  DO NOT MOUNT
+B                                                                                                                                                                                                                                                       6
+                                                                                                                                                                                                                                                                  PH1/OSC_OUT                                            PC7
+                                                                                                                                                                                                                                                                                                                                                 38                NRF_TX                                                                                              STM_NRST
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           2                                                               VCCNRF
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     NRF_SWCLK 1                                                 B
+                                                                                 U1 decoupling:                                                                                                                                                                                                                                                                                                                                                                        STM_SWIO
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           3                                                                                      2
+                                                                                                                                                                X1                                                                                                                                                                               39         M3_OVERIDE
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               P3
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            P4
+                                                                                 100n on each VDD                                                                                                               STM_NRST                            7                                                                         PC8                                                                                                                                          4                                                                                      3
+                                                                             VCC                                                                               8MHz                                                                                               NRST                                                                           40         IMU_SDA
+                                                                                 10n and 4.7u on VDDA                                                                                                           STM_BOOT0                           60                                                                        PC9                                                                                                                                STM_SWCLK 5                                                                         NRF_SWIO     4
+                                                                                                                                                                                                                                                                  BOOT0                                                                          51           E_TX1
+                                                                                                                                                                                                                                                                                                                             PC10                                                                                                                                   VCC
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           6
+                                          +BATT
+                                                                                                                                                                                                                                                    31
+                                                                                                                                                                                                                                                                  VCAP_1                                                     PC11
+                                                                                                                                                                                                                                                                                                                                                 52           E_RX1
+       Battery                                                      C4        C5       C6            C7             C8           C9                                                                                                                 47
+                                                                                                                                                                                                                                                                  VCAP_2                                                     PC12
+                                                                                                                                                                                                                                                                                                                                                 53           E_CS0                                                                                                                                            VCC
+                                      1                                                                                                                                                                                               VCC VCCNRF
+                  CONN_BAT
+
+
+
+
+                                                                                                                                                                                          C1
+                                                                     100n     100n         100n      100n           10n          1u                                                                             C2          C3
+                                                                                                                                                                                                    10k
+                                                                                                                                                                                                                                                        1
+                                                                                                                                                                                                    R3
+                             P5
+
+
+
+
+                                                                                                                                                                                                                                                                  VBAT
+                                      2                                                                                                                                                   100n
+                                                                                                                                                                                                                4.7u          4.7u                  32
+                                                                                                                                                                                                                                                                  VDD
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     VCC
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Expansion port
+                                                                                                                                                                                                                                                    48
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            2.2k
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     2.2k
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            R29
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     R30
+                                                                                                                                                                                                                                                                  VDD                                                                                                                                                                                                                                                                                        1
+                                                                                                                                                                                                                                                                                                                                                                                                                                   VCC                                     VCC
+                                                                                                                                                                                                                                                    64                                                                                           18
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            FBM1211-1001A01B1AF
+          MH1                                                                                                                                                                                                                                                     VDD                                                            VSS                                                                                                                                                                                                  E_RX1                  2
+                                                                                                                                                                                                                                                    19                                                                                           63
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                    LED_BLUE_L
+                                                                                                                                                                                                                                                                  VDD                                                            VSS                                                                                                                                                                                                  E_TX1                  3
+                                  1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                      D1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               D2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      E_SDA
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                   1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             4
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                     RG_LED
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             RG_LED
+                                                                                                                                                                                                                                                    13                                                                                           12
+                                                                                                                                                                                                                                                                  VDDA                                                       VSSA                                                                                                                                                                                                     E_SCL                  5
+MH_WITH_PAD
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      P6
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      E_CS3                  6
+                                                                                                                                                                                                                                                                  STM32F405RG
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                         3
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                         2
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 3
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      E_CS2                  7
+          MH2
+                                                                                   +BATT                                                                           +BATT                                                                        +BATT                                                                    +BATT
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      E_CS1                  8
+                                  1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   E_CS0                  9
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             10
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                      100R
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              100R
+C                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                C
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                           47R
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                    47R
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                             47R
+                                                                                                                                                                                                                                                                                                                                                                                                           R4
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                       R5
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                     R6
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               R7
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                              R8
+MH_WITH_PAD
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        E_TX2                                1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            FBM1211-1001A01B1AF
+                                                                                                                                                                                                                                                                                                                                                                        Blue LED for power
+                                                                                             1                                                                               1                                                                            1                                                                        1                                                                                                                                                                                    E_RX2                                2
+                                                      CONN_01X03
+
+
+
+
+                                                                                                                                        CONN_01X03
+
+
+
+
+                                                                                                                                                                                                                       CONN_01X03
+
+
+
+
+                                                                                                                                                                                                                                                                                                CONN_01X03
+                                                                   P12                                                                               P13                                                                            P14                                                                      P15
+                                                                                                                         BAT54
+
+
+
+
+                                                                                                                                                                                                      BAT54
+
+
+
+
+                                                                                                                                                                                                                                                                                 BAT54
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                BAT54
+                                                                         1                                                                                 1                                                                              1                                                                        1                                                                                                                                                                                                    E_SCK                                3
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                           P10
+                                                                                                          NM
+
+
+
+
+                                                                                                                                                                                          NM
+
+
+
+
+                                                                                                                                                                                                                                                                       NM
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                 NM
+                                                                                                               D3
+
+
+
+
+                                                                                                                                                                                               D4
+
+
+
+
+                                                                                                                                                                                                                                                                            D5
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                      D6
+                                                                                                     P7
+
+
+
+
+                                                                                                                                                                                     P8
+
+
+
+
+                                                                                                                                                                                                                                                                  P9
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               LED_GREEN_R
+                                                                                                                                                                                                                                                                                                                                                                                                                                       LED_GREEN_L
+                                                                                                                                                                                                                                                                                                                                                                                             BLUE_LED
+                                                                         2                   2                                                             2                 2                                                            2               2                                                        2               2                                                                                                                                                                                    E_MISO                               4
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                        1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               LED_RED_R
+                                                                                                                                                                                                                                                                                                                                                                                                                       LED_RED_L
+                                                                         3                                                                                 3                                                                              3                                                                        3                                                                                                                                                                                                    E_MOSI                               5
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                 D7
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      P11
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        E_NRF_IO2                            6
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                        2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        E_NRF_IO1                            7
+                                           R9                                                                                     R10                                                                          R11                                                                        R12
+       MOTOR1                             100R                                                        MOTOR2                     100R                                                MOTOR3                   100R                                                MOTOR4                 100R                                                                                                                                                                                                                           E_OW/WKUP                            8
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     VCOM_EXP                                9
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     VUSB                                    10
+                                                                    R19
+
+
+
+
+                                                                                                                                                      R22
+
+
+
+
+                                                                                                                                                                                                                                     R33
+
+
+
+
+                                                                                                                                                                                                                                                                                                              R34
+                                                                    NM
+
+
+
+
+                                                                                                                                                      NM
+
+
+
+
+                                                                                                                                                                                                                                     NM
+
+
+
+
+                                                                                                                                                                                                                                                                                                              NM
+
+
+
+
+                                                                          Q1                                                                                Q2                                                                             Q3                                                                       Q4
+                                                                                   D
+
+
+
+
+                                                                                                                                                                   D
+
+
+
+
+                                                                                                                                                                                                                                                D
+
+
+
+
+                                                                                                                                                                                                                                                                                                                         D
+
+
+       M1_OVERIDE                                                        G                            M2_OVERIDE                                           G                         M3_OVERIDE                                           G                       M4_OVERIDE                                       G
+                                                                                                                                                                                                                                                                                                                                                 Main CPU, motor control and connectors
+                                                                                           FDMA410
+
+
+
+
+                                                                                                                                                                           FDMA410
+
+
+
+
+                                                                                                                                                                                                                                                        FDMA410
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                 FDMA410
+
+                                                                                                                                                                                                                                                                                                                                                 Licenced under CC-BY-NC-SA 4.0
+                                                                                   S
+
+
+
+
+                                                                                                                                                                   S
+
+
+
+
+                                                                                                                                                                                                                                                S
+
+
+
+
+                                                                                                                                                                                                                                                                                                                         S
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                 Bitcraze AB
+                                                                    R13
+
+
+
+
+                                                                                                                                                      R14
+
+
+
+
+                                                                                                                                                                                                                                     R15
+
+
+
+
+                                                                                                                                                                                                                                                                                                              R16
+                                                                    10k
+
+
+
+
+                                                                                                                                                      10k
+
+
+
+
+                                                                                                                                                                                                                                     10k
+
+
+
+
+                                                                                                                                                                                                                                                                                                              10k
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                 Sheet: /
+D                                                                                                                                                                                                                                                                                                                                                File: tern.sch                                                                                                                                                                                                                                                  D
+
+                                                                                                                                                                                                                                                                                                                                                 Title: Crazyflie Bolt 1.1
+                                                                                                                                                                                                                                                                                                                                                 Size: A4              Date: 2021-10-29                                                                                                                                                                    Rev: Rev.H
+                                                                                                                                                                                                                                                                                                                                                 KiCad E.D.A. kicad 5.1.10-88a1d61d5890ubuntu20.04.1                                                                                                                                                       Id: 1/3
+                                                  1                                                                                                            2                                                                                                  3                                                                                         4                                                                                                                                         5                                                                                                          6
+    1                            2                                                              3                       4                                               5                6
+
+
+
+
+A                                                                                                                                                                                        A
+
+
+
+
+                                                                                  U9
+                                                              8                                 16
+                              IMU_SCK                                      SCL/SCK       INT1           INT_ACC
+                                                              9                                 1
+                               IMU_SDI                                     SDA/SDI       INT2           INT_GYR
+                                                              15                                12
+                              IMU_SDO                                      SDO1          INT3
+                                                              10                                13
+                                                                           SDO2          INT4
+                                                              14
+                          IMU_CS_ACC                                       CS_ACC
+                                                              5
+                          IMU_CS_GYR                                       CS_GYR
+                                                                  7                                 2
+                                                                           PS             NC
+                                     VCCA
+                                                              3                                     6
+                                                                           VDD      GND
+                                                              11                                    4
+                                                                           VDD_IO GND_IO
+                                                                                BMI088
+                                                C31
+
+
+                                                100n
+
+B                                                                                                                                                                                        B
+
+
+
+
+                                                                                   U10
+                                     IMU_SCL            IMU_SCL       2
+                                                                                SCK/SCL
+                                     IMU_SDA            IMU_SDA       4
+                                                                                SDI/SDA
+                                                                      5                         7
+                                                                                SDO/A0 INT
+                                                                      6
+                                                                                CSB
+                                                                                                3
+                                                  VCCA                                  VSS
+                                                                      1                         8
+                                                                                VDDIO VSS
+                                                                      10                        9
+                                                                                VDD     VSS
+                                                                                 BMP388
+                                                       C32
+
+
+                                                       100n
+
+
+
+
+C                                                                                                                                                                                        C
+
+
+
+
+        Please note the following about the Crazyflie expansion connectors:
+        * VCOM is always on power directly from the battery/USB and is not regulated
+                                                                                                                  Licenced under CC-BY-NC-SA 4.0
+        * VCC is only on when the system is on and is regulated to 2.8V
+        * VUSB is connected directly to the USB which means this will supply at 4.5-5.5V                          Bitcraze AB
+          when the USB is connected and can be used for charging the battery when the                             Sheet: /imu/
+D         USB is not connected                                                                                    File: imu.sch                                                          D
+
+                                                                                                                  Title: Crazyflie Bolt 1.1
+                                                                                                                  Size: A4              Date: 2019-10-01                    Rev: Rev.F
+                                                                                                                  KiCad E.D.A. kicad 5.1.10-88a1d61d5890ubuntu20.04.1       Id: 2/3
+    1                            2                                                              3                       4                                               5                6
+                                1                                                                                  2                                                               3                                                                           4                                                               5                                                6
+
+
+                                                                                                                                                                                       5V-3V
+                                                                                                                                                                                                                                                     nrf51822 always-on power supply
+                                                                                                                                                                                        VCOM
+     5V                                                                                                                                            MBR0520
+                                                                                                                                                                                                                                   VFILT                           NCP702SN30                                  VCCNRF
+                                                                                                                                                                                                             R17
+                                                                                                                                                                                                                                                           1                               5
+    VUSB                                                                                                                                                                                                     0R                                                    IN               OUT
+                                                                                                                                                      D9                                                                                                   2
+                                                                                                                                                                                                                                                                   GND
+                                                3V-17V input (1S - 4S)                                                                                                                                                                                     3
+                                                                                                                                                                                                                                                                   EN                NC
+                                                                                                                                                                                                                                                                                           4
+                                                         +BATT
+
+A                                                                                                  U4                                                                                                                                                                                                                                                                           A
+                                                                                                                             L4
+                                                                                                                                                                                                                            C11
+                                                                                                                                                                                                                                                                                      U3                C10
+                                                                                               2                   7
+                                                                                                   VIN        SW
+                                                                                               3                   6        2.2uH                                                                                                                                                                       4.7u
+                                                                                                   EN        VOS
+                R18
+                10k
+
+
+
+
+                                                                                                                                                                                                                            4.7u
+                                                                            C12
+                                                                                               4
+                                                                                                   AGND       PG
+                                                                                                                   8   PM_PGOOD                            C19
+                                     SMF4L17A
+
+
+                                                                                               1                   5
+                                                                                                   PGND       FB
+
+
+
+
+                                                                                                                                                   430k
+                                                                                                                                                   R20
+                                                 D10
+
+                                                        510k
+                                                        R24
+                                                                            10u                                                                            22u
+                                                                                                    TPS62170                                                                                                                                                                                           Filter the power supply at 73KHz, should filter most of the PWM
+                      VEN_D
+                                                                                                                                                                                                                                                                                                                        L1 shall support at least 20mA to power the IMU.
+                                                                                                                                                                                                                                                                                                           VCC
+                                                                                                                                                                                                                                                                                                                                                Eg. MLZ1608N1R0L 700mA
+                                                                                                                                                                                                                                                                   LP2985-30                                                              VCCA
+                                                                                                                                                                                                                                                                                                                              L1                 Analog power only
+                                                                                                                                                                                                                                                           1                               5
+                R23
+                10k
+
+
+
+
+                                                                                                                                                                                                                                                                   IN               OUT                                                          used by IMU.
+                                                                                                                                                                                                                                                           2                                                              1uH
+                                                                                                                                                                                                                                                                   GND                                                                           Inductance and
+                                                                  10n                                                                                                                                                                                      3                               4
+
+
+
+
+                                                                                                                                                   R21
+                                                                                                                                                   82k
+                                                                                                                                                                                                                            C13                                    EN             BYPASS                                                         capacitor placed
+                                                        110k
+                                                        R25
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                 near IMU
+                                                                  C37
+                                                                                                                                                                                                                            4.7u                                                      U5
+                                                                                                                                                                                                                                                                                                 C14     C15                              C16
+
+
+                                                                                                                                                                                                                                                                                                 10n     4.7u                             4.7u
+
+                                                                                                        U6
+                                                               PM_CHG                              4
+                                                                                                        P0.00/AREF0                  P0.17
+                                                                                                                                              25          SWITCH
+                                                                                                                                                                                                                           VEN_D
+B
+                U13                                            VBAT                                5                                          26                       PA_ANT_SW                                                                                         SiP32431                                                                                               B
+                                                                                                        P0.01/AIN2                   P0.18
+           1
+                    IO   N.C
+                                      2                                                            6
+                                                                                                        P0.02/AIN3                   P0.19
+                                                                                                                                              27                         PA_MODE                                                                               3
+                                                                                                                                                                                                                                                                        IN          OUT
+                                                                                                                                                                                                                                                                                           1
+                                                                                                                                                                                                                                                                                                              VCOM_EXP
+                                                                                                   7
+                                                                                                        P0.03/AIN4                   P0.20
+                                                                                                                                              28                        PA_RX_EN                                                                               4
+                                                                                                                                                                                                                                                                        EN          GND
+                                                                                                                                                                                                                                                                                           2
+                         GND
+                                      3                        PM_PGOOD                            8
+                                                                                                        P0.04/AIN5                   P0.21
+                                                                                                                                              40
+                                                                                                                                                           STM_NRST
+                                                                                                   9                                          41                                                                                                                                     U11
+                                                                                                        P0.05/AIN6                   P0.22                 STM_BOOT0
+                 DS28E05                                                                           10                                         42
+                                                                                                        P0.06/AIN7/AREF1             P0.23
+                                                                                                   11                                         43                                                                                                                                                                               U12
+                                                                                                        P0.07                        P0.24
+                                                                                                   14                                         44                                                                                                                                                                          4                         2              P2
+          E_OW/WKUP                                                                                     P0.08                        P0.25                                                                                                                                                                                          IN     OUT
+                                                                             OW_PU
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                         u.FL
+                                                                                                   15                                         45                                                                                                                                                                                                               1
+                                                          1k                                            P0.09               P0.26/AIN0/XL2
+                                                         R28                 VEN_D                 16
+                                                                                                        P0.10               P0.27/AIN1/XL1
+                                                                                                                                              46
+                                                                                                                                                                                                                                                                                                                                           GND
+                                                                                                                                                                                                                                                                                                                                                    1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                   2
+                                                                                                   17                                         47                                                                                                                                                                                                    3
+               E_NRF_IO2                                                                                P0.11                        P0.28                                                                                                                                                                                                 GND
+                                                                                                   18                                         48
+               E_NRF_IO1                                                                                P0.12                        P0.29                 NRF_TX                                                                                                            U8
+                                                                        LED_BLUE                   19                                         3                                                                                                                                                                                    ADFC15-2450.00
+                                                                                                        P0.13                        P0.30                 NRF_RX
+                                                                                                   20                                                                                                                                                                                                          14
+    NRF_FLOW_CTRL                                                                                       P0.14                                                                                                                                                                                   ANT_A
+                                                                                                   21                                                                                                                                                              5                                                           U14
+                                                                                                        P0.15                                                                                                                                                                TXRX
+                                                                                                   22                                                                                                                                                                                                          12         4                         2              P16
+                                                                                                        P0.16                                                                                                                                                                                   ANT_B                               IN     OUT
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                         u.FL
+                                                                                                                                                                                                                                                                   6                                                                                           1
+                                                                                                   23                                                                                                                                                                        TXEN
+                                        NRF_SWDIO                                                       SWDIO/nRESET                          32                                       U7                                                  PA_RX_EN  7                                                          8                                   1
+                                                                                                   24                                 ANT2                                                                                                                                   RXEN                PDET                                      GND
+                                       NRF_SWDCLK                                                       SWDCLK                                                                                                                             PA_MODE
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                   2
+                                                                                                                                              31                       4                             3                                               9                                                                                              3
+                                                                                                                                      ANT1                                     BAL2      BAL1                                                                                MODE                                                          GND
+                                                                                                   37
+                                                                                                        XC1                         VDD_PA
+                                                                                                                                              30                       5
+                                                                                                                                                                               DC         GND
+                                                                                                                                                                                                     2                                     PA_ANT_SW 10                      SW_ANT               IND
+                                                                                                                                                                                                                                                                                                               15
+C                                                                                                  38                                                                  6                             1                                                                                                                             ADFC15-2450.00                               C
+                                                                                                        XC2                                                                    GND      UNBAL                                                                      3
+                                                                   X3                                                                                                                                                                                                        DNC
+                                                                                                                                                                                                                                                                   16                                           2
+                                                                 16MHz                                                                        39                                   BALUN                                                                                     DNC                  NC
+                                                                                                   2                                  DEC1                                                           R31                                                           17                                           4
+                                                                                      VCCNRF            DCC                                                                                                                                                                  DNC                  NC
+
+
+
+
+                                                                                                                                                                                                                                                                                                                        2nH
+                                                                                                                                              29
+
+
+
+
+                                                                                                                                                                                                                                                                                                                               L2
+                                                                                                                                      DEC2                                                           1k                                     VCCNRF
+           VCCNRF
+                                                                                                   35
+                                                                                                        AVDD                                  13                                                                                                                   18                                          1
+                                                                                                   36                                  VSS                       C23   C24              C25                                                                                  VDD                 GND
+                                                                                                        AVDD                                  34                                                                                                                   20                                          11
+                                                                                                                                       VSS                                                                                                                                   VDD                 GND
+                                                                                                   1                                          33                 47n   100n             2.2n                                                                                                                   13
+                                                        C26                       C27                   VDD                            VSS                                                                                                                                                       GND
+                C28      C29    C30                                                                12                                                                                                                                                                                                          19
+                                                                                                        VDD                                                                                                                                C20       C22                                         GND
+                                                        12p                       12p                                                         49                                                                                                                                                               21
+                100n     100n       100n
+                                                                                                                                     EPAD                                                                                                                                                        GND
+                                                                                                                                                                                                                                           4.7u      220p                            RFX2411N
+                                                                                                        NRF51822
+
+
+
+
+                                                                                                                                                                                                                                                  Power management and radio
+                                                                             D8
+                    LED_BLUE                                            1         2                                                                                                                                                               Licenced under CC-BY-NC-SA 4.0
+                                                       47R
+                                                                                                                                             SW1                                   For KiCad ERC check
+                                                       R32          BLUE_LED                                       SWITCH                                                                                                                         Bitcraze AB
+                                                                                                                                                                           +BATT   VCCNRF      VCC    VCCA   VFILT    PWR_FLAG
+                                                                                                                                     SW_PUSH                                                                                                      Sheet: /pm_radio/
+D                                                                                                                                                                                                                                                 File: pm_radio.sch                                                                                                            D
+
+                                                                                                                                                                                                                                                  Title: Crazyflie Bolt 1.1
+                                                                                                                                                                       PWR_FLAG PWR_FLAG PWR_FLAG PWR_FLAG PWR_FLAG
+                                                                                                                                                                                                                                                  Size: A4              Date: 2019-10-01                                                                     Rev: Rev.F
+                                                                                                                                                                                                                                                  KiCad E.D.A. kicad 5.1.10-88a1d61d5890ubuntu20.04.1                                                        Id: 3/3
+                                1                                                                                  2                                                               3                                                                           4                                                               5                                                6
+

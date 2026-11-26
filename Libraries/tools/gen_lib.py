@@ -170,8 +170,9 @@ def sym_tps61235p():
 
 
 def sym_bmi088():
-    # murexrobotics, bit-bots and ArduPilot NxtPX4v2 symbols agree (NxtPX4 swaps the names of the
-    # two ground pins 4 / 6; the other two say 4 GNDA, 6 GNDIO).
+    # Pin numbers: Bitcraze Crazyflie Bolt 1.1 schematic (rev H, imu sheet) = murexrobotics = bit-bots =
+    # ArduPilot NxtPX4v2. Ground names as the Bolt and NxtPX4 (4 GND_IO, 6 GND); murex / bit-bots
+    # swap the two names. Both pins go to ground either way.
     return symbol(
         "BMI088", "U", "KD_Sensors:Bosch_LGA-16_3x4.5mm_P0.5mm",
         "https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi088/",
@@ -181,11 +182,12 @@ def sym_bmi088():
               ("SCK", 8, IN), ("SDI", 9, BI)],
         right=[("SDO1", 15, BI), ("SDO2", 10, BI), None, ("INT1", 16, BI), ("INT2", 1, BI), ("INT3", 12, BI),
                ("INT4", 13, BI), ("NC", 2, NC)],
-        bottom=[("GNDA", 4, PI), ("GNDIO", 6, PI)])
+        bottom=[("GNDIO", 4, PI), ("GND", 6, PI)])
 
 
 def sym_bmp388():
-    # leelili444, Caped-Crussader VENDETTAFC, fdiwth tvc-drone and ArduPilot NxtPX4v2 agree.
+    # leelili444, Caped-Crussader VENDETTAFC, fdiwth tvc-drone, ArduPilot NxtPX4v2 and the Bitcraze
+    # Crazyflie Bolt 1.1 schematic (rev H) agree.
     return symbol(
         "BMP388", "U", "KD_Sensors:Bosch_LGA-10_2x2mm_P0.5mm",
         "https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp388/",
@@ -210,14 +212,14 @@ PICO_PINS = {   # physical pin -> (name, type); Pico 2 W datasheet section 2.1 (
 def sym_pico2w():
     left = [(PICO_PINS[p][0], p, PICO_PINS[p][1]) for p in range(1, 21)]
     right = [(PICO_PINS[p][0], p, PICO_PINS[p][1]) for p in range(40, 20, -1)]
-    # underside pads of the footprint (pad names = pin numbers); TP order and SWD order TO CHECK
-    bottom = [("GND", "TP1", PA), ("USB_DM", "TP2", BI), ("USB_DP", "TP3", BI), None,
+    # underside pads of the footprint (pad names = pin numbers), confirmed on the module silkscreen
+    bottom = [("GND", "TP1", PA), ("USB_DM", "TP2", BI), ("USB_DP", "TP3", BI), ("BOOTSEL", "TP6", IN), None,
               ("SWCLK", "SWCLK", IN), ("GND", "SWD_GND", PA), ("SWDIO", "SWDIO", BI)]
     return symbol(
         "RPi_Pico_2_W", "U", "KD_Modules:RPi_Pico_2_W_SMD_Castellated",
         "https://datasheets.raspberrypi.com/pico/pico-2-w-datasheet.pdf",
-        "Raspberry Pi Pico 2 W (RP2350, CYW43439 Wi-Fi/BT), castellated SMD; also the underside USB test "
-        "points TP1-3 and SWD pads",
+        "Raspberry Pi Pico 2 W (RP2350, CYW43439 Wi-Fi/BT), castellated SMD; also the underside test "
+        "points TP1-3 (USB), TP6 (BOOTSEL) and SWD pads",
         "raspberry pi pico rp2350 module wifi", left=left, right=right, bottom=bottom, width=22.86)
 
 
@@ -316,16 +318,27 @@ def fp_rwl():
 
 # --- Pico 2 W (moved from Drone_1S_Pico2W/tools/gen_libs.py) ------------------------
 # Datasheet Fig. 5 origin is the module's bottom-left corner: fx = x - 10.5, fy = 25.5 - y.
-PICO_TP = [(8 - 10.5, 25.5 - y) for y in (41.5, 39.0, 36.5)]            # 1.5 x 1.5 mm
-PICO_TP_NAMES = ["TP1", "TP2", "TP3"]       # GND, USB DM, USB DP: order from the USB end TO CHECK
+# Test points (1.5 x 1.5 mm, 0.3 mm corner radius). Fig. 5 draws two groups; the module's bottom
+# silkscreen (photo, Materials/extracted/pico2w_top_bottom_photo.jpg) names them:
+#   at the USB end: TP2 (11.5, 49.8) and TP3 (9.5, 49.8) side by side at the edge, TP1 (10.5, 46.5)
+#   behind them - TP2 on the pin 21-40 side; column at x = 8: TP4 (41.5), TP5 (39), TP6 (36.5).
+# Datasheet 2.1: TP1 GND, TP2 USB DM, TP3 USB DP, TP4 WL_GPIO1 / SMPS PS (do not use),
+# TP5 WL_GPIO0 / LED (not recommended), TP6 BOOTSEL.
+_TP = {"TP1": (10.5, 46.5), "TP2": (11.5, 49.8), "TP3": (9.5, 49.8),
+       "TP4": (8.0, 41.5), "TP5": (8.0, 39.0), "TP6": (8.0, 36.5)}
+PICO_TP_ALL = {n: (x - 10.5, 25.5 - y) for n, (x, y) in _TP.items()}
+PICO_TP_NAMES = ["TP1", "TP2", "TP3", "TP6"]      # solder pads; TP4 / TP5 get no copper (datasheet: void it)
+PICO_TP = [PICO_TP_ALL[n] for n in PICO_TP_NAMES]
+# SWD pads E (square) / F / G = SWCLK / GND / SWDIO: confirmed on the module's bottom silkscreen (photo).
 PICO_SWD = [(x - 10.5, 25.5 - 19.8) for x in (11.0841, 13.6241, 16.1641)]
-PICO_SWD_NAMES = ["SWCLK", "SWD_GND", "SWDIO"]   # E, F, G: order TO CHECK
+PICO_SWD_NAMES = ["SWCLK", "SWD_GND", "SWDIO"]
 
 
 def fp_pico():
     """Raspberry Pi Pico 2 W castellated: Pico 2 W datasheet Figure 5 (identical to the Pico W
     figure): pads 3.2 x 1.6 mm, 0.79 mm outside the module edge, rows 17.78 mm, 22.58 mm wide,
-    USB shell relief pads A-D, test points TP1-3 and SWD pads E-G as solder pads. Module +0.3 mm
+    USB shell relief pads A-D, test points TP1-3 (USB) and TP6 (BOOTSEL) and SWD pads E-G as solder
+    pads; TP4 / TP5 drawn on Fab only (no copper, as the datasheet allows). Module +0.3 mm
     over-paste (datasheet). Origin at the module centre, USB at -Y, pin 1 at -X."""
     pads = []
     px = 9.69
@@ -358,15 +371,16 @@ def fp_pico():
         line(-11.5, -25.3, -9.0, -25.3, "F.SilkS", 0.2),
         rect(-11.55, -27.05, 11.55, 25.75, "F.CrtYd", 0.05),
     ]
-    for i, (x, y) in enumerate(PICO_TP):
+    for name, (x, y) in PICO_TP_ALL.items():     # all six on Fab; TP4 / TP5 have no copper
         g.append(rect(x - 0.75, y - 0.75, x + 0.75, y + 0.75, "F.Fab", 0.05))
-        g.append(text("user", f"TP{i + 1}", x + 2.0, y, "F.Fab", size=0.5, thick=0.08))
+        g.append(text("user", name, x + (0 if name in ("TP2", "TP3") else 1.9), y + (1.3 if name in ("TP2", "TP3") else 0),
+                      "F.Fab", size=0.4, thick=0.06))
     for x, y in PICO_SWD:
         g.append(rect(x - 0.79, y - 0.79, x + 0.79, y + 0.79, "F.Fab", 0.05))
     g.append(text("user", "SWD", PICO_SWD[1][0], PICO_SWD[1][1] + 1.6, "F.Fab", size=0.5, thick=0.08))
     return footprint("RPi_Pico_2_W_SMD_Castellated",
                      "Raspberry Pi Pico 2 W, surface-mounted by its castellated pads. Pad geometry per Pico 2 W "
-                     "datasheet Fig. 5. Keep top copper away from TP1-3, the SWD pads and the antenna area.",
+                     "datasheet Fig. 5; TP1-3, TP6 and SWD as solder pads (names from the module silkscreen). No copper under TP4/TP5 or the antenna.",
                      "RPi Pico 2 W RP2350 castellated SMD module", "smd", g, pads)
 
 

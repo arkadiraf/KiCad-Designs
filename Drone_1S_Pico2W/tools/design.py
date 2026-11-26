@@ -154,11 +154,18 @@ FC = dict(
 # RIGHT row (scad -y), pin 1 at the front.
 DECK_LEFT = ["VCC_3V", "UART1_RX", "UART1_TX", "I2C_SDA", "I2C_SCL",
              "IO_1", "IO_2", "IO_3", "IO_4", "GND"]
-DECK_RIGHT = ["UART2_RX", "UART2_TX", "SPI_SCK", "SPI_MISO", "SPI_MOSI",
+DECK_RIGHT = ["UART2_TX", "UART2_RX", "SPI_SCK", "SPI_MISO", "SPI_MOSI",
               "NRF_IO_1", "NRF_WKUP", "NRF_OW", "VCOM", "VUSB"]
-# Flow deck v2 use (to verify against the Flow deck v2 schematic before stage 2):
-# SPI + a chip select on an IO pin for the PMW3901, I2C for the VL53L1x, and its
-# supply from VCOM / VCC_3V.
+# Pin names as the Flow deck v2 schematic (rev A) and Crazyflie Bolt 1.1 schematic (rev H)
+# expansion connectors (Materials/): left 2 RX1, 3 TX1; right 1 TX2, 2 RX2.
+# Flow deck v2 use (Materials/flow_deck_v2_reva_schematic.pdf), VERIFIED:
+#   L1  VCC_3V  -> PMW3901 VCCIO + VL53L1x VCC (Crazyflie supplies 2.8-3.0 V; the Pico gives 3.3 V)
+#   L4/L5 I2C   -> VL53L1x (XSHUT pulled up to VCC; GPIO1 not fitted)
+#   L8  IO_3    -> PMW3901 CS (IO_1 = Loco deck CS, IO_4 = micro-SD deck CS: free here)
+#   R3-R5 SPI   -> PMW3901 SCK / MISO / MOSI (RESET, MOTION not fitted)
+#   R8  NRF_OW  -> DS28E05 1-wire deck ID EEPROM (optional for us)
+#   R9  VCOM    -> TLV70218 LDO -> 1.8 V PMW3901 core. Bolt: VCOM = VBAT (or 5 V) up to 400 mA.
+#   L10 GND     (the only ground pin; R6/R7, UARTs, VUSB unused)
 
 # ---------------------------------------------------------------------------
 # Board-to-board: the FC hangs under the frame on the 4 shared M2 holes and plugs
