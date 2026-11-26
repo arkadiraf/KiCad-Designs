@@ -56,7 +56,6 @@ SCAD = dict(
     motor_bell_d=15.76, prop_d=63.5,
     esc_l=16.2, esc_w=11.0, esc_radius=47.0, esc_pins_in=4, esc_pins_out=3,
     pin_hole=1.0,
-    fc_size=(36.0, 35.4), fc_holes=30.5, fc_hole_d=2.7,
     center_l=80.0, center_w=44.0,
     crad_hole=(24.0, 9.45 + 6.0 + 2.05), crad_hole_d=2.2,   # rail_in + rail_w + 2.05
     ph_hole=0.8,
@@ -81,7 +80,7 @@ FRAME = dict(
 HOLE_CLASSES = {
     4.0: "motor_shaft",     # clearance for the shaft end and clip (NPTH)
     2.2: "m2",              # motor M2 screws and cover/gear M2 screws (NPTH)
-    2.7: "fc_mount",        # FC module M2.5 screws, 30.5 mm square (NPTH)
+    2.7: "fc_mount",        # old Bolt M2.5 pattern (removed from the scad; none expected)
     1.0: "esc_pin",         # ESC header pins (plated, electrical)
     0.8: "jst_ph",          # JST PH pins of the Bolt-era connectors (dropped, see README)
 }
@@ -92,7 +91,7 @@ TAB_PAD_X = SCAD["bat_len"] / 2 + SCAD["tab_pad"] / 2 - 0.5
 
 # ---------------------------------------------------------------------------
 # FC module board - a new design (not the Bolt). The frame will be rewired to
-# suit it; the 30.5 mm M2.5 pattern is kept only until the frame is redone.
+# suit it.
 #   TOP side    (faces the frame): Pico 2 W, castellated SMD, nothing else.
 #   BOTTOM side (faces the ground): sensor / support ICs and the Crazyflie deck
 #               connectors, so the Flow deck v2 plugs in from below exactly as
@@ -100,22 +99,35 @@ TAB_PAD_X = SCAD["bat_len"] / 2 + SCAD["tab_pad"] / 2 - 0.5
 # ---------------------------------------------------------------------------
 LIB = "Drone_1S"            # project footprint library (../Drone_1S.pretty, gen_libs.py)
 
+# The FC hangs on the SAME four M2 holes that hold the printed battery cover (and the
+# Pi Zero on it) and the landing gear: one bolt stack per hole, top to bottom:
+#   cover boss - frame - landing gear (2 mm) - M2 standoff - FC - M2 screw from below.
+# Hole positions come from the scad (crad_hole = 24, rail_in + rail_w + 2.05).
+CRAD = SCAD["crad_hole"]
 FC = dict(
     project="Drone_1S_FC",
     title="1S Pico 2 W drone - flight controller module",
     thickness=1.6,
-    size=(56.0, 35.4),          # 35.4 = old Bolt width (fits the printed landing gear)
-    corner_r=2.0,
-    holes=SCAD["fc_holes"], hole_d=SCAD["fc_hole_d"],
+    holes=[(sx * CRAD[0], sy * CRAD[1]) for sx, sy in ((1, 1), (1, -1), (-1, -1), (-1, 1))],
+    hole_d=SCAD["crad_hole_d"],  # 2.2 mm, M2
+    ear_r=3.2,                   # board radius round each hole (M2 standoff hex 4 mm AF: 2.31 to the corners)
     pico_size=(51.0, 21.0),
     pico_c=(-2.5, 0.0),          # Pico spans x -28 .. 23; micro-USB at the rear edge (x = -28)
     notch=(14.0, 9.0),           # Pico 2 W datasheet 2.2.1: 14 x 9 mm antenna cut-out
+    # Minimum outline = union of
+    #   the Pico band     x -28 .. 23, |y| <= 12.5 (Pico lands reach |y| 11.29, + edge clearance and its silk)
+    #   the middle block  |x| <= 12.5, |y| <= 16.5 (deck pads |y| <= 13.4, B2B header pads |y| <= 15.7, + silk)
+    #   four ears         capsule from each hole to the band, radius ear_r
+    # minus the antenna notch, all corners filleted 1 mm.
+    band=(-28.0, 23.0, 12.5),
+    middle=(12.5, 16.5),
+    ear_root=(20.0, 10.0),       # |x|, |y| where each ear joins the band
+    fillet=1.0,
     # Crazyflie deck interface (Bitcraze deck template c8f9a2e): two 1x10 rows,
-    # 2.00 mm pitch, 22.0 mm apart, pin 1 of both rows at the FRONT. Deck board
-    # 25.2 x 27.3 mm centred on the connector pair. Centred on the FC = frame centre.
+    # 2.00 mm pitch, 22.0 mm apart, pin 1 of both rows at the FRONT.
     deck_c=(0.0, 0.0),
     deck_rows=22.0,
-    deck_board=(25.2, 27.3),     # x (along the rows) by y
+    deck_board=(21.0, 28.0),     # Flow deck v2, x (along the rows) by y - to check
 )
 
 # Crazyflie 2.x deck connector pinout (docs/cf2_exp_pinout.png in the Bitcraze
@@ -130,13 +142,13 @@ DECK_RIGHT = ["UART2_RX", "UART2_TX", "SPI_SCK", "SPI_MISO", "SPI_MOSI",
 # supply from VCOM / VCC_3V.
 
 # ---------------------------------------------------------------------------
-# Board-to-board: the FC hangs under the frame on 4 x M2.5 standoffs and plugs
+# Board-to-board: the FC hangs under the frame on the 4 shared M2 holes and plugs
 # into it, so it can be pulled off and replaced (nothing soldered between them).
 #   FC top    : 2 x male pin header 1x10, 2.00 mm, through-hole (J1 left, J2 right)
 #   Frame bot : 2 x female socket 1x10, 2.00 mm, SMD (J5 left, J6 right) - SMD so
 #               no pin tails come up under the battery-cover rails on the frame top.
-# 2.00 mm because a 2.54 mm 1x10 (25.4 mm + body) runs into the M2.5 standoff
-# hexes at x = +-12.35 mm; 2.00 mm (20 mm) clears them.
+# 2.00 mm keeps the FC's middle block narrow (|x| <= 12.5); 2.54 mm would also fit
+# between the shared holes at x = +-24 but widens the board.
 # Rows at y = +-15: outside the Pico courtyard (+-11.55) and the deck pads on the
 # FC bottom (|y| <= 13.4), and the FC-side pin tails stay outside the Flow deck
 # board (|y| <= 13.65).  Pin 1 of both rows at the front, pin k at x = 9 - 2(k-1).
@@ -150,6 +162,7 @@ B2B = dict(
     # 1.5 mm header on 6 mm standoffs. Pico 2 W on the FC top is ~4 mm tall at the
     # micro-USB, so 6 mm leaves ~2 mm under the frame: keep tall frame-bottom parts
     # out of the area above the Pico. To confirm with the chosen part datasheets.
-    standoff=6.0,
+    standoff=6.0,                # FC top to frame bottom = landing gear (2 mm) + M2 standoff (4 mm)
+    gear_t=2.0,                  # printed landing-gear frame, clamped between frame and standoffs
 )
 B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of pins 1..10

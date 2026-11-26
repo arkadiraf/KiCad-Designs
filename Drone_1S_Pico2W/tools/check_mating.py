@@ -32,8 +32,8 @@ for h, s in (("J1", "J5"), ("J2", "J6")):
     print(f"FC {h} <-> frame {s}: 10 pins, pin line y = {row_y}")
 holes = lambda b, pre: sorted((round(mm(f.GetPosition().x), 3), round(mm(f.GetPosition().y), 3))
                               for f in b.GetFootprints() if f.GetReference().startswith(pre))
-hf, hc = holes(fr, "H_FC"), holes(fc, "H")
-print("M2.5 holes frame", hf, "\n           FC   ", hc)
+hf, hc = holes(fr, "H_CV"), holes(fc, "H")      # the shared cover / gear / standoff holes
+print("M2 holes frame", hf, "\n         FC   ", hc)
 ok &= hf == hc
 print("MATING OK" if ok else "MATING FAILED")
 sys.exit(0 if ok else 1)

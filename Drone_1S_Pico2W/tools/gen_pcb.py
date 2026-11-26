@@ -203,6 +203,47 @@ def place_b2b(board, lib, name, ref, value, row_sign, bottom):
     raise AssertionError(f"{ref}: no orientation puts pin k at x = 9 - 2(k-1)")
 
 
+def poly_set(pts_mm):
+    s = pcbnew.SHAPE_POLY_SET()
+    s.NewOutline()
+    for x, y in pts_mm:
+        kx, ky = to_kicad(x, y)
+        s.Append(mm(kx), mm(ky))
+    return s
+
+
+def capsule(p, q, r, n=24):
+    """Stadium between scad points p and q, radius r, as a point list."""
+    a = math.atan2(q[1] - p[1], q[0] - p[0])
+    pts = [(q[0] + r * math.cos(a - math.pi / 2 + math.pi * i / n), q[1] + r * math.sin(a - math.pi / 2 + math.pi * i / n)) for i in range(n + 1)]
+    pts += [(p[0] + r * math.cos(a + math.pi / 2 + math.pi * i / n), p[1] + r * math.sin(a + math.pi / 2 + math.pi * i / n)) for i in range(n + 1)]
+    return pts
+
+
+def fc_outline_pts():
+    """Minimum FC outline (scad points, closed polygon), see design.FC."""
+    x0, x1, by = FC["band"]
+    mx, my = FC["middle"]
+    shape = poly_set([(x0, -by), (x1, -by), (x1, by), (x0, by)])
+    shape.BooleanAdd(poly_set([(-mx, -my), (mx, -my), (mx, my), (-mx, my)]), pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE)
+    rx, ry = FC["ear_root"]
+    for hx, hy in FC["holes"]:
+        root = (math.copysign(rx, hx), math.copysign(ry, hy))
+        shape.BooleanAdd(poly_set(capsule((hx, hy), root, FC["ear_r"])), pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE)
+    nw, nd = FC["notch"]
+    pico_end = FC["pico_c"][0] + FC["pico_size"][0] / 2
+    shape.BooleanSubtract(poly_set([(pico_end - nd, -nw / 2), (pico_end + 10, -nw / 2), (pico_end + 10, nw / 2), (pico_end - nd, nw / 2)]),
+                          pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE)
+    shape = shape.Fillet(mm(FC["fillet"]), mm(0.01))
+    assert shape.OutlineCount() == 1 and shape.HoleCount(0) == 0
+    o = shape.Outline(0)
+    pts = []
+    for i in range(o.PointCount()):
+        v = o.CPoint(i)
+        pts.append((pcbnew.ToMM(v.x) - ORIGIN_X, ORIGIN_Y - pcbnew.ToMM(v.y)))
+    return pts
+
+
 def new_fp(board, ref, value, pos, name):
     fp = pcbnew.FOOTPRINT(board)
     fp.SetFPID(pcbnew.LIB_ID("Drone_1S", name))
@@ -345,7 +386,7 @@ def build_frame():
 
     # --- mounting holes (library footprints) ---
     lib_hole = {"fc_mount": ("MountingHole", "MountingHole_2.7mm_M2.5", "H_FC"),
-                "m2": ("MountingHole", "MountingHole_2.2mm_M2", "H_CV")}
+                "m2": ("MountingHole", "MountingHole_2.2mm_M2", "H_CV")}   # cover + gear + FC standoffs
     cnt = {}
     for h in holes:
         if h["kind"] == "m2" and min(math.hypot(h["x"] - mx, h["y"] - my) for mx, my in MOTORS) < 6:
@@ -356,10 +397,10 @@ def build_frame():
         cnt[pre] = cnt.get(pre, 0) + 1
         fp = load_fp(lib, fpn)
         fp.SetReference(f"{pre}{cnt[pre]}")
-        fp.SetValue("FC M2.5" if pre == "H_FC" else "Cover/gear M2")
+        fp.SetValue("FC M2.5" if pre == "H_FC" else "Cover/gear/FC M2")
         fp.SetPosition(VS(h["x"], h["y"]))
         board.Add(fp)
-    assert cnt == {"H_FC": 4, "H_CV": 4}, cnt
+    assert cnt == {"H_CV": 4}, cnt      # the 4 shared cover / gear / FC holes (no separate FC holes)
     dropped = [h for h in holes if h["kind"] == "jst_ph"]
 
     # --- battery tab pads (scad pcb(): tab_pad x 10 mm at both cell ends, top copper) ---
@@ -387,8 +428,8 @@ def build_frame():
             circle(board, VS(sx * SCAD["pi_hole_x"] / 2, sy * SCAD["pi_hole_y"] / 2), 1.375, top)
     text(board, "Pi Zero 2 W (on the battery cover, above the cell)", VS(0, SCAD["pi_w"] / 2 - 2.5), top, 1.0)
     text(board, "18650 cell on top, tabs soldered to BT1", VS(0, -5), top, 1.0)
-    poly(board, rect_s(0, 0, *FC["size"]), bot, 0.15)
-    text(board, f"FC module below on {B2B['standoff']:g} mm M2.5 standoffs, plugs into J5/J6", VS(0, -FC["size"][1] / 2 - 1.5), bot, 1.0)
+    poly(board, [VS(x, y) for x, y in fc_outline_pts()], bot, 0.15)
+    text(board, "FC module below (gear + M2 standoffs on H_CV1-4), plugs into J5/J6", VS(0, -23), bot, 1.0)
     pcx, pcy = FC["pico_c"]
     poly(board, rect_s(pcx, pcy, *FC["pico_size"]), bot, 0.1)
     text(board, "Pico 2 W below (~4 mm tall): only low parts here", VS(pcx, pcy - 3), bot, 0.8)
@@ -422,34 +463,18 @@ def build_fc():
     write_project(os.path.join(d, f"{name}.kicad_pro"), ("VSYS", "VBAT*", "3V3"))
     board = new_board(pcb, FC["title"], FC["thickness"],
                       "Pico 2 W + BMI088 + BMP388 + Flow deck v2 adapter; 30.5 mm M2.5 mount")
-    L_, W_ = FC["size"]
-    r = FC["corner_r"]
-    nw, nd = FC["notch"]
-    x0, x1, y0, y1 = -L_ / 2, L_ / 2, -W_ / 2, W_ / 2
-    pico_end = FC["pico_c"][0] + FC["pico_size"][0] / 2       # antenna end of the Pico
-    nx = pico_end - nd                                          # notch bottom
-    k = r * (1 - 1 / math.sqrt(2))
-    # outline, counter-clockwise in scad coordinates, starting at the rear-right corner
-    E = pcbnew.Edge_Cuts
-    seg(board, VS(x0 + r, y0), VS(x1 - r, y0))
-    arc(board, VS(x1 - r, y0), VS(x1 - k, y0 + k), VS(x1, y0 + r))
-    seg(board, VS(x1, y0 + r), VS(x1, -nw / 2))
-    poly_pts = [VS(x1, -nw / 2), VS(nx, -nw / 2), VS(nx, nw / 2), VS(x1, nw / 2)]
-    for a, b in zip(poly_pts, poly_pts[1:]):
-        seg(board, a, b)
-    seg(board, VS(x1, nw / 2), VS(x1, y1 - r))
-    arc(board, VS(x1, y1 - r), VS(x1 - k, y1 - k), VS(x1 - r, y1))
-    seg(board, VS(x1 - r, y1), VS(x0 + r, y1))
-    arc(board, VS(x0 + r, y1), VS(x0 + k, y1 - k), VS(x0, y1 - r))
-    seg(board, VS(x0, y1 - r), VS(x0, y0 + r))
-    arc(board, VS(x0, y0 + r), VS(x0 + k, y0 + k), VS(x0 + r, y0))
+    pts = fc_outline_pts()
+    poly(board, [VS(x, y) for x, y in pts], pcbnew.Edge_Cuts, 0.1)
+    xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+    print(f"  FC outline {len(pts)} points, bbox x {min(xs):.2f}..{max(xs):.2f}  y {min(ys):.2f}..{max(ys):.2f}")
 
-    for n, (sx, sy) in enumerate(((1, 1), (1, -1), (-1, -1), (-1, 1)), 1):
-        fp = load_fp("MountingHole", "MountingHole_2.7mm_M2.5")
+    # the four shared M2 holes (cover / frame / landing gear / standoff / FC)
+    for n, (hx, hy) in enumerate(FC["holes"], 1):
+        fp = load_fp("MountingHole", "MountingHole_2.2mm_M2")
         fp.SetReference(f"H{n}")
-        fp.SetValue("M2.5 to frame")
-        fp.SetPosition(VS(sx * FC["holes"] / 2, sy * FC["holes"] / 2))
-        fp.Reference().SetLayer(pcbnew.F_Fab)     # silk would hang off the board edge
+        fp.SetValue("M2 standoff to frame")
+        fp.SetPosition(VS(hx, hy))
+        fp.Reference().SetLayer(pcbnew.F_Fab)
         board.Add(fp)
 
     top, bot = pcbnew.Dwgs_User, pcbnew.Cmts_User
@@ -500,20 +525,21 @@ def build_fc():
         fp = place_b2b(board, "Connector_PinHeader_2.00mm", "PinHeader_1x10_P2.00mm_Vertical", ref,
                        "Header 1x10 2.00mm male (to frame " + ("J5" if sy > 0 else "J6") + ")", sy, bottom=False)
         fp.Value().SetVisible(False)
-    text(board, f"FC hangs on {B2B['standoff']:g} mm M2.5 standoffs; J1/J2 plug into the frame", VS(0, -16.9), top, 0.6)
+        fp.Reference().SetLayer(pcbnew.F_Fab)      # no room for it on the trimmed outline
+    text(board, "FC hangs on the 4 cover screws: frame + gear + M2 standoffs; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
 
     # --- guides ---
     poly(board, rect_s(dcx, dcy, *FC["deck_board"]), bot, 0.15)
     text(board, "Flow deck v2 (below, on P1/P2)", VS(dcx, dcy + 5), bot, 0.8)
     poly(board, rect_s(dcx, dcy, 14, 14), bot, 0.1)
     text(board, "BMI088 here (bottom, centre = CG)", VS(dcx, dcy - 1), bot, 0.7)
-    text(board, "bottom: ICs + deck", VS(-19, 0), bot, 0.8, rot=90)
+    text(board, "bottom: BMP388 + ICs", VS(-19.5, 0), bot, 0.8, rot=90)
+    poly(board, rect_s(-19.5, 0, 15, 22), bot, 0.1)
     seg(board, VS(-6, -13), VS(6, -13), top, 0.3)
     seg(board, VS(6, -13), VS(4, -11.5), top, 0.3)
     seg(board, VS(6, -13), VS(4, -14.5), top, 0.3)
-    text(board, f"FC r{REVISION}", VS(-21.5, 15.2), pcbnew.F_SilkS, 0.8, 0.15)
-    text(board, "FRONT >", VS(-21.5, -15.2), pcbnew.F_SilkS, 0.8, 0.15)
-    text(board, f"1S Pico2W FC r{REVISION} bottom", VS(-24.5, 0), pcbnew.B_SilkS, 0.8, 0.12, rot=90)
+    text(board, f"FC r{REVISION}   FRONT >", VS(0, 13.0), pcbnew.F_SilkS, 0.7, 0.15)   # strip between Pico and J1
+    text(board, f"1S Pico2W FC r{REVISION} bottom", VS(-26.3, 0), pcbnew.B_SilkS, 0.8, 0.12, rot=90)
     return finish(board, pcb, name)
 
 

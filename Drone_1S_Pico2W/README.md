@@ -16,7 +16,7 @@ The design intent comes from
 | Board | Folder | Size | Thickness | Carries |
 |---|---|---|---|---|
 | **Frame** (power board) | [Frame/](Frame/) | 117 × 117 mm, the quad frame itself | **2.0 mm** | 18650 tab pads, USB-C + BQ25606 charger, TPS22810 Pico rail switch + SPDT slide switch, 4 × TPS22997 motor switches, TPS61235P 5.1 V boost (optional), 4 × DYS XSD7A ESCs on pin headers, Pi Zero 5.1 V output, 2 × 10 header to the FC |
-| **FC** (flight controller module) | [FC/](FC/) | 56 × 35.4 mm | 1.6 mm | **Top:** Pico 2 W only (castellated SMD, faces the frame). **Bottom:** BMI088 IMU (SPI0), BMP388 baro (I2C0), support ICs, and the Crazyflie deck connectors for the Flow deck v2 (SPI1 + I2C0), which plugs in from below as it does under a Crazyflie. Also JST-SH 4 to the Pi Zero and the 2 × 10 header to the frame |
+| **FC** (flight controller module) | [FC/](FC/) | 55.3 × 41.5 mm bbox, minimum outline | 1.6 mm | **Top:** Pico 2 W only (castellated SMD, faces the frame). **Bottom:** BMI088 IMU (SPI0), BMP388 baro (I2C0), support ICs, and the Crazyflie deck connectors for the Flow deck v2 (SPI1 + I2C0), which plugs in from below as it does under a Crazyflie. Also JST-SH 4 to the Pi Zero and the 2 × 10 header to the frame |
 
 ## Status: stage 1, bare boards (rev 0.1)
 
@@ -48,33 +48,50 @@ other contour as a circle and snaps it to a known drill:
 |---|---|---|---|
 | 4.0 | 4 | motor shaft clearance, NPTH | H1–H4 (with the motor screws) |
 | 2.2 | 16 | motor M2 screws, 9 mm PCD, NPTH | H1–H4 (`MotorMount_1203_M2_9mm`) |
-| 2.2 | 4 | battery-cover / landing-gear M2 screws, NPTH | H_CV1–4 |
-| 2.7 | 4 | FC module M2.5 screws, 30.5 mm square, NPTH | H_FC1–4 |
+| 2.2 | 4 | the shared M2 holes: battery cover + landing gear + FC standoffs, NPTH | H_CV1–4 |
 | 1.0 | 28 | ESC header pins, **plated**, 1.7 mm pads | J1–J4: pads 1–4 inner row (power end), 5–7 outer row (motor phases) |
-| 0.8 | 4 | JST-PH holes of the Bolt-era J1 "Pi power" / J3 "Bolt power" | **dropped**: they come back as real connector footprints in stage 3 |
+| 0.8 | 2 | JST-PH holes of J1 "Pi power" (the Bolt connectors are removed from the scad) | **dropped**: placed as a real connector footprint in stage 3 |
 
 Plus **BT1**, the two 3 × 10 mm battery tab pads on top copper at x = ±33.6 mm (from `pcb()` in the
 scad). Polarity is not set yet.
 
 `tools/check_import.py` checks every drilled hole in the board against the DXF (within 0.01 mm, same
-drill) and checks the outline segment count. Result: `IMPORT OK`, 56 holes.
+drill) and checks the outline segment count. Result: `IMPORT OK`, 52 holes.
 
 Motor and ESC names: FL, FR, RR, RL (x forward to the camera, y left). In KiCad the front points right.
 
 ### Board-to-board: plug-in FC on standoffs
 
 The FC module sits **under the frame** (the frame top over the centre carries the 18650 and its
-cover). It hangs on **4 × M2.5 standoffs** and **plugs into the frame through male/female headers**.
-Nothing is soldered between the boards, so the FC can be pulled off and replaced.
+cover). It **plugs into the frame through male/female headers**. Nothing is soldered between the
+boards, so the FC can be pulled off and replaced.
+
+**One set of four M2 holes holds everything** at (±24, ±17.5): the printed battery cover (which
+also carries the Pi Zero 2 W posts), the frame, the landing gear and the FC. One bolt stack per hole,
+top to bottom:
+
+| Layer | Thickness | |
+|---|---|---|
+| M2 × 10 screw, head on the cover boss | | into the standoff, 2.0 mm of thread |
+| printed battery cover boss + rail | 4 mm | |
+| frame PCB | 2.0 mm | H_CV1–4 |
+| printed landing gear (flat pad, clamped) | 2 mm | `B2B["gear_t"]` |
+| M2 × 4 standoff, female-female, 4 mm hex | 4 mm | |
+| FC module | 1.6 mm | H1–H4 (ears) |
+| M2 × 3 screw from below | | 1.4 mm of thread |
+
+The gear's heat-set inserts are gone. The frame's separate 30.5 mm FC holes are gone too, from the
+scad and from the KiCad frame. Gear + standoff = 6 mm = the mated header/socket height, so the scad
+asserts that its `gear_t` equals KiCad's.
 
 | Board | Ref | Side | Part |
 |---|---|---|---|
 | FC | J1 (left, +y), J2 (right, −y) | top, pins up | male pin header 1×10, **2.00 mm**, through-hole (`Connector_PinHeader_2.00mm:PinHeader_1x10_P2.00mm_Vertical`) |
 | Frame | J5 (left), J6 (right) | bottom, facing down | female socket 1×10, **2.00 mm**, SMD (`Connector_PinSocket_2.00mm:PinSocket_1x10_P2.00mm_Vertical_SMD_Pin1Left`) |
 
-* **Why 2.00 mm:** the rows run beside the Pico at y = ±15 mm, between the M2.5 standoffs. A 2.54 mm
-  1×10 (25.4 mm plus body) runs into the standoff hexes at x = ±12.35 mm. The 2.00 mm row (20 mm)
-  clears them. 2 × 10 pins = the 20-pin bus from the design doc.
+* **Why 2.00 mm:** a 1×10 at 2.00 mm is 20 mm long, so the FC's middle block stays at ±12.5 mm. Now
+  that the standoffs sit out at x = ±24, a 2.54 mm 1×10 (25.4 mm) would also fit, but the middle
+  block would grow to about ±15 mm. 2 × 10 pins = the 20-pin bus from the design doc.
 * **Why y = ±15:**
   * clear of the Pico courtyard (±11.55) and of the deck pads on the FC bottom (|y| ≤ 13.4);
   * the FC's pin tails stay outside the Flow deck board (|y| ≤ 13.65).
@@ -84,23 +101,35 @@ Nothing is soldered between the boards, so the FC can be pulled off and replaced
 * **Checks:**
   * `gen_pcb.py` asserts every pin position on both boards.
   * `check_mating.py` compares the two boards: same pin numbers at the same plan position (the SMD
-    socket pads sit 1.6 mm off the pin line by design), and the M2.5 holes line up. Result:
+    socket pads sit 1.6 mm off the pin line by design), and the four shared M2 holes line up. Result:
     `MATING OK`.
-* **Stack height:** standoff length = socket body + header plastic. `B2B["standoff"]` = 6 mm, for
+* **Stack height:** gear + standoff = socket body + header plastic. `B2B["standoff"]` = 6 mm, for
   example a 4.5 mm socket + a 1.5 mm header. The Pico 2 W is about 4 mm tall at its micro-USB, which
   leaves about 2 mm under the frame. The frame bottom shows the Pico area as "only low parts here".
   Confirm both heights with the parts you buy.
 
 ### FC module
 
-Placed so far (no nets yet). Footprints are in `Drone_1S.pretty`, generated by `tools/gen_libs.py`:
+**Outline, the minimum that holds the Pico 2 W and the Flow deck** (`fc_outline_pts()` in `gen_pcb.py`,
+built with KiCad's polygon engine). It is the union of:
+* the **Pico band**: x −28…23, |y| ≤ 12.5 (the Pico's lands reach |y| 11.29);
+* a **middle block**: |x| ≤ 12.5, |y| ≤ 16.5, for the deck connector pads (|y| ≤ 13.4) and the J1/J2
+  header pads (|y| ≤ 15.7);
+* **four ears**: r 3.2 mm round the shared holes, joined to the band.
+
+The 14 × 9 mm antenna notch is subtracted and all corners are filleted 1 mm. Bounding box
+55.3 × 41.5 mm.
+
+The rest of the sensors go in the bottom space that is left:
+* the BMI088 in the centre between the deck rows, at the CG;
+* the BMP388 and the other ICs in the rear part of the band (x −27…−12), outlined on Cmts.User.
 
 | Ref | Side | Part | Source |
 |---|---|---|---|
-| U1 | top | `RPi_Pico_2_W_SMD_Castellated` at x = −2.5, micro-USB at the rear edge, antenna forward over a **14 × 9 mm notch** | Pico 2 W datasheet Fig. 5 (SMT footprint) and §2.2.1 (keep-out). Fig. 5 has the same dimensions as the Pico W, so the geometry is the one checked in Pico_Alvik_Adapter |
-| P1, P2 | bottom | `CF_Deck_1x10_P2.00mm_SMD`: Crazyflie deck rows, **2.00 mm pitch, 22.0 mm apart**, centred on the board (= frame centre / CG), pin 1 of both rows at the front | Bitcraze [crazyflie2-exp-template-electronics](https://github.com/bitcraze/crazyflie2-exp-template-electronics) (c8f9a2e, CC-BY 3.0): footprint `CF2-DECK-SMD-HOLES` (SMD pads only) and P1/P2 positions. Copies in `Materials/extracted/` |
+| U1 | top | `RPi_Pico_2_W_SMD_Castellated` at x = −2.5, micro-USB at the rear edge, antenna forward over the **14 × 9 mm notch** | Pico 2 W datasheet Fig. 5 (SMT footprint) and §2.2.1 (keep-out). Fig. 5 has the same dimensions as the Pico W |
+| P1, P2 | bottom | `CF_Deck_1x10_P2.00mm_SMD`: Crazyflie deck rows, **2.00 mm pitch, 22.0 mm apart**, centred (= frame centre / CG), pin 1 at the front | Bitcraze [crazyflie2-exp-template-electronics](https://github.com/bitcraze/crazyflie2-exp-template-electronics) (c8f9a2e, CC-BY 3.0). Copies in `Materials/extracted/` |
 | J1, J2 | top | 1×10 2.00 mm male headers to the frame (see above) | |
-| H1–H4 | – | M2.5, 30.5 mm square, for the standoffs | same holes as frame H_FC1–4 |
+| H1–H4 | ears | M2, on the shared cover / gear holes | same holes as frame H_CV1–4 (`check_mating.py`) |
 
 * **Why the deck connectors are SMD:** the rows (y = ±11 mm) fall right under the Pico's edge lands
   (22.58 mm wide). Through-hole pins would come up into the Pico's pads. `gen_pcb.py` asserts that
@@ -206,6 +235,6 @@ python3 render.py                     # docs/*.png
 When the OpenSCAD frame changes, export `part="pcb_outline"` to DXF, copy it to
 `Materials/extracted/1S_PiZero_PCB_outline.dxf`, update `SCAD` in `design.py`, and regenerate.
 
-Current results: Frame 19 footprints / 78 pads, FC 9 footprints / 88 pads. `MATING OK`. DRC **0 violations, 0 unconnected,
+Current results: Frame 15 footprints / 74 pads, FC 9 footprints / 88 pads. `MATING OK`. DRC **0 violations, 0 unconnected,
 0 footprint errors** on both boards. `IMPORT OK`. The boards haven't been opened in the KiCad GUI (KiCad
 7.0.11 in the container). The `.kicad_pcb` files are KiCad 7 format and open in 8 and 9.
