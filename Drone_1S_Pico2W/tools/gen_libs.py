@@ -169,6 +169,27 @@ def fp_bmp388():
                      "Bosch BMP388 barometer LGA", "smd", g, pads)
 
 
+def fp_bitcraze_female():
+    """Bitcraze female deck connector, PCB layout from its datasheet drawing (bitcraze/hardware
+    female-deck-connector): pads 0.89 x 2.0 mm, 2.00 mm pitch, staggered, 5.4 mm overall
+    (pad centres +-1.7 mm off the pin line). Body 20.5 x 2.0 x 2.1 mm. Pin 1 at -X like the
+    KiCad PinSocket_..._SMD_Pin1Left; odd pads at -1.7 Y."""
+    pads = []
+    for p in range(1, 11):
+        x = -9 + 2 * (p - 1)
+        y = -1.7 if p % 2 else 1.7
+        pads.append(f'  (pad "{p}" smd rect (at {x:g} {y:g}) (size 0.89 2) '
+                    f'(layers "F.Cu" "F.Paste" "F.Mask") (tstamp {uid(f"bcf{p}")}))')
+    g = [text("reference", "REF**", 0, -3.6, "F.SilkS", size=0.8, thick=0.12),
+         text("value", "Bitcraze female deck connector", 0, 3.6, "F.Fab", size=0.6, thick=0.1),
+         rect(-10.25, -1.0, 10.25, 1.0, "F.Fab", 0.1),
+         line(-10.7, -2.9, -10.7, 2.9, "F.SilkS", 0.15),
+         rect(-10.75, -2.95, 10.75, 2.95, "F.CrtYd", 0.05)]
+    return footprint("Bitcraze_FemaleDeck_1x10_P2.00mm_SMD",
+                     "Bitcraze female deck connector, 1x10 2.00 mm, SMD, 2.1 mm high (Bitcraze datasheet drawing)",
+                     "Bitcraze Crazyflie deck female socket 2.00mm", "smd", g, pads)
+
+
 def write_tables():
     for board in ("Frame", "FC"):
         with open(os.path.join(ROOT, board, "fp-lib-table"), "w") as f:
@@ -179,7 +200,8 @@ def write_tables():
 if __name__ == "__main__":
     os.makedirs(PRETTY, exist_ok=True)
     for name, txt in (("RPi_Pico_2_W_SMD_Castellated", fp_pico()), ("CF_Deck_1x10_P2.00mm_SMD", fp_deck()),
-                      ("Bosch_LGA-16_3x4.5mm_P0.5mm", fp_bmi088()), ("Bosch_LGA-10_2x2mm_P0.5mm", fp_bmp388())):
+                      ("Bosch_LGA-16_3x4.5mm_P0.5mm", fp_bmi088()), ("Bosch_LGA-10_2x2mm_P0.5mm", fp_bmp388()),
+                      ("Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", fp_bitcraze_female())):
         with open(os.path.join(PRETTY, f"{name}.kicad_mod"), "w") as f:
             f.write(txt)
         print("wrote", name)

@@ -19,7 +19,7 @@ import pcbnew
 
 import dxf_import
 from gen_libs import PICO_TP, PICO_SWD
-from design import (FC, FRAME, LIB, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
+from design import (FC, FRAME, LIB, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, FRAME_CONN, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
                     REVISION, DATE, to_kicad, uid, ORIGIN_X, ORIGIN_Y)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -182,7 +182,7 @@ def place_b2b(board, lib, name, ref, value, row_sign, bottom, row_y=None):
     orientations and keeps the one that matches (asserted)."""
     y = row_sign * (B2B["row_y"] if row_y is None else row_y)
     want = {str(k + 1): VS(B2B_PIN_X[k], y) for k in range(B2B["pins"])}
-    fp = load_fp(lib, name)
+    fp = load_prj_fp(name) if lib == LIB else load_fp(lib, name)
     fp.SetReference(ref)
     fp.SetValue(value)
     board.Add(fp)                       # KiCad 7: Flip() needs the parent board
@@ -197,7 +197,7 @@ def place_b2b(board, lib, name, ref, value, row_sign, bottom, row_y=None):
         got = {p.GetNumber(): p.GetPosition() for p in fp.Pads()}
         # SMD sockets alternate pads either side of the pin line: check along the row exactly
         if all(abs(got[k].x - want[k].x) < mm(0.01) for k in want) and \
-           all(abs(got[k].y - want[k].y) < mm(1.7) for k in want):
+           all(abs(got[k].y - want[k].y) < mm(2.0) for k in want):
             assert all(p.IsOnLayer(pcbnew.B_Cu if bottom else pcbnew.F_Cu) for p in fp.Pads())
             return fp
     raise AssertionError(f"{ref}: no orientation puts pin k at x = 9 - 2(k-1)")
@@ -406,7 +406,7 @@ def build_frame():
         fp.Reference().SetLayer(pcbnew.F_Fab)     # close to the board edge
         board.Add(fp)
     assert cnt == {"H_CV": 4, "H_LG": 4}, cnt      # cover + FC standoffs, and the landing-gear skids
-    dropped = [h for h in holes if h["kind"] == "jst_ph"]
+    dropped = [h for h in holes if h["kind"] == "jst_ph"]     # J8 is placed on them below
 
     # --- battery tab pads (scad pcb(): tab_pad x 10 mm at both cell ends, top copper) ---
     fp = new_fp(board, "BT1", "18650 tabs", VS(0, 0), "Battery_18650_TabPads")
@@ -418,9 +418,28 @@ def build_frame():
 
     # --- J5 / J6 female sockets on the BOTTOM: the FC module's J1 / J2 plug in ---
     for ref, sy in (("J5", 1), ("J6", -1)):
-        fp = place_b2b(board, "Connector_PinSocket_2.00mm", "PinSocket_1x10_P2.00mm_Vertical_SMD_Pin1Left", ref,
-                       "Socket 1x10 2.00mm female SMD (FC " + ("J1" if sy > 0 else "J2") + ")", sy, bottom=True)
+        fp = place_b2b(board, LIB, "Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", ref,
+                       "Bitcraze female deck connector 1x10 2.00mm (FC " + ("J1" if sy > 0 else "J2") + ")", sy, bottom=True)
         fp.Value().SetVisible(False)
+
+    # --- connectors to the Pi Zero 2 W on the frame top ---
+    for ref, lib, fpn, val, (x, y), rot in FRAME_CONN:          # J7 Pi UART (JST-SH 4)
+        fp = load_fp(lib, fpn)
+        fp.SetReference(ref)
+        fp.SetValue(val)
+        fp.SetPosition(VS(x, y))
+        fp.SetOrientationDegrees(rot)
+        board.Add(fp)
+    ph = sorted(dropped, key=lambda h: h["x"])                 # J8 Pi 5.1 V: JST-PH on the scad's two holes
+    assert len(ph) == 2 and abs(ph[0]["y"] - ph[1]["y"]) < 0.01
+    fp = load_fp("Connector_JST", "JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical")
+    fp.SetReference("J8")
+    fp.SetValue("Pi 5.1 V: 5V1, GND")
+    fp.Reference().SetLayer(pcbnew.F_Fab)
+    board.Add(fp)
+    fp.SetPosition(VS(ph[0]["x"], ph[0]["y"]))                 # pad 1 is the footprint origin
+    p2 = [p for p in fp.Pads() if p.GetNumber() == "2"][0].GetPosition()
+    assert abs(p2.x - VS(ph[1]["x"], 0).x) < mm(0.01) and abs(p2.y - VS(0, ph[1]["y"]).y) < mm(0.01), "J8 pads off the DXF holes"
 
     # --- guides: top side on Dwgs.User, bottom side on Cmts.User ---
     top, bot = pcbnew.Dwgs_User, pcbnew.Cmts_User
@@ -452,8 +471,7 @@ def build_frame():
              rot=-math.degrees(math.atan2(my, mx)) + (180 if mx < 0 else 0))
 
     c = finish(board, pcb, name)
-    print(f"  imported {len(holes)} holes from the DXF; dropped {len(dropped)} JST-PH holes "
-          f"(J1 Pi power, placed as a real connector footprint in stage 3)")
+    print(f"  imported {len(holes)} holes from the DXF; the {len(dropped)} JST-PH holes carry J8 (Pi 5.1 V)")
     return c
 
 

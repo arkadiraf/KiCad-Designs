@@ -123,6 +123,10 @@ def main():
 kc_frame_t = {FRAME['thickness']:g};     // frame PCB thickness
 kc_fc_t    = {FC['thickness']:g};     // FC module PCB thickness
 kc_b2b_standoff = {B2B['standoff']:g}; // FC top to frame bottom = M2 standoff = mated header + socket
+kc_b2b_male_plastic = {B2B['male_plastic']:g};  // FC header plastic
+kc_b2b_male_pin = {B2B['male_pin']:g};      // mating pin above the plastic (trimmed)
+kc_b2b_socket_h = {B2B['socket_h']:g};      // Bitcraze female deck connector on the frame
+kc_pico_top = {B2B['pico_top']:g};          // Pico micro-USB top above the FC top
 
 kc_fc_size = [{max(p[0] for p in fc_poly) - min(p[0] for p in fc_poly):.2f}, {max(p[1] for p in fc_poly) - min(p[1] for p in fc_poly):.2f}];  // outline bounding box x, y
 kc_fc_outline = [{", ".join(f"[{x:g}, {y:g}]" for x, y in fc_poly)}];

@@ -74,7 +74,7 @@ also carries the Pi Zero 2 W posts. One bolt stack per hole, top to bottom:
 | M2 × 8 screw, head on the cover boss | | into the standoff, 2.0 mm of thread |
 | printed battery cover boss + rail | 4 mm | |
 | frame PCB | 2.0 mm | H_CV1–4 |
-| M2 × 6 standoff, female-female, 4 mm hex | 6 mm | = mated header + socket |
+| M2 × 5 standoff, female-female, 4 mm hex | 5 mm | lowest standard length over the Pico USB |
 | FC module | 1.6 mm | H1–H4 (ears) |
 | M2 × 4 screw from below | | 2.4 mm of thread |
 
@@ -84,29 +84,30 @@ FC. It is two identical printed skids (front, rear). Each skid is a cross-beam w
 insert boss and a leg at each end, held by M2 × 4 screws from the frame top. A one-piece frame would
 run into the FC standoffs at y = ±17.5. The frame's old 30.5 mm FC holes are gone.
 
-| Board | Ref | Side | Part |
-|---|---|---|---|
-| FC | J1 (left, +y), J2 (right, −y) | top, pins up | male pin header 1×10, **2.00 mm**, through-hole (`Connector_PinHeader_2.00mm:PinHeader_1x10_P2.00mm_Vertical`) |
-| Frame | J5 (left), J6 (right) | bottom, facing down | female socket 1×10, **2.00 mm**, SMD (`Connector_PinSocket_2.00mm:PinSocket_1x10_P2.00mm_Vertical_SMD_Pin1Left`) |
+**Connector choice: low profile on a standard standoff.**
+* **What sets the height:** the Pico 2 W's micro-USB is its tallest part, **3.73 mm** above the FC.
+  * Measured in the KiCad-RP-Pico 3D model (`ncarandini/KiCad-RP-Pico`, `Pico.wrl`): the original
+    Pico, same USB part. BOOTSEL is 2.08 mm, everything else ≤ 1.68 mm.
+  * So **5 mm** is the lowest standard M2 standoff that clears it, with 1.2 mm to spare; 4 mm
+    would leave 0.2 mm.
+* **The stack:** one connector system, Bitcraze's, as on the Flow deck.
 
-* **Why 2.00 mm:** a 1×10 at 2.00 mm is 20 mm long, so the FC's middle block stays at ±12.5 mm. Now
-  that the standoffs sit out at x = ±24, a 2.54 mm 1×10 (25.4 mm) would also fit, but the middle
-  block would grow to about ±15 mm. 2 × 10 pins = the 20-pin bus from the design doc.
-* **Why y = ±15:**
-  * clear of the Pico courtyard (±11.55) and of the deck pads on the FC bottom (|y| ≤ 13.4);
-  * the FC's pin tails stay outside the Flow deck board (|y| ≤ 13.65).
-* **Why SMD sockets on the frame:** through-hole tails would come up under the battery-cover rails on
-  the frame top.
-* **Pin 1** of both rows is at the front. Pin k is at x = 9 − 2(k−1) mm, the same on both boards.
-* **Checks:**
-  * `gen_pcb.py` asserts every pin position on both boards.
-  * `check_mating.py` compares the two boards: same pin numbers at the same plan position (the SMD
-    socket pads sit 1.6 mm off the pin line by design), and the four shared M2 holes line up. Result:
-    `MATING OK`.
-* **Stack height:** gear + standoff = socket body + header plastic. `B2B["standoff"]` = 6 mm, for
-  example a 4.5 mm socket + a 1.5 mm header. The Pico 2 W is about 4 mm tall at its micro-USB, which
-  leaves about 2 mm under the frame. The frame bottom shows the Pico area as "only low parts here".
-  Confirm both heights with the parts you buy.
+| Board | Ref | Side | Part | Height |
+|---|---|---|---|---|
+| Frame | J5 (left), J6 (right) | bottom | **Bitcraze female deck connector** 1×10 2.00 mm SMD (`Bitcraze_FemaleDeck_1x10_P2.00mm_SMD`, pads from its datasheet drawing: 0.89 × 2 mm, ±1.7 mm stagger), no holes | 2.1 mm |
+| FC | J1 (left, +y), J2 (right, −y) | top | 2.00 mm male header, through-hole (`PinHeader_1x10_P2.00mm_Vertical`): **Bitcraze short pins** (9 / 2 / 2 mm), short side soldered into the FC, long side up, trimmed to ~2.8 mm above the plastic | 2.0 mm plastic |
+
+* **Mated:** 2.0 + 2.1 = 4.1 mm + 0.9 mm air on the 5 mm standoff. The pins enter the sockets about
+  1.9 mm, and nothing passes through the frame.
+* **Pin budget (`B2B_SIGNALS` in `design.py`):** 17 signals + VSYS + 2 × GND = 20.
+  * ON1–4, PG1–4, DSHOT1–4, BOOST_EN, CHG_PG, and the Pi link PI_TX, PI_RX, PI_STATUS.
+  * Assigned to pins in stage 2.
+
+**Connectors to the Pi Zero 2 W, on the frame top:**
+* **J7, Pi UART:** JST-SH 4, SM04B-SRSS-TB, side entry, at (5, 18.3). Carries GND, TX, RX, PI_STATUS
+  (1 k series resistors on the FC side, per the design doc).
+* **J8, Pi 5.1 V:** JST-PH 2, B2B-PH-K vertical, on the scad's two PH holes. The holes are now
+  0.75 mm, JST's drill as in the KiCad footprint (was 0.8).
 
 ### FC module
 
@@ -151,7 +152,7 @@ cross-checked from open designs and STEP models):
 | P1, P2 | bottom | **male** 1×10 2.00 mm SMD headers (`PinHeader_1x10_P2.00mm_Vertical_SMD_Pin1Left`), pins down into the Flow deck's female connectors; rows **22.0 mm apart**, centred, pin 1 at the front | Rows: Bitcraze deck template (c8f9a2e). The Flow deck carries the Bitcraze female deck connector (20.5 × 2.0 × 2.1 mm, datasheet in bitcraze/hardware) |
 | U2, C1 | bottom | BMI088 `Bosch_LGA-16_3x4.5mm_P0.5mm` + 100 nF | see above |
 | U3, C2 | bottom | BMP388 `Bosch_LGA-10_2x2mm_P0.5mm` + 100 nF | see above |
-| J1, J2 | top | 1×10 2.00 mm male headers to the frame (see above) | |
+| J1, J2 | top | 1×10 2.00 mm male headers to the frame (Bitcraze short pins, see above) | |
 | H1–H4 | ears | M2, on the shared cover holes | same holes as frame H_CV1–4 (`check_mating.py`) |
 
 * **Flow deck v2 (verified):** Bitcraze datasheet and mechanical drawing (bitcraze/hardware).
@@ -203,7 +204,7 @@ gear, the ESCs and the screws/standoffs.
 
 Model values still to confirm with real parts (marked "to check" in the scad):
 * Pico micro-USB height (2.7 mm) and top-side parts envelope (1.2 mm);
-* board-to-board header plastic 1.5 mm + socket 4.5 mm on 6 mm standoffs;
+* board-to-board: Bitcraze pins trimmed to ~2.8 mm, JST-SH height (2.95 mm modelled);
 * deck header plastic 2.0 mm (+ the Bitcraze socket 2.1 mm = 4.1 mm stack), deck PCB 0.8 mm;
 * sensor positions on the deck (from the product photo);
 * PMW3901 / VL53L1x fields of view (42° / 27°, nominal).

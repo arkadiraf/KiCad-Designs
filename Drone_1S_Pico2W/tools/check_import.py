@@ -13,8 +13,6 @@ drills = [(pcbnew.ToMM(p.GetPosition().x), pcbnew.ToMM(p.GetPosition().y), pcbne
           for fp in board.GetFootprints() for p in fp.Pads() if p.GetDrillSize().x > 0]
 bad, used = 0, set()
 for h in holes:
-    if h["kind"] == "jst_ph":
-        continue
     kx, ky = to_kicad(h["x"], h["y"])
     m = [i for i, (x, y, d) in enumerate(drills) if math.hypot(x - kx, y - ky) < 0.01 and abs(d - h["d"]) < 1e-3]
     if len(m) != 1:

@@ -83,7 +83,7 @@ HOLE_CLASSES = {
     2.2: "m2",              # motor M2 screws and cover/gear M2 screws (NPTH)
     2.7: "fc_mount",        # old Bolt M2.5 pattern (removed from the scad; none expected)
     1.0: "esc_pin",         # ESC header pins (plated, electrical)
-    0.8: "jst_ph",          # JST PH pins of the Bolt-era connectors (dropped, see README)
+    0.75: "jst_ph",         # JST PH pins of J8, Pi 5.1 V (JST ePH drill)
 }
 
 ESC_PAD = 1.7               # annular pad for the 1.0 mm ESC header holes
@@ -155,8 +155,14 @@ DECK_RIGHT = ["UART2_RX", "UART2_TX", "SPI_SCK", "SPI_MISO", "SPI_MOSI",
 # Board-to-board: the FC hangs under the frame on the 4 shared M2 holes and plugs
 # into it, so it can be pulled off and replaced (nothing soldered between them).
 #   FC top    : 2 x male pin header 1x10, 2.00 mm, through-hole (J1 left, J2 right)
-#   Frame bot : 2 x female socket 1x10, 2.00 mm, SMD (J5 left, J6 right) - SMD so
-#               no pin tails come up under the battery-cover rails on the frame top.
+#   Frame bot : 2 x Bitcraze female deck connector 1x10, 2.00 mm, SMD, 2.1 mm high
+#               (J5 left, J6 right) - the same part as on the Flow deck; SMD pads only,
+#               no holes, so nothing comes up under the battery-cover rails.
+# Height (low profile, standard standoff): the Pico 2 W's micro-USB reaches 3.73 mm above
+# the FC (KiCad-RP-Pico 3D model), so the lowest standard M2 standoff that clears it is
+# 5 mm (1.2 mm left). Mated: 2.0 mm male plastic + 2.1 mm socket = 4.1 mm + 0.9 mm air;
+# the male pin (Bitcraze short pins, long side up) is trimmed to ~2.8 mm above its plastic
+# so it enters the socket ~1.9 mm.
 # 2.00 mm keeps the FC's middle block narrow (|x| <= 12.5); 2.54 mm would also fit
 # between the shared holes at x = +-24 but widens the board.
 # Rows at y = +-15: outside the Pico courtyard (+-11.55) and the deck pads on the
@@ -172,6 +178,24 @@ B2B = dict(
     # 1.5 mm header on 6 mm standoffs. Pico 2 W on the FC top is ~4 mm tall at the
     # micro-USB, so 6 mm leaves ~2 mm under the frame: keep tall frame-bottom parts
     # out of the area above the Pico. To confirm with the chosen part datasheets.
-    standoff=6.0,                # FC top to frame bottom = M2 standoff (the landing gear has its own holes)
+    standoff=5.0,                # FC top to frame bottom = M2 standoff (lowest standard length over the Pico USB)
+    male_plastic=2.0,            # FC header plastic (Bitcraze pins: 2 mm)
+    male_pin=2.8,                # mating pin above the plastic, after trimming
+    socket_h=2.1,                # Bitcraze female deck connector
+    pico_top=3.73,               # Pico micro-USB top above the FC top (KiCad-RP-Pico Pico.wrl)
 )
 B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of pins 1..10
+
+# Board-to-board pin budget (20 pins): 17 signals + VSYS + 2 x GND. Assigned in stage 2.
+B2B_SIGNALS = ["VSYS", "GND", "GND",
+               "ON1", "ON2", "ON3", "ON4", "PG1", "PG2", "PG3", "PG4",
+               "DSHOT1", "DSHOT2", "DSHOT3", "DSHOT4",
+               "BOOST_EN", "CHG_PG", "PI_TX", "PI_RX", "PI_STATUS"]
+assert len(B2B_SIGNALS) == 2 * B2B["pins"]
+
+# Frame-top connectors to the Pi Zero 2 W (design doc: 5.1 V separately, UART + status on
+# a 4-pin JST-SH with 1 k series resistors). [ref, lib, footprint, value, (x, y), rotation]
+FRAME_CONN = [
+    ("J7", "Connector_JST", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
+     "Pi UART: GND, TX, RX, PI_STATUS", (5.0, 18.3), 180),
+]
