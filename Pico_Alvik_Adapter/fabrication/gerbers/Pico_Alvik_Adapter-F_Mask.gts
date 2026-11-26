@@ -1,12 +1,12 @@
 %TF.GenerationSoftware,KiCad,Pcbnew,7.0.11+dfsg-1build4*%
-%TF.CreationDate,2026-11-26T15:44:25+00:00*%
-%TF.ProjectId,Pico_Alvik_Adapter,5069636f-5f41-46c7-9669-6b5f41646170,1.0*%
+%TF.CreationDate,2026-11-26T15:49:59+00:00*%
+%TF.ProjectId,Pico_Alvik_Adapter,5069636f-5f41-46c7-9669-6b5f41646170,1.1*%
 %TF.SameCoordinates,Original*%
 %TF.FileFunction,Soldermask,Top*%
 %TF.FilePolarity,Negative*%
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW 7.0.11+dfsg-1build4) date 2026-11-26 15:44:25*
+G04 Created by KiCad (PCBNEW 7.0.11+dfsg-1build4) date 2026-11-26 15:49:59*
 %MOMM*%
 %LPD*%
 G01*

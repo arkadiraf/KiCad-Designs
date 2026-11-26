@@ -115,14 +115,21 @@ def build_nets():
     add("GND", "J1", 29)
     add("GND", "C1", 2)
 
-    # Power: Nano VIN <-> Pico VSYS (JP1 bridged, D1 optional, DNP)
-    add("VSYS", "U1", 39)
-    add("VSYS", "JP1", 2)
-    add("VSYS", "D1", 1)       # cathode
-    add("VSYS", "C1", 1)
+    # Power (diode-OR, see README "Power design"):
+    #   D2: Pico VBUS (USB) -> Nano VIN   USB charges / powers the Alvik
+    #   D1: Nano VIN -> Pico VSYS         Alvik powers the Pico without USB
+    #   Pico on-board Schottky: VBUS -> VSYS (USB powers the Pico)
+    #   JP1 (open): optional bypass of D1
+    add("VBUS", "U1", 40)
+    add("VBUS", "D2", 2)       # anode
+    add("VIN", "D2", 1)        # cathode
     add("VIN", "J1", 30)
-    add("VIN", "JP1", 1)
     add("VIN", "D1", 2)        # anode
+    add("VIN", "JP1", 1)
+    add("VSYS", "D1", 1)       # cathode
+    add("VSYS", "JP1", 2)
+    add("VSYS", "U1", 39)
+    add("VSYS", "C1", 1)
 
     # 3V3: Pico 3V3(OUT) -> Nano 3V3 pin (Alvik +3V3_EXT)  JP2 bridged
     add("+3V3", "U1", 36)
@@ -140,7 +147,7 @@ def build_nets():
 
 
 def _no_connect():
-    used_u = {p for _n, _j, p, _g, _c in SIGNALS} | {3, 8, 13, 18, 23, 28, 33, 38, 30, 36, 39}
+    used_u = {p for _n, _j, p, _g, _c in SIGNALS} | {3, 8, 13, 18, 23, 28, 33, 38, 30, 36, 39, 40}
     used_j = {j for _n, j, _p, _g, _c in SIGNALS} | {3, 4, 17, 29, 30}
     return {"U1": [p for p in range(1, 41) if p not in used_u],
             "J1": [p for p in range(1, 31) if p not in used_j]}
@@ -148,7 +155,7 @@ def _no_connect():
 
 NO_CONNECT = _no_connect()
 
-POWER_NETS = {"GND", "VSYS", "VIN", "+3V3", "3V3_NANO"}
+POWER_NETS = {"GND", "VSYS", "VIN", "VBUS", "+3V3", "3V3_NANO"}
 
 # ---------------------------------------------------------------------------
 # Components
@@ -159,12 +166,14 @@ COMPONENTS = {
            f"{LIB}:RPi_Pico_W_SMD_Castellated", {}),
     "J1": (f"{LIB}:Arduino_Nano_Headers", "Nano footprint headers (2x 1x15 SMD male)",
            f"{LIB}:Arduino_Nano_SMD_Headers_Bottom", {}),
-    "D1": ("Device:D_Schottky", "B5819W (DNP)",
-           "Diode_SMD:D_SOD-123", {"DNP": True}),
+    "D1": ("Device:D_Schottky", "PMEG6020ER",
+           "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
+    "D2": ("Device:D_Schottky", "PMEG6020ER",
+           "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),
     "C1": ("Device:C", "10uF 10V",
            "Capacitor_SMD:C_0805_2012Metric", {}),
-    "JP1": ("Jumper:SolderJumper_2_Bridged", "VIN-VSYS",
-            "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm", {}),
+    "JP1": ("Jumper:SolderJumper_2_Open", "D1 bypass",
+            "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", {}),
     "JP2": ("Jumper:SolderJumper_2_Bridged", "3V3",
             "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm", {}),
     "JP3": ("Jumper:SolderJumper_2_Open", "RST-RUN",

@@ -36,11 +36,12 @@ CX = BX0 + BOARD_W / 2
 # bottom side passive placement (top-view coordinates) and silk labels
 BOTTOM_PARTS = {
     #  ref    x      y      rot   label
-    "C1":  (CX,   105.8,  0,   "10u"),
-    "JP2": (CX,   109.6,  0,   "3V3"),
-    "JP3": (CX,   130.6,  0,   "RST"),
-    "JP1": (CX,   134.6,  0,   "VIN"),
-    "D1":  (CX,   138.0,  0,   "D1"),
+    "C1":  (CX,   105.6,  0,   ""),
+    "D2":  (CX,   109.2,  0,   ""),
+    "JP2": (CX,   113.0,  0,   "3V3"),
+    "JP3": (CX,   129.6,  0,   "RST"),
+    "D1":  (CX,   133.4,  0,   ""),
+    "JP1": (CX,   137.4,  0,   "BYP"),
 }
 
 
@@ -187,7 +188,7 @@ def place():
 
     tb = board.GetTitleBlock()
     tb.SetTitle("Pico Alvik Adapter")
-    tb.SetRevision("1.0")
+    tb.SetRevision("1.1")
     tb.SetDate("2026-11-26")
     tb.SetCompany("KiCad-Designs")
     tb.SetComment(0, "Raspberry Pi Pico W carrier in Arduino Nano form factor for the Arduino Alvik")
@@ -255,10 +256,12 @@ def place():
 
     # silkscreen
     for ref, (x, y, rot, lbl) in BOTTOM_PARTS.items():
-        add_text(board, lbl, x - 3.0, y, pcbnew.B_SilkS, 0.7, mirror=True)
-    add_text(board, "PICO-ALVIK v1.0", CX, 120.0, pcbnew.B_SilkS, 0.8, rot=90, mirror=True)
+        if lbl:
+            add_text(board, lbl, x - 2.9, y, pcbnew.B_SilkS, 0.7, mirror=True)
+    add_text(board, "PICO-ALVIK v1.1", CX, 121.3, pcbnew.B_SilkS, 0.8, rot=90, mirror=True)
     add_text(board, "USB", CX, BY0 + 2.0, pcbnew.B_SilkS, 0.8, mirror=True)
-    add_text(board, "JP3 open", CX, 128.6, pcbnew.B_SilkS, 0.6, mirror=True)
+    add_text(board, "D2 USB>VIN", CX, 107.4, pcbnew.B_SilkS, 0.6, mirror=True)
+    add_text(board, "D1 VIN>VSYS", CX, 131.6, pcbnew.B_SilkS, 0.6, mirror=True)
 
     pcbnew.SaveBoard(PCB, board)
     board = pcbnew.LoadBoard(PCB)
