@@ -330,8 +330,7 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 * [ ] The Pico 2 W antenna faces up at the frame. Keep frame copper out above the antenna area, or
       move the antenna out from under the frame.
 * [ ] Battery tab polarity (BT1 pad 1 is at the front).
-* [ ] Datasheets still to collect into `Materials/`: TPS22810, TPS22997, BQ25606, TPS61235P,
-      BMI088, BMP388, Flow deck v2 and Crazyflie Bolt schematics, DYS XSD7A.
+* [ ] Datasheets still to collect: see [Materials/MISSING_DATASHEETS.md](Materials/MISSING_DATASHEETS.md) (18 items, by priority).
 
 ## Regenerate
 
