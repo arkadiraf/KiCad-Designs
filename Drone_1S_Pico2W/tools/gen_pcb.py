@@ -407,7 +407,7 @@ def build_frame():
 
     c = finish(board, pcb, name)
     print(f"  imported {len(holes)} holes from the DXF; dropped {len(dropped)} JST-PH holes "
-          f"(Bolt-era J1/J3 connectors, placed again as real footprints later)")
+          f"(J1 Pi power, placed as a real connector footprint in stage 3)")
     return c
 
 
