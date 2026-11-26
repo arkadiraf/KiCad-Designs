@@ -153,6 +153,34 @@ def add_text(board, txt, x, y, layer, size=0.8, rot=0, mirror=False):
     board.Add(t)
 
 
+def add_poly(board, pts, layer, w=0.12, fill=True):
+    sh = pcbnew.PCB_SHAPE(board)
+    sh.SetShape(pcbnew.SHAPE_T_POLY)
+    sh.SetPolyPoints([V(x, y) for x, y in pts])
+    sh.SetLayer(layer)
+    sh.SetWidth(mm(w))
+    sh.SetFilled(fill)
+    board.Add(sh)
+
+
+def diode_mark(board, fp, y, layer=pcbnew.B_SilkS):
+    """Silkscreen diode symbol (anode -> |cathode) below a 2-pad diode,
+    oriented from the real pad positions (pad 1 = cathode), with net labels."""
+    pads = {p.GetNumber(): p for p in fp.Pads()}
+    k = pads["1"].GetPosition()
+    a = pads["2"].GetPosition()
+    kx, ax = pcbnew.ToMM(k.x), pcbnew.ToMM(a.x)
+    cx = (kx + ax) / 2
+    d = 1 if kx > ax else -1                 # direction anode -> cathode
+    tip, base, hh = cx + d * 0.55, cx - d * 0.55, 0.5
+    add_poly(board, [(base, y - hh), (base, y + hh), (tip, y)], layer)
+    seg(board, tip, y - hh - 0.05, tip, y + hh + 0.05, layer, 0.2)       # cathode bar
+    an = pads["2"].GetNetname()
+    kn = pads["1"].GetNetname()
+    add_text(board, an, cx - d * (0.95 + 0.38 * len(an)), y, layer, 0.6, mirror=True)
+    add_text(board, kn, cx + d * (0.95 + 0.38 * len(kn)), y, layer, 0.6, mirror=True)
+
+
 def add_rule_area(board, pts, layer, name):
     z = pcbnew.ZONE(board)
     z.SetIsRuleArea(True)
@@ -258,6 +286,12 @@ def place():
             dx = 3.4 if ref.startswith("D") else 2.9
             add_text(board, lbl, x - dx, y, pcbnew.B_SilkS, 0.6, mirror=True)
     add_text(board, "PICO-ALVIK v1.5", CX, 120.6, pcbnew.B_SilkS, 0.7, rot=90, mirror=True)
+    # component markings: diode direction and capacitor value
+    d1 = board.FindFootprintByReference("D1")
+    diode_mark(board, d1, pcbnew.ToMM(d1.GetPosition().y) + 2.0)
+    c1 = board.FindFootprintByReference("C1")
+    add_text(board, COMPONENTS["C1"][1].split()[0], pcbnew.ToMM(c1.GetPosition().x) - 3.1,
+             pcbnew.ToMM(c1.GetPosition().y), pcbnew.B_SilkS, 0.6, mirror=True)
     add_text(board, "USB", CX, BY0 + 2.0, pcbnew.B_SilkS, 0.8, mirror=True)
 
     pcbnew.SaveBoard(PCB, board)
