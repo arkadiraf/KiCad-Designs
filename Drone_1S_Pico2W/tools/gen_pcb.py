@@ -19,7 +19,7 @@ import pcbnew
 
 import dxf_import
 from gen_libs import PICO_TP, PICO_SWD
-from design import (FC, FRAME, LIB, DECK_LEFT, DECK_RIGHT, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
+from design import (FC, FRAME, LIB, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
                     REVISION, DATE, to_kicad, uid, ORIGIN_X, ORIGIN_Y)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -174,6 +174,33 @@ def rule_area(board, pts, layer, name):
     for p in pts:
         o.Append(p.x, p.y)
     board.Add(z)
+
+
+def place_b2b(board, lib, name, ref, value, row_sign, bottom):
+    """Place a 1x10 board-to-board part so that pad k sits at scad
+    (B2B_PIN_X[k-1], row_sign * row_y), on the given side. Tries the four
+    orientations and keeps the one that matches (asserted)."""
+    y = row_sign * B2B["row_y"]
+    want = {str(k + 1): VS(B2B_PIN_X[k], y) for k in range(B2B["pins"])}
+    fp = load_fp(lib, name)
+    fp.SetReference(ref)
+    fp.SetValue(value)
+    board.Add(fp)                       # KiCad 7: Flip() needs the parent board
+    if bottom:
+        fp.Flip(fp.GetPosition(), True)
+    tgt = VS(0.5 * (B2B_PIN_X[0] + B2B_PIN_X[-1]), y)
+    for rot in (0, 90, 180, 270):
+        fp.SetOrientationDegrees(rot)
+        pads = {p.GetNumber(): p.GetPosition() for p in fp.Pads()}
+        mid = pcbnew.VECTOR2I((pads["1"].x + pads["10"].x) // 2, (pads["1"].y + pads["10"].y) // 2)
+        fp.Move(pcbnew.VECTOR2I(tgt.x - mid.x, tgt.y - mid.y))
+        got = {p.GetNumber(): p.GetPosition() for p in fp.Pads()}
+        # SMD sockets alternate pads either side of the pin line: check along the row exactly
+        if all(abs(got[k].x - want[k].x) < mm(0.01) for k in want) and \
+           all(abs(got[k].y - want[k].y) < mm(1.7) for k in want):
+            assert all(p.IsOnLayer(pcbnew.B_Cu if bottom else pcbnew.F_Cu) for p in fp.Pads())
+            return fp
+    raise AssertionError(f"{ref}: no orientation puts pin k at x = 9 - 2(k-1)")
 
 
 def new_fp(board, ref, value, pos, name):
@@ -343,6 +370,12 @@ def build_frame():
     fp_poly(fp, rect_s(0, 0, SCAD["bat_len"], SCAD["bat_d"]), pcbnew.F_Fab, 0.1)
     fp_poly(fp, rect_s(0, 0, 2 * TAB_PAD_X + TAB_PAD_SIZE[0] + 0.5, SCAD["bat_d"] + 0.5), pcbnew.F_CrtYd)
 
+    # --- J5 / J6 female sockets on the BOTTOM: the FC module's J1 / J2 plug in ---
+    for ref, sy in (("J5", 1), ("J6", -1)):
+        fp = place_b2b(board, "Connector_PinSocket_2.00mm", "PinSocket_1x10_P2.00mm_Vertical_SMD_Pin1Left", ref,
+                       "Socket 1x10 2.00mm female SMD (FC " + ("J1" if sy > 0 else "J2") + ")", sy, bottom=True)
+        fp.Value().SetVisible(False)
+
     # --- guides: top side on Dwgs.User, bottom side on Cmts.User ---
     top, bot = pcbnew.Dwgs_User, pcbnew.Cmts_User
     for i, (mx, my) in enumerate(MOTORS):
@@ -355,7 +388,10 @@ def build_frame():
     text(board, "Pi Zero 2 W (on the battery cover, above the cell)", VS(0, SCAD["pi_w"] / 2 - 2.5), top, 1.0)
     text(board, "18650 cell on top, tabs soldered to BT1", VS(0, -5), top, 1.0)
     poly(board, rect_s(0, 0, *FC["size"]), bot, 0.15)
-    text(board, "FC module (bottom, M2.5 standoffs)", VS(0, -FC["size"][1] / 2 - 1.5), bot, 1.0)
+    text(board, f"FC module below on {B2B['standoff']:g} mm M2.5 standoffs, plugs into J5/J6", VS(0, -FC["size"][1] / 2 - 1.5), bot, 1.0)
+    pcx, pcy = FC["pico_c"]
+    poly(board, rect_s(pcx, pcy, *FC["pico_size"]), bot, 0.1)
+    text(board, "Pico 2 W below (~4 mm tall): only low parts here", VS(pcx, pcy - 3), bot, 0.8)
     text(board, "ESC under arm (bottom)", VS(SCAD["esc_radius"] * 0.5, -3), bot, 0.8)
     seg(board, VS(-8, 0), VS(8, 0), top, 0.3)
     seg(board, VS(8, 0), VS(5, 2), top, 0.3)
@@ -457,6 +493,14 @@ def build_fc():
             assert abs(p.GetPosition().x - want) < mm(0.01), (ref, k, pcbnew.ToMM(p.GetPosition().x))
             assert p.IsOnLayer(pcbnew.B_Cu)
         fp.Value().SetVisible(False)
+        fp.Reference().SetPosition(VS(dcx - 12.3, dcy + sy * FC["deck_rows"] / 2))   # rear end of the row
+
+    # --- J1 / J2 male headers on TOP: plug up into the frame's J5 / J6 ---
+    for ref, sy in (("J1", 1), ("J2", -1)):
+        fp = place_b2b(board, "Connector_PinHeader_2.00mm", "PinHeader_1x10_P2.00mm_Vertical", ref,
+                       "Header 1x10 2.00mm male (to frame " + ("J5" if sy > 0 else "J6") + ")", sy, bottom=False)
+        fp.Value().SetVisible(False)
+    text(board, f"FC hangs on {B2B['standoff']:g} mm M2.5 standoffs; J1/J2 plug into the frame", VS(0, -16.9), top, 0.6)
 
     # --- guides ---
     poly(board, rect_s(dcx, dcy, *FC["deck_board"]), bot, 0.15)
@@ -467,8 +511,8 @@ def build_fc():
     seg(board, VS(-6, -13), VS(6, -13), top, 0.3)
     seg(board, VS(6, -13), VS(4, -11.5), top, 0.3)
     seg(board, VS(6, -13), VS(4, -14.5), top, 0.3)
-    text(board, f"1S Pico2W FC r{REVISION}", VS(-4, 13.6), pcbnew.F_SilkS, 1.0, 0.15)
-    text(board, "FRONT >", VS(-4, -13.6), pcbnew.F_SilkS, 1.0, 0.15)
+    text(board, f"FC r{REVISION}", VS(-21.5, 15.2), pcbnew.F_SilkS, 0.8, 0.15)
+    text(board, "FRONT >", VS(-21.5, -15.2), pcbnew.F_SilkS, 0.8, 0.15)
     text(board, f"1S Pico2W FC r{REVISION} bottom", VS(-24.5, 0), pcbnew.B_SilkS, 0.8, 0.12, rot=90)
     return finish(board, pcb, name)
 

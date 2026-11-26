@@ -128,3 +128,28 @@ DECK_RIGHT = ["UART2_RX", "UART2_TX", "SPI_SCK", "SPI_MISO", "SPI_MOSI",
 # Flow deck v2 use (to verify against the Flow deck v2 schematic before stage 2):
 # SPI + a chip select on an IO pin for the PMW3901, I2C for the VL53L1x, and its
 # supply from VCOM / VCC_3V.
+
+# ---------------------------------------------------------------------------
+# Board-to-board: the FC hangs under the frame on 4 x M2.5 standoffs and plugs
+# into it, so it can be pulled off and replaced (nothing soldered between them).
+#   FC top    : 2 x male pin header 1x10, 2.00 mm, through-hole (J1 left, J2 right)
+#   Frame bot : 2 x female socket 1x10, 2.00 mm, SMD (J5 left, J6 right) - SMD so
+#               no pin tails come up under the battery-cover rails on the frame top.
+# 2.00 mm because a 2.54 mm 1x10 (25.4 mm + body) runs into the M2.5 standoff
+# hexes at x = +-12.35 mm; 2.00 mm (20 mm) clears them.
+# Rows at y = +-15: outside the Pico courtyard (+-11.55) and the deck pads on the
+# FC bottom (|y| <= 13.4), and the FC-side pin tails stay outside the Flow deck
+# board (|y| <= 13.65).  Pin 1 of both rows at the front, pin k at x = 9 - 2(k-1).
+# ---------------------------------------------------------------------------
+B2B = dict(
+    pitch=2.0,
+    pins=10,
+    row_y=15.0,
+    # Board-to-board gap (FC top to frame bottom) = standoff length = socket body
+    # height + header plastic height. Pick a matched pair, e.g. a 4.5 mm socket +
+    # 1.5 mm header on 6 mm standoffs. Pico 2 W on the FC top is ~4 mm tall at the
+    # micro-USB, so 6 mm leaves ~2 mm under the frame: keep tall frame-bottom parts
+    # out of the area above the Pico. To confirm with the chosen part datasheets.
+    standoff=6.0,
+)
+B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of pins 1..10
