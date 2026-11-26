@@ -50,13 +50,13 @@ other contour as a circle and snaps it to a known drill:
 | 2.2 | 16 | motor M2 screws, 9 mm PCD, NPTH | H1–H4 (`MotorMount_1203_M2_9mm`) |
 | 2.2 | 4 | the shared M2 holes: battery cover + landing gear + FC standoffs, NPTH | H_CV1–4 |
 | 1.0 | 28 | ESC header pins, **plated**, 1.7 mm pads | J1–J4: pads 1–4 inner row (power end), 5–7 outer row (motor phases) |
-| 0.8 | 2 | JST-PH holes of J1 "Pi power" (the Bolt connectors are removed from the scad) | **dropped**: placed as a real connector footprint in stage 3 |
+| 0.75 | 2 | JST-PH holes for the Pi 5.1 V connector (JST ePH drill) | J8 (`JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical`), pads asserted on the holes |
 
 Plus **BT1**, the two 3 × 10 mm battery tab pads on top copper at x = ±33.6 mm (from `pcb()` in the
 scad). Polarity is not set yet.
 
 `tools/check_import.py` checks every drilled hole in the board against the DXF (within 0.01 mm, same
-drill) and checks the outline segment count. Result: `IMPORT OK`, 52 holes.
+drill) and checks the outline segment count. Result: `IMPORT OK`, 58 holes.
 
 Motor and ESC names: FL, FR, RR, RL (x forward to the camera, y left). In KiCad the front points right.
 
