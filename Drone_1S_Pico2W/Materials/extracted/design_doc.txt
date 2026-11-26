@@ -1,0 +1,482 @@
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+Toothpick Drone Hardware Design (1S, Pico
+2 W)
+  ​Nov 25, 2026 · ​@Arkadi
+
+
+
+Overview
+One 18650 cell (1S, 30 A peak) feeds two independent paths: a 0.5 A logic path for the Pico
+2 that has hardware undervoltage cutoff and a slide switch, and four 8 A motor paths that
+only turn on when the Pico tells them to.
+
+       Circuit A, logic power: a TPS22810 load switch feeds the Pico 2 (RP2350) and
+       peripherals. It cuts off on low battery and is turned off by an SPDT slide switch.
+       Circuit B, motor power: one TPS22997 load switch per ESC, high side. Their ON pins
+       are driven by Pico GPIOs, so they can't turn on unless the Pico is running.
+       Main effect: if the Pico loses power for any reason (switch off, undervoltage, crash),
+       the pull-downs on the ON pins turn all motor power off.
+       No contact in the 30 A path: the slide switch only carries the EN signal.
+
+
+
+
+power architecture · logic path and four motor paths
+
+The slide switch and the lockout control only the Pico rail. The motor switches follow the
+Pico's GPIOs.
+
+
+
+
+                                                                                            Page 1 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+System diagram
+
+
+
+
+full system · main PCB, bottom module and external boards
+
+Gray arrows are power; the blue bus is the 2×10 module header, which carries the Pico's
+control lines to the switches, ESCs and boost. Every rail downstream of the cell is off
+unless the Pico is running.
+
+
+Circuit A: Pico supply (TPS22810)
+The TPS22810's built-in lockout turns the Pico rail on above about 2.54 V and off around
+2.41 V. The SPDT slide switch forces it into shutdown, which draws under 1 µA.
+
+
+  Connection               To
+
+  VIN                      BAT+ (1 µF or more to GND)
+
+  VOUT                     Pico 2 VSYS (pin 39) + peripherals (1 µF or more to
+                           GND)
+
+
+
+
+                                                                                      Page 2 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+  Connection               To
+
+  EN/UVLO                  SPDT common. ON throw → VIN, OFF throw → GND
+
+  CT                       Leave open, or add a capacitor for slower turn-on
+
+  GND                      Common ground
+
+
+
+  Parameter                           Value
+
+  Input range                         2.7–18 V
+
+  Load                                0.5 A (Pico + peripherals), part rated 2 A in SOT-23-
+                                      6
+
+  On threshold                        2.54 V typ, 2.62 V max (rising)
+
+  Off threshold                       About 2.41 V (5% hysteresis)
+
+  Shutdown current                    Under 1 µA (switch OFF)
+
+
+       SPDT, not SPST: EN/UVLO must never float, and the SPDT needs no pull-down that
+       would drain the cell.
+       Low hysteresis: after a cutoff, the unloaded cell recovers to about 2.9 V, so the rail can
+       come back on. Firmware handles this (see Firmware).
+       2.41 V is below the part's 2.7 V minimum. The switch still turns off, but Rds(on) rises
+       near that point.
+       In-spec alternative (off 2.70 V, on 3.30 V, no cycling): EN/UVLO driven by a divider
+       instead of the SPDT throw: R1 156 kΩ from switched BAT+ to EN, R2 100 kΩ from EN to
+       GND, R3 1.27 MΩ from VOUT to EN.
+
+
+Circuit B: motor power (4 × TPS22997)
+Each ESC gets its own TPS22997 on the high side, carrying about 7.5 A each at 30 A total.
+Compared with the TPS22998 it adds thermal shutdown and a power-good output, in a 2 ×
+1.5 mm WQFN-HR package. The ON pin takes a 3.3 V GPIO directly (VIH 0.8 V), so no gate
+driver is needed.
+
+
+  Pin (per ESC)               Connection
+
+  VIN (2, 3)                  BAT+, with 10 µF or more next to the chip
+
+  VBIAS (1)                   BAT+
+
+
+
+
+                                                                                              Page 3 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+  Pin (per ESC)               Connection
+
+  VOUT (7, 8)                 ESC + lead
+
+  ON                          Pico GPIO. Internal 500 kΩ smart pull-down; add
+                              100 kΩ external for margin
+
+  CT (9)                      Capacitor to GND sets rise time; size for a few ms
+                              to limit inrush into the ESC capacitors
+
+  PG (4)                      Open drain; 47 kΩ pull-up to Pico 3V3, read by a
+                              Pico GPIO
+
+  QOD (6)                     Tie to VOUT for quick output discharge; a series
+                              resistor sets the fall time
+
+  GND (5)                     Common ground, shared with ESC signal ground
+
+
+
+  Parameter                                      Value
+
+  Continuous current                             10 A per switch
+
+  On-resistance                                  4 mΩ typ
+
+  VIN range                                      0.1–5.5 V
+
+  VBIAS range                                    1.5–5.5 V (covers the 2.4 V cutoff)
+
+  Off current                                    0.1 µA typ
+
+  On-state quiescent current                     10 µA typ
+
+  Thermal shutdown                               170 °C typ, 20 °C hysteresis, restarts when cooled
+
+  Current limit                                  None
+
+
+       High side keeps the ESC grounds tied to the Pico's signal ground.
+       Control: one GPIO can drive all four ON pins. Four GPIOs allow staggered turn-on
+       (about 10 ms apart) to spread inrush, and shutting off one faulted ESC.
+       Power good: after enabling, the Pico checks all four PG lines. A channel that never
+       asserts, or drops out in flight (thermal shutdown), flags a fault, so land and disarm.
+       Thermal shutdown is not a current limit. It protects the switch, but a hard short still
+       loads the cell until the die heats up and trips.
+
+
+
+
+                                                                                                      Page 4 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+Firmware and protection layers
+Firmware is the main protection and the TPS22810 lockout is the backstop. The Pico cuts
+motor power well before the cell reaches 2.4 V.
+
+   1. Boot: read the cell on GPIO29 (VSYS/3, on-board divider). If it's below about 3.0 V at
+       rest, keep the motors off and go into dormant mode. This also stops the reboot loop
+       after a hardware cutoff.
+   2. Enable motors: drive the TPS22997 ON pins high, staggered if you use separate
+       GPIOs. Confirm all four PG lines go high before arming.
+   3. In flight: filter the cell reading over about 0.5 s. Land at about 3.0–3.2 V resting or 2.9
+       V under load, then switch the motors off.
+   4. Backstop: if the firmware fails, the TPS22810 drops the Pico rail around 2.41 V. The ON
+       pull-downs then shut off all motor power.
+
+
+  Layer                             Trigger                             Action
+
+  Firmware                          ~3.0–3.2 V resting / 2.9 V loaded   Motors off, dormant
+
+  TPS22810 lockout                  ~2.41 V falling                     Pico rail off → motors off
+
+  Slide switch                      User                                TPS22810 shutdown, under 1 µA
+
+
+
+
+Drivetrain and fit check
+The drivetrain uses four separate ESCs, so the per-ESC TPS22998 layout fits. At 10 A per
+channel, each switch is rated above its ESC's burst current.
+
+
+
+
+                                                                                                        Page 5 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+  Part                                           Key spec                            What it means here
+
+  DYS XSD7A ESC × 4                              1–2S, 7 A cont, 9 A burst (10 s),   TPS22997 (10 A) is not the weak
+                                                 no BEC, 0.83 g, BLHeli_S            link. No BEC, so Circuit A
+                                                                                     powers the Pico
+
+  RCinPower GTS V3 1203                          1–2S, ~4.5 g, 100 mΩ                Estimated ~6–8 A per motor at
+  11500KV × 4                                                                        full throttle on 1S (not
+                                                                                     measured)
+
+  Gemfan Hurricane 2520                          2.5 in prop                         Sets the load. Check full-
+  ×4                                                                                 throttle current per motor
+                                                                                     stays under 7 A
+
+  18650 cell                                     1S, 30 A peak                       4 × ~7.5 A matches the 30 A
+                                                                                     design figure
+
+
+       Throttle protocol: the XSD7A takes DShot150/300/600, Oneshot, Multishot and PWM.
+       The Pico 2 can generate DShot on its PIO blocks, one pin per ESC.
+       ESC brownout: the ESC MCU runs from the cell. Hard sag near 3 V can reset it mid-
+       flight. The firmware landing threshold (3.0–3.2 V resting) keeps clear of this. Each
+       TPS22997 adds only about 30 mV at 7.5 A.
+       Fault protection: the TPS22997 has no current limit, so a shorted ESC loads the cell
+       directly. Its thermal shutdown protects the switch, and the PG line tells the Pico
+       which channel dropped out.
+
+
+
+Charger: BQ25606 + USB-C
+A TI BQ25606 standalone buck charger charges the soldered 18650 from USB-C at up to 3
+A, with no firmware involved. Charge current and input limit are set by resistors, so it
+charges even with the Pico switched off.
+
+
+  Pin                   Connection
+
+  VBUS                  USB-C VBUS, 10 µF or more
+
+  ICHG                  R to GND: 226 Ω → 3.0 A (ICHG = 677 / R)
+
+  ILIM                  R to GND: 150 Ω → 3.2 A input limit (IINDPM = 478 /
+                        R)
+
+  VSET                  Float → 4.208 V charge voltage
+
+
+
+
+                                                                                                                  Page 6 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+  Pin                   Connection
+
+  TS                    10 k NTC (103AT-2) touching the cell, divider from
+                        REGN per datasheet
+
+  BAT                   Cell + directly
+
+  SYS                   Feeds the TPS22810 (Pico rail) only
+
+  D+ / D−               USB-C D+/D− for adapter detection
+
+  PG                    To a spare header pin, so the Pico blocks arming
+                        while USB is connected
+
+  SW / BTST             1 µH inductor (saturation ≥ 3.6 A), bootstrap
+                        capacitor
+
+  CE                    GND (charging always enabled)
+
+
+       USB-C sink: 5.1 kΩ from each CC pin to GND. Without these, USB-C-to-C chargers
+       supply no VBUS.
+       Actual charge current depends on the adapter: the charger's D+/D− detection sets
+       the input limit. A dedicated charger (DCP) gets 2.4 A input, an unknown adapter gets
+       the 3.2 A ILIM setting, a computer port gets 500 mA. From 5 V, that's roughly 2.5–3 A
+       into the cell.
+       Motors stay on BAT, never on SYS. The BATFET is rated for 6 A and latches off on
+       overload until VBUS is replugged.
+       Power path: SYS holds at least 3.5 V while USB is connected, so the Pico runs from
+       USB even with a flat cell. Unplugged, SYS sits about 50 mV above BAT, so the
+       TPS22810 lockout still tracks the cell.
+       Safety: this charger is the only overvoltage protection on the soldered cell. Check the
+       cell datasheet allows 3 A charge; if not, raise R_ICHG.
+       Programming: keep USB-C for charging only and program the Pico through its own
+       USB during development. Sharing D+/D− with the charger's detection needs care.
+       Thermal: about 1–1.5 W of loss at 3 A. Use the thermal pad with several vias into the
+       GND plane, and keep it away from the IMU.
+
+Source: BQ25606 datasheet
+
+
+Sensors (Crazyflie set)
+The sensors copy the Crazyflie 2.1 / Bolt set: a BMI088 IMU and BMP388 barometer on the
+main board, plus a Flow deck v2 underneath. Staying identical means the open-source
+Crazyflie drivers and state-estimator parameters carry over to the Pico.
+
+
+
+                                                                                         Page 7 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+  Sensor                  Part                         Bus on Pico 2                 Notes
+
+  IMU                     Bosch BMI088                 SPI0, two chip selects        Same SPI hookup as the
+                                                       (accel, gyro) + two data-     Bolt. Alone on its bus so
+                                                       ready interrupts              the control loop is never
+                                                                                     delayed
+
+  Barometer               Bosch BMP388                 I2C0                          Cover with open-cell
+                                                                                     foam, shield from prop
+                                                                                     wash and light
+
+  Optical                 PixArt PMW3901               SPI1, own chip select, max    Works best on matt
+  flow                    (on Flow deck v2)            2 MHz                         surfaces; needs more
+                                                                                     light than newer flow
+                                                                                     chips
+
+  Height                  ST VL53L1x (on               I2C0                          Up to 4 m; converts flow
+                          Flow deck v2)                                              counts into m/s
+
+
+       Flow deck v2 on the Pico: wire power, GND, the SPI lines plus the flow chip select, and
+       the I2C lines from its Crazyflie deck connector. Check power and chip-select pins
+       against the deck schematic before connecting.
+       BMI088 start-up: the accelerometer powers up in I2C mode. One rising edge on its
+       chip select switches it to SPI, and every accel read returns a dummy byte first.
+       Mounting: IMU near the centre of gravity, soft-mounted. Flow deck facing straight
+       down with a clear view, near the centre so rotation adds little false motion.
+       Reference design: the Bolt schematic is open source and shows the BMI088 and
+       BMP388 circuits.
+
+Sources: Crazyflie 2.1 sensors (PX4 docs) · Crazyflie Bolt datasheet · Flow deck v2
+
+
+Optional: 5.1 V rail for a Raspberry Pi Zero
+A TI TPS61235P boost converter makes a fixed 5.1 V rail for a Pi Zero 2 W (or a future Pi
+Zero), switched on and off by a Pico GPIO. It fully disconnects the Pi from the battery
+when disabled.
+
+
+  Item                                   Choice
+
+  IC                                     TPS61235P: fixed 5.1 V output, true disconnect in
+                                         shutdown, 10 A internal switches, 2.5 × 2.5 mm
+                                         VQFN
+
+
+
+
+                                                                                                          Page 8 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+  Item                                   Choice
+
+  Rated output                           3 A at 5 V (TI EVM)
+
+  Input                                  Charger SYS rail (Pi runs from USB on the bench;
+                                         total stays under the 6 A BATFET limit)
+
+  Enable                                 Pico GPIO, 100 kΩ pull-down: Pico off → Pi off
+
+  Output current limit                   Resistor-programmed; set about 2.5 A so a fault
+                                         can't drag the cell down
+
+  Pi connection                          5.1 V and GND to the Pi's GPIO header 5 V pins
+                                         (bypasses the Pi's micro-USB input protection)
+
+  Alternative                            TPS61022: 8 A, adjustable 2.2–5.5 V output (set 5.1
+                                         V), also with true disconnect
+
+
+       Battery cost: at 2 A output from a 3.3 V cell, the boost draws about 3.4 A. Budget it
+       alongside the 30 A motor peak.
+       Graceful shutdown: cutting power can corrupt the Pi's SD card. Use a handshake: the
+       Pico sends a shutdown command over UART, the Pi shuts down and signals done on
+       PI_STATUS (gpio-poweroff overlay), then the Pico disables the boost (with a timeout if
+       PI_STATUS never comes). The Pico's low-battery logic must start this early enough.
+       Pico-to-Pi link: a 4-pin JST-SH (1.0 mm, locking) on the module goes straight to the Pi:
+       GND, Pico TX → Pi RX (GPIO15), Pi TX (GPIO14) → Pico RX, and PI_STATUS (Pi → Pico).
+       The Pico requests shutdown with a UART command; PI_STATUS (gpio-poweroff
+       overlay) tells it when the Pi is safe to cut. Only BOOST_EN crosses the main header, so
+       it stays at 2 × 10. The 5.1 V power runs separately from the main board to the Pi's 5 V
+       pins. Put 1 kΩ in series on each signal and keep Pico outputs high-impedance while the
+       Pi is off, so neither side back-powers the other. On the Pi, use dtoverlay=disable-bt or
+       miniuart-bt so GPIO14/15 get the stable PL011 UART, and disable the serial console.
+       Future Pi Zero: the 3 A rating leaves headroom, but confirm its power needs when it's
+       released.
+
+Sources: TPS61235P / TPS61236P · TPS61022
+
+
+BOM, layout and open items
+
+  Qty         Part                                                       Role
+
+  1           TI TPS22810 (SOT-23-6)                                     Pico rail switch with undervoltage
+                                                                         lockout
+
+
+
+
+                                                                                                         Page 9 of 10
+Toothpick Drone Hardware Design (1S, Pico 2 W)
+
+
+
+
+  Qty         Part                                       Role
+
+  1           SPDT slide switch, signal rating           EN/UVLO on/off
+
+  4           TI TPS22997 (WQFN-HR, 2 × 1.5 mm)          Per-ESC motor power switch
+
+  4           100 kΩ resistor                            ON pull-downs
+
+  4           10 µF or more, 10 V ceramic                TPS22997 input capacitors
+
+  2           1 µF or more ceramic                       TPS22810 VIN / VOUT
+
+  1           High-drain 18650 (e.g. Molicel P28A,       1S cell, 30 A peak
+              Samsung 30T)
+
+
+Layout
+
+       Wide pours on BAT+ and each VOUT, several vias under each TPS22997 thermal pad.
+       Place each TPS22997 close to its ESC connector, with its input capacitor right at VIN.
+       Check the TPS22997 land pattern before committing to hand assembly. It's a small
+       fine-pitch package.
+
+Open items
+
+       Measure full-throttle current per motor with the 2520 props on a fresh cell; it should
+       stay under the XSD7A's 7 A continuous rating.
+       Add reverse-polarity protection on the ESC power leads.
+       Choose between the internal 2.54 V lockout and the 2.70 / 3.30 V divider.
+       Worst-case check of thresholds against datasheet min/max values.
+
+Sources: TPS22810 datasheet · TPS22997 product page · TPS22997 datasheet
+
+
+
+
+                                                                                       Page 10 of 10
+
