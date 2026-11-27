@@ -1,48 +1,34 @@
-# Datasheets still needed for validation
+# What is still missing (updated 27 Nov 2026)
 
-Part datasheets for the BOM go in [bom_datasheets/](bom_datasheets/README.md), which tracks each
-orderable part's Digi-Key number, lifecycle and verification result.
+Status of part verification: [bom_datasheets/README.md](bom_datasheets/README.md). Excluding the 19 stock
+passives and LEDs, 18 parts are verified against manufacturer documents and 2 partly; 6 have no document yet
+(the cable housings and contacts were added today, so their catalogs are still to come).
+Parts that still need a Digi-Key number: [../fabrication/BOM_to_source.md](../fabrication/BOM_to_source.md).
 
-These manufacturer sites are blocked from the build container. Until the PDFs are here, the parts
-are checked only against open-source KiCad libraries (see `../../Libraries/README.md`). Drop each PDF
-into `Materials/` under the file name given. Each item lists what it validates.
+## Documents still needed
 
-## Priority 1: blocks schematic values and land-pattern sign-off
-
-| # | Document | Save as | Validates | Link |
-|---|---|---|---|---|
-| 1 | TI **BQ25606** datasheet | `bq25606.pdf` | RGE pinout and land pattern; K_ICHG / K_ILIM (R3 226 Ω, R4 150 Ω); TS divider for the 103AT (R5/R6); inductor (L1) and capacitor values; VSET; D+/D− detection; STAT drive | ti.com/lit/ds/symlink/bq25606.pdf |
-| 2 | TI **TPS22997** datasheet | `tps22997.pdf` | pinout; VBIAS range (tie to BAT?); CT vs rise time (C14–C17); PG open-drain levels; QOD; current and thermal limits at ~7.5 A | ti.com/lit/ds/symlink/tps22997.pdf |
-| 3 | TI **RYZ0010A** package / land pattern (WQFN-HR-10) | `mpqf651a.pdf` | the `KD_Power:Texas_RYZ0010A...` pads; hand-assembly fit (doc open item) | ti.com/lit/ml/mpqf651a/mpqf651a.pdf |
-| 4 | TI **TPS22810** datasheet | `tps22810.pdf` | DBV (SOT-23-6) pinout; internal UVLO 2.54 / 2.41 V vs the R8–R10 divider; EN thresholds for the slide switch; CT; QOD | ti.com/lit/ds/symlink/tps22810.pdf |
-| 5 | TI **TPS61235P / TPS61236P** datasheet (incl. RWL package drawing) | `tps61235p.pdf` | RWL pinout and land pattern; inductor (L2); input/output capacitors (C18–C22); CC / current-limit resistor (R20, ~2.5 A); INACT and FB pin use; EN levels | ti.com/lit/ds/symlink/tps61235p.pdf |
-| 6 | Bosch **BMI088** datasheet | `BST-BMI088-DS001.pdf` | pad-1 corner (pin numbers confirmed by the Bolt schematic); LGA-16 land pattern; PS strap for SPI; decoupling; accel SPI start-up | bosch-sensortec.com (BMI088 product page, Downloads) |
-| 7 | Bosch **BMP388** datasheet | `BST-BMP388-DS001.pdf` | LGA-10 land pattern; CSB/SDO strapping (I2C address 0x77); decoupling | bosch-sensortec.com (BMP388 product page, Downloads) |
-| ~~8~~ | ✅ **received** – Bitcraze **Flow deck v2** schematic | `flow-deck-v2-schematic.pdf` | which deck pins it uses: supply (VCC / 3V3 / VCOM), the PMW3901 CS pin, the I2C and SPI pins; PMW3901 / VL53L1x running from 3.3 V | bitcraze.io (Flow deck v2 product page) / github bitcraze hardware |
-
-## Priority 2: reference circuits and mechanical fit
-
-| # | Document | Save as | Validates |
+| # | Part | Document | What it settles |
 |---|---|---|---|
-| ~~9~~ | ✅ **received** – Bitcraze **Crazyflie Bolt 1.1** schematic | `crazyflie-bolt-1.1-schematic.pdf` | BMI088 / BMP388 reference circuits (analog supply filter, interrupt wiring) |
-| 10 | ◐ **partly** (vendor images: size, ratings, pad silk) – **DYS XSD7A** ESC datasheet or pad drawing | `dys-xsd7a.pdf` | ESC header J1–J4 pin functions (BAT+, GND, signal), 7 A continuous rating, DShot support |
-| 11 | (socket drawings received: Sullins 10483, Samtec SMM; the male header drawing is still needed) **2.00 mm male SMD header** datasheet, e.g. Samtec TMM (the FC J1/J2 and P1/P2 part) | `header-2mm-smd.pdf` | plastic and pin heights against the 5 mm standoff and the Bitcraze socket (2.1 mm) |
-| ~~12~~ | ✅ **received** (photo; TP positions fixed) – **Pico 2 W underside**: a photo or drawing of the bottom silkscreen (not covered by the datasheet) | `pico2w-bottom.jpg` | TP1/TP2/TP3 order (GND, USB DM, USB DP) and SWD pad order (SWCLK, GND, SWDIO) |
-| ~~13~~ | ✅ **received** (5 V 2.5 A) – Raspberry Pi **Zero 2 W** product brief | `pi-zero-2w-product-brief.pdf` | 5 V supply current, so the boost can be sized; GPIO header 5 V pins |
+| 1 | Samsung **CL31B226KPHNFNE** (C20–C22, 22 µF 10 V X7R 1206) | Samsung datasheet / DC-bias curve (the file received was Murata's catalog) | 3 × 22 µF must stay ≥ 20 µF effective at 5.1 V for the TPS61235P |
+| 2 | Sullins **PRPC040SAAN-RC** (J1–J4 ESC header strip) | Sullins drawing | pin length / plastic height under the ESC (seat height in the 3D model) |
+| 3 | JST **SHR-04V-S-B / SHR-03V-S-B, SSH-003T-P0.2-H** | SH housing and contact pages (the SH catalog received covers the headers) | wire gauge, crimp tool |
+| 4 | JST **PHR-2, SPH-002T-P0.5S** | PH housing and contact pages | wire gauge (24–26 AWG for 2.5 A), crimp tool |
+| 5 | **DYS XSD7A** ESC | pad drawing (photos give the pad functions) | exact ESC pin map onto J1–J4 |
+| 6 | Hardware (standoffs, screws, inserts) | the chosen Digi-Key parts' drawings | standoff length / hex size, insert size vs the printed bosses |
 
-## Priority 3: stock footprints to confirm
+## Open decisions
 
-| # | Document | Save as | Validates |
-|---|---|---|---|
-| 14 | GCT **USB4105-GF-A** drawing | `usb4105.pdf` | J10 footprint (stock `USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal`) |
-| 15 | C&K **PCM12** slide switch drawing | `pcm12.pdf` | SW1 footprint and actuator position at the frame edge |
-| 16 | Coilcraft **XAL4020** datasheet | `xal4020.pdf` | 1 µH part: Isat ≥ 3.6 A (charger), boost inductor current; footprint |
-| 17 | Semitec **103AT-2** NTC datasheet | `103at.pdf` | R–T table for the BQ25606 TS divider (with item 1) |
-| 18 | JST **SH** (SM03B / SM04B-SRSS-TB) and **PH** (S2B-PH) drawings | `jst-sh.pdf`, `jst-ph.pdf` | J7, J8, J9 footprints and heights |
+- [ ] **FC socket:** Bitcraze female deck socket on 5 mm standoffs (current design, FC J1/J2 = TMM-110-01-L-S) or
+      Samtec SMM-110-02-S-S on 6 mm (then J1/J2 = TMM-110-02-L-S).
+- [ ] **BQ25606 SYS capacitance:** about 41 µF on SYS vs ≤ 20 µF for the charger's loop. Move the boost input to BAT
+      (recommended) or keep it on SYS and test stability.
+- [ ] **TPS22997 PG pull-ups (R15–R18):** on the FC, Pico internal pull-ups, or 3V3 added to the header.
+- [ ] **FC additions from the Bolt:** 1 µH + 4.7 µF sensor-supply filter and 100 Ω series resistors on the DShot lines.
+- [ ] **TMM-110-04-L-S-SM availability** (non-standard length at Samtec) for P1/P2.
 
-Received so far: the Crazyflie Bolt 1.1 schematic and datasheet, the Flow deck v2 schematic, the Pi Zero
-2 W product brief, the Pico 2 datasheet, a Pico 2 W underside photo, and XSD7A images. Validation
-results are in the README ("Validation against uploaded documents").
+## Received and checked
 
-Already here before that: the design doc, the Pico 2 W datasheet, and the Bitcraze deck connector / Flow deck
-mechanical drawings (`extracted/bitcraze/`).
+BQ25606, TPS22810, TPS22997 + RYZ0010A drawing, TPS61235P, BMI088, BMP390, Pico 2 W (datasheet, photo), Pico 2,
+USB4105 (spec + SnapMagic footprint), Würth 74438357010, Semitec 103AT, APEM MA12R/TR, Omron/Aratas B3U, JST SH and
+PH catalogs, Samtec SMM and TMM (TH, SM), Sullins 10483, Murata MLCC catalog, Crazyflie Bolt 1.1 schematic and
+datasheet, Flow deck v2 schematic, Pi Zero 2 W brief, XSD7A images. Not used: JST SR/SZ catalog (IDC series).

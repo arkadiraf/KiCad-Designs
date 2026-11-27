@@ -78,10 +78,29 @@ FC_PARTS = [
     ("SW1", 1, "BOOTSEL tactile switch", ("Aratas (formerly Omron)", "B3U-1000P", "ok", "top-actuated, 3.0 x 2.5 x 1.6 mm")),
 ]
 
-# Mechanical stack (FC on the 4 cover holes) - generic hardware, any vendor
+# Mechanical stack and printed-part hardware (from the OpenSCAD model 1S_PiZero.scad, screw lengths computed there).
+# Generic parts: Digi-Key numbers to be filled in (user). refs, qty, value, (mfr, MPN, status, note)
 MECH_PARTS = [
-    ("-", 4, "M2 x 5 mm hex standoff F-F, 4 mm AF (6 mm if the Samtec socket is chosen)",
-     ("any", "M2x5 F-F standoff", "TBD", "length follows the J5/J6 decision")),
+    ("FC stack", 4, "M2 x 5 mm hex standoff, female-female, 4 mm AF, nylon or aluminium",
+     ("any", "M2x5 F-F standoff 4 mm hex", "TBD", "FC under the frame on the 4 cover holes; 6 mm if the Samtec SMM socket is chosen")),
+    ("FC stack", 4, "M2 x 4 mm socket head screw", ("any", "M2x4 SHCS", "TBD", "FC into the standoffs, from below")),
+    ("Cover", 4, "M2 x 8 mm socket head screw", ("any", "M2x8 SHCS", "TBD", "battery cover + frame into the standoffs")),
+    ("Gear", 4, "M2 x 4 mm socket head screw", ("any", "M2x4 SHCS", "TBD", "landing-gear skids, from the frame top")),
+    ("Gear, camera", 6, "M2 brass heat-set insert, 3.6 mm OD x 3.0 mm", ("any", "M2 heat-set insert 3.6x3.0", "TBD", "4 skid bosses + 2 camera blocks")),
+    ("Pi", 4, "M2.5 x 5 mm socket head screw", ("any", "M2.5x5 SHCS", "TBD", "Pi Zero 2 W into the cover posts")),
+    ("Pi", 4, "M2.5 brass heat-set insert, 4.0 mm OD x 4.0 mm", ("any", "M2.5 heat-set insert 4.0x4.0", "TBD", "cover posts")),
+    ("Camera", 2, "M2 x 6 mm socket head screw", ("any", "M2x6 SHCS", "TBD", "camera harness to the cover")),
+    ("Motors", 16, "M2 x 5 mm screw (check against the motors' own)", ("any", "M2x5 motor screw", "TBD", "motors, from under the frame")),
+]
+
+# Cables and their mating housings / contacts (frame and FC connectors). Crimp parts or pre-crimped leads.
+CABLE_PARTS = [
+    ("J7 cable", 1, "JST SH 4-pin housing (to frame J7, Pi USB)", ("JST", "SHR-04V-S-B", "ok", "frame end; Pi end soldered to the Pi Zero 2 W USB test pads")),
+    ("J9 cable", 1, "JST SH 3-pin housing (to FC J9, SWD, optional)", ("JST", "SHR-03V-S-B", "ok", "or the JST-SH 3-pin cable that comes with the Raspberry Pi Debug Probe")),
+    ("J7 J9 cables", 7, "JST SH crimp contact 28-32 AWG (4 + 3)", ("JST", "SSH-003T-P0.2-H", "ok", "or pre-crimped SH leads (28 AWG, ~100 mm)")),
+    ("J8 cable", 1, "JST PH 2-pin housing (to frame J8, Pi 5.1 V)", ("JST", "PHR-2", "ok", "frame end; Pi end to GPIO pins 4 (5 V) / 6 (GND), soldered or a 1x2 2.54 mm housing")),
+    ("J8 cable", 2, "JST PH crimp contact 24-30 AWG", ("JST", "SPH-002T-P0.5S", "ok", "24-26 AWG for up to 2.5 A; or pre-crimped PH leads")),
+    ("Wire", 1, "silicone wire 26 AWG, red + black, ~0.5 m each (J8) and 28-30 AWG for J7", ("any", "silicone hookup wire", "TBD", "")),
 ]
 
 

@@ -27,6 +27,7 @@ exported from the shared design doc. It has the design status, renders, the part
 yet checked for stock).
 **Stock parts** (0603 resistors and capacitors from the sample book, 0805 LEDs): [fabrication/BOM_stock.md](fabrication/BOM_stock.md)
 (16 values, with E24 fallbacks for the E96 values); they are left out of the Digi-Key CSV.
+**Still to source** (cables, standoffs, screws, inserts, Samtec parts): [fabrication/BOM_to_source.md](fabrication/BOM_to_source.md).
 
 | Stage | Content | State |
 |---|---|---|

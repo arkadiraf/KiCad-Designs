@@ -20,3 +20,8 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 2,Samtec,TMM-110-01-L-S,,FC J1 J2,2.00 mm male 1x10 THT (to the frame),ok,"-01: 3.20 mm post, 1.8 mm into the Bitcraze socket on 5 mm standoffs (-02 for SMM on 6 mm); not listed in this variant; Samtec direct / Mouser, or a listed variant"
 0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
 1,Aratas (formerly Omron),B3U-1000P,SW1020CT-ND,FC SW1,BOOTSEL tactile switch,ok,"top-actuated, 3.0 x 2.5 x 1.6 mm"
+1,JST,SHR-04V-S-B,,Cable J7 cable,"JST SH 4-pin housing (to frame J7, Pi USB)",ok,frame end; Pi end soldered to the Pi Zero 2 W USB test pads
+1,JST,SHR-03V-S-B,,Cable J9 cable,"JST SH 3-pin housing (to FC J9, SWD, optional)",ok,or the JST-SH 3-pin cable that comes with the Raspberry Pi Debug Probe
+7,JST,SSH-003T-P0.2-H,,Cable J7 J9 cables,JST SH crimp contact 28-32 AWG (4 + 3),ok,"or pre-crimped SH leads (28 AWG, ~100 mm)"
+1,JST,PHR-2,,Cable J8 cable,"JST PH 2-pin housing (to frame J8, Pi 5.1 V)",ok,"frame end; Pi end to GPIO pins 4 (5 V) / 6 (GND), soldered or a 1x2 2.54 mm housing"
+2,JST,SPH-002T-P0.5S,,Cable J8 cable,JST PH crimp contact 24-30 AWG,ok,24-26 AWG for up to 2.5 A; or pre-crimped PH leads
