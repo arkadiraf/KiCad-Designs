@@ -271,7 +271,7 @@ FRAME_BOM = [
     ("C5", "10uF 16V", "Device:C", _C08, "BAT"),
     ("C6", "4.7uF 10V", "Device:C", _C, "REGN"),
     ("C7", "47nF 16V", "Device:C", _C, "BTST bootstrap"),
-    ("D1", "LED red 0603", "Device:LED", "LED_SMD:LED_0603_1608Metric", "STAT charge indicator (optional), from SYS as TI's diagram"),
+    ("D1", "LED red 0805", "Device:LED", "LED_SMD:LED_0805_2012Metric", "STAT charge indicator (optional), from SYS as TI's diagram"),
     ("R7", "2.2k", "Device:R", _R, "STAT LED series resistor (STAT sinks 6 mA max)"),
     # --- logic rail: TPS22810 + slide switch ---
     ("U2", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, 2.54 V UVLO"),

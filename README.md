@@ -13,7 +13,8 @@ KiCad Design Projects
 * **Passives:** chip resistors and capacitors are **0603**. Bulk capacitors (10 µF and up, or where the
   voltage rating needs a bigger case) are **0805 or 1206**. No 0402 or smaller: the boards are
   hand-assembled. Exceptions (e.g. a current-sense or power resistor in a larger case) must be
-  stated next to the part in the project's `design.py`. `Drone_1S_Pico2W/tools/check_bom.py`
+  stated next to the part in the project's `design.py`.
+* **LEDs:** 0805 (`LED_SMD:LED_0805_2012Metric`). `Drone_1S_Pico2W/tools/check_bom.py`
   enforces this rule. Copy it into new projects.
 * **Shared parts:** custom symbols and footprints go in [Libraries](Libraries/), not project-local
   libraries, so later designs can reuse them.

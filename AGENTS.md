@@ -118,7 +118,7 @@ Design to the **strictest** fab the user might use, so one copper design fits al
 | Copper to edge | **0.4 mm** | OSH Park 15 mil |
 | Silkscreen | strokes ≥ 0.15 mm | OSH Park ~5 mil, JLC 0.15 mm |
 | Finish | ENIG recommended (flat pads for castellations / stencils) | |
-| Passives | R / C **0603**; bulk capacitors (≥ 10 µF) **0805 or 1206**; nothing smaller than 0603 | hand assembly (root README "Design rules", checked by `check_bom.py`) |
+| Passives | R / C **0603**; bulk capacitors (≥ 10 µF) **0805 or 1206**; LEDs **0805**; nothing smaller than 0603 | hand assembly (root README "Design rules", checked by `check_bom.py`) |
 | Custom parts | symbols / footprints in the shared `Libraries/` (KD_*), not project-local | reuse across designs |
 
 `export_fab.sh` produces one board zip per fab, all from the same copper:

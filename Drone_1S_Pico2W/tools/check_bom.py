@@ -35,6 +35,8 @@ def farads(val):
 
 def passive_rule(refs, val, fp):
     """None if fine, else the reason. Only R_ / C_ chip footprints are checked."""
+    if re.match(r"(?:\w+:)?LED_\d{4}_", fp) and "LED_0805_" not in fp:
+        return "LED not 0805, rule: LEDs 0805"
     m = re.match(r"(?:\w+:)?([RC])_(\d{4})_", fp)
     if not m:
         return None
