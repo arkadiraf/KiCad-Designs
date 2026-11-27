@@ -258,8 +258,11 @@ FRAME_BOM = [
     # (the application diagram shows 30.1 k; the worked example gives 30.9 k - used here).
     ("R5", "5.23k", "Device:R", _R, "TS divider top, REGN -> TS (0-60 C window)"),
     ("R6", "30.9k", "Device:R", _R, "TS divider bottom, TS -> GND"),
-    ("TH1", "10k NTC 103AT-2", "Device:Thermistor_NTC", "Connector_Wire:SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm",
-     "cell temperature, wire-leaded NTC taped to the 18650"),
+    # Semitec 103AT-2 (AT series datasheet p.12-13): 10.0 k +-1 % at 25 C, B25/85 3435 K +-1 %, radial resin
+    # body 3.7 x 2.4 x 4.0 mm max, 0.5 mm square tin-plated leads (0.71 mm diagonal) at 2.54 mm, 17 mm long.
+    # -> 2.54 mm pitch, 1.0 mm drill. Stands next to the cell, bead bent onto it and taped.
+    ("TH1", "10k NTC 103AT-2", "Device:Thermistor_NTC", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+     "cell temperature for the BQ25606 TS pin (0-60 C window with R5/R6)"),
     # Datasheet pin table: 1 uF on VBUS close to the IC, 10 uF on PMID; 10.2.2.2: ~22 uF input for 3 A charging
     # -> 2 x 10 uF on PMID (the input capacitor of the buck, placed first in the layout order).
     ("C1", "1uF 25V", "Device:C", _C, "VBUS, close to pin 24 (VBUS up to 13.5 V)"),

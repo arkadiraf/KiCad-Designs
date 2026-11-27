@@ -7,7 +7,7 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Yageo,RC0603FR-07150RL,311-150HRCT-ND,Frame R4,150 (R_0603_1608Metric); ILIM: 3.2 A input limit (doc),ok,
 1,Yageo,RC0603FR-075K23L,311-5.23KHRCT-ND,Frame R5,"5.23k (R_0603_1608Metric); TS divider top, REGN -> TS (0-60 C window)",ok,BQ25606 datasheet 9.3.5; Digi-Key PN by the Yageo 311-<value>HRCT-ND pattern - confirm
 1,Yageo,RC0603FR-0730K9L,311-30.9KHRCT-ND,Frame R6,"30.9k (R_0603_1608Metric); TS divider bottom, TS -> GND",ok,BQ25606 datasheet 9.3.5; Digi-Key PN by the Yageo 311-<value>HRCT-ND pattern - confirm
-1,Semitec,103AT-2,4316-103AT-2-ND,Frame TH1,"10k NTC 103AT-2 (SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm); cell temperature, wire-leaded NTC taped to the 18650",verify,Mouser stocks it; Digi-Key may list it as 103AT-2-ND; bulk
+1,Semitec,103AT-2,4316-103AT-2-ND,Frame TH1,10k NTC 103AT-2 (PinHeader_1x02_P2.54mm_Vertical); cell temperature for the BQ25606 TS pin (0-60 C window with R5/R6),ok,"10 k +-1 %, B 3435 K +-1 %, radial 2.54 mm; bulk"
 1,Samsung,CL10B105KA8NNNC,1276-1184-1-ND,Frame C1,"1uF 25V (C_0603_1608Metric); VBUS, close to pin 24 (VBUS up to 13.5 V)",verify,1 uF 25 V X7R 0603; Digi-Key PN not looked up here - confirm
 11,Murata,GRM21BR61C106KE15L,490-3886-1-ND,"Frame C2 C23, Frame C3 C4, Frame C5, Frame C10 C11 C12 C13, Frame C18 C19","10uF 16V (C_0805_2012Metric); PMID, buck input (~22 uF total for 3 A)",ok,10 uF 16 V X5R 0805
 1,Murata,GRM188R61A475KE15D,490-10477-1-ND,Frame C6,4.7uF 10V (C_0603_1608Metric); REGN,ok,4.7 uF 10 V X5R 0603; OBSOLETE - Digi-Key upgrade: GRM188R61A475KAAJD (490-14373-1-ND)

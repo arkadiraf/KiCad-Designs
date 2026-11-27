@@ -27,7 +27,7 @@ FRAME_MPN = {
     "R4": (YAGEO, "RC0603FR-07150RL", "ok", ""),
     "R5": (YAGEO, "RC0603FR-075K23L", "ok", "BQ25606 datasheet 9.3.5"),
     "R6": (YAGEO, "RC0603FR-0730K9L", "ok", "BQ25606 datasheet 9.3.5"),
-    "TH1": ("Semitec", "103AT-2", "verify", "Mouser stocks it; Digi-Key may list it as 103AT-2-ND"),
+    "TH1": ("Semitec", "103AT-2", "ok", "10 k +-1 %, B 3435 K +-1 %, radial 2.54 mm"),
     "C1": ("Samsung", "CL10B105KA8NNNC", "verify", "1 uF 25 V X7R 0603"),
     "C2 C23": (MURATA, "GRM21BR61C106KE15L", "ok", "10 uF 16 V X5R 0805"),
     "C3 C4": (MURATA, "GRM21BR61C106KE15L", "ok", "16 V part on the 10 V lines: less DC-bias loss"),
@@ -137,6 +137,15 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "103AT-2": [
+        ("103AT-2_Semitec_AT_thermistor.pdf",
+         "CONFIRMED: R25 10.0 k +-1 %, B25/85 3435 K +-1 % (the NTC TI recommends for the BQ25606 TS pin), "
+         "thermal time constant ~15 s, 0.5 mm square leads at 2.54 mm, body 3.7 x 2.4 x 4.0 mm max. "
+         "With R5 5.23 k / R6 30.9 k and the BQ25606 VT1/VT5 thresholds: charge window ~0-60 C "
+         "(B model 1.5 / 60.0 C; TI's table 0 / 60 C; tolerances -1.5..4.3 C / 57.5..61.9 C); JEITA steps at "
+         "~11 C and ~45 C. CHANGED: footprint from a 3.6 mm / 0.4 mm-drill wire pad to 2.54 mm, 1.0 mm drill "
+         "(lead diagonal 0.71 mm)."),
+    ],
     "74438357010": [
         ("74438357010_Wurth_datasheet.pdf",
          "CONFIRMED (WE-MAPI, rev 003.002): 1 uH +-20 %, Isat 6.2 A @ -10 % (12.5 A @ -30 %), IRP 10.25 A (40 K), "
