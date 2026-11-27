@@ -69,9 +69,19 @@ ZONES = {
     "J4 motor R": (12.0, 93.0, 21.0, 99.6),
     "U3 driver L": (-22.0, 80.0, -11.0, 91.0),           # drivers right above their connectors
     "U4 driver R": (11.0, 80.0, 22.0, 91.0),
+    # user 2026-11-27: boost in the bottom part beside the Pico, next to the drivers (left side);
+    # slide switch on the other side at the board edge (EG1218 body 11.6 x 4.0, long side along the edge)
+    "U5 boost": (-29.0, 50.0, -12.0, 78.0),
+    "SW1": (25.4, 30.2, 29.4, 41.8),
+    "U7 + D2": (13.0, 26.0, 24.0, 46.0),
 }
 
 PICO_SOCKET_PITCH = 17.78              # 2 x 1x20, 2.54 mm, Pico W / Pico 2 W
+
+# Operating modes (user 2026-11-27): the robot is never driven while charging; it is left disabled (slide switch
+# off) to charge slowly. If power is left on, firmware drops MOTOR_EN and BOOST_EN (TPS61235P disconnects 5V1),
+# puts the BNO086 to sleep and sends the Pico dormant (wake: RTC, GP21 button or CHG_PG). The 100 k pull-downs on
+# MOTOR_EN / BOOST_EN keep motor power off through resets; the TPS22810 UVLO is the final backstop.
 
 # ---------------------------------------------------------------------------
 # Draft pin map (Pico W and Pico 2 W). GP23/24/25/29 belong to the CYW43439 on both modules.

@@ -128,7 +128,7 @@ def main():
     for name, (x0, y0, x1, y1) in ZONES.items():
         rect(board, x0, y0, x1, y1, pcbnew.Dwgs_User, 0.05)
         text(board, name, (x0 + x1) / 2, (y0 + y1) / 2, pcbnew.Dwgs_User, 1.0)
-    text(board, f"{PROJECT} rev {REVISION}", 0, 74, pcbnew.F_SilkS, 1.5)
+    text(board, f"{PROJECT} rev {REVISION}", 12, 72, pcbnew.F_SilkS, 1.2)
     board.Save(PCB)
     def table(name, libs, ext):
         rows = [f'  (lib (name "{n}")(type "KiCad")(uri "${{KIPRJMOD}}/../Libraries/{n}{ext}")(options "")(descr ""))'
