@@ -1,0 +1,673 @@
+                                                                                                                             MP6550
+
+                                                                                                      1.8V to 22V, 2A, H-Bridge Motor Driver
+
+DESCRIPTION                                                                                           FEATURES
+
+The MP6550 is an H-bridge motor driver. The                                                            Wide 1.8V to 22V Operating Input Range
+H-bridge consists of four N-channel power                                                              2A Continuous Driver Current
+MOSFETs and an internal charge pump to                                                                 MOSFET On Resistance (HS + LS) 240m
+generate gate-drive voltages. The MP6550 is                                                            Cycle-by-Cycle Current Regulation/Limit
+typically used to drive a DC brush motor.                                                              Built-In 3.3V Reference Output
+                                                                                                       PWM Input Interface, Compatible with
+The MP6550 operates on a motor power supply
+voltage from 1.8V to 22V, which can supply an                                                             Industry-Standard Devices, Up to 100kHz
+output current of up to 2A according to the logic                                                      Low Standby Circuit Current
+control.                                                                                               Thermal Shutdown
+                                                                                                       Internal Charge Pump
+The MP6550 has a PWM input interface, which                                                            Cycle-by-Cycle Over-Current Protection
+is compatible with industry-standard devices.                                                          Short-Circuit Protection
+Very low standby circuit current can be                                                                Available in a QFN-12 (2mmx2mm)
+achieved when the device is disabled.
+                                                                                                          Package
+An internal current-sensing circuit provides an
+output with a voltage proportional to the load                                                        APPLICATIONS
+current. Cycle-by-cycle current regulation and
+limiting is also provided. These features do not                                                       Robotics
+require the use of a low-value shunt resistor.                                                         Cameras
+                                                                                                       Toys
+There are internal shutdown functions for over-                                                        Consumer Products
+current protection, short-circuit protection,                                                          Medical Devices
+under-voltage lockout, and over-temperature
+protection.                                                                                           All MPS parts are lead-free, halogen free, and adhere to the RoHS directive. For
+                                                                                                      MPS green status, visit the MPS website under Quality Assurance. "MPS", the
+The MP6550 requires a minimal number of                                                               MPS logo, and "Simple, Easy Solutions" are registered trademarks of Monolithic
+readily available, standard external components,                                                      Power Systems, Inc. or its subsidiaries.
+and is available in a QFN-12 (2mmx2mm)
+package.
+
+TYPICAL APPLICATION                                                                                                          OUT1         DC
+                                                                                          VIN                                           Motor
+                                                                            VIN                                                       M
+                                                                      (1.8V to 22V)
+                                                                                                                                   3.3VOUT
+                                                                                     CIN
+
+                 Controller                                                               IN1 MP6550  OUT2
+                                                                                                       VCC
+                                                                                          IN2
+                                                                                                       V3P3
+                                                                                          nSLEEP_HB    ISET
+
+                                                                                          nSLEEP_LDO
+
+                                                                                          VISEN
+
+                                                                                                 GND
+
+MP6550 Rev. 1.0                                                                           www.MonolithicPower.com                              1
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                             © 2019 MPS. All Rights Reserved.
+                                  MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+                               ORDERING INFORMATION
+
+                 Part Number*                  Package              Top Marking
+
+                 MP6550GG         QFN-12 (2mmx2mm)                  See Below
+
+                 * For Tape & Reel, add suffix -Z (e.g. MP6550GG-Z).
+
+                                  TOP MARKING
+
+                 GX: Product code of MP6550GG
+                 Y: Year code
+                 LLL: Lot number
+
+                               PACKAGE REFERENCE
+
+                                               TOP VIEW
+
+                                  nSLEEP_HB VISEN
+
+                                               12  11
+
+                           IN1 1                                    10 IN2
+
+                 OUT1 2                                             9 VIN
+
+                           GND 3                                    8 OUT2
+
+                 V3P3          4                                    7 ISET
+
+                                               5        6
+
+                                  nSLEEP_LDO VCC
+
+                                  QFN-12 (2mmx2mm)
+
+MP6550 Rev. 1.0                   www.MonolithicPower.com                                                           2
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                                  © 2019 MPS. All Rights Reserved.
+                               MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+PIN FUNCTIONS
+
+Pin #      Name Description
+
+1                IN1  Input 1. Internal pull-down resistor.
+
+2          OUT1 Switch output 1. Connect OUT1 to the motor winding.
+
+3          GND        Ground.
+
+4          V3P3       3.3V regulator output. Bypass to GND with a 0.47F capacitor.
+
+5 nSLEEP_LDO Sleep mode input of LDO output. Pull high for 3.3V LDO normal operation. Pull low to disable the LDO output and enter low-power sleep mode. Internal pull-down.
+
+6          VCC        Internal circuitry supply bypass. Bypass VCC to GND with a 0.1F to 10F capacitor.
+
+7 ISET Current programming resistor. Connect a resistor to ground to set the current limit and VISEN output voltage.
+
+8          OUT2 Switch output 2. Connect OUT2 to the motor winding.
+
+9 VIN Supply voltage. An input capacitor is needed to prevent large voltage spikes from appearing at the input.
+
+10               IN2  Input 2. Internal pull-down resistor.
+
+11         VISEN Current-sense output voltage.
+
+12 nSLEEP_HB Sleep mode input of H-bridge. Pull high for H-bridge normal operation. Pull low to disable the H-bridge output and enter low-power sleep mode. Internal pull-down.
+
+ABSOLUTE MAXIMUM RATINGS (1)                                      Thermal Resistance (4) JA JC
+
+Supply voltage (VIN) ...................... -0.3V to +24V         QFN-12 (2mmx2mm)............... 80 .....16.....°C/W
+VOUTx ....................................... -0.3V to VIN +0.3V
+All other pins ..................................... -0.3 to +5V  Notes:
+Continuous power dissipation (TA = 25°C) (2)
+                                                                  1) Exceeding these ratings may damage the device.
+ ......................................................1.56W      2) The maximum allowable power dissipation is a function of the
+Junction temperature ................................ 150°C
+Lead temperature...................................... 260°C           maximum junction temperature TJ (MAX), the junction-to-
+Storage temperature .................-65C to +150C                     ambient thermal resistance JA, and the ambient temperature
+                                                                       TA. The maximum allowable continuous power dissipation at
+Recommended Operating Conditions (3)                                   any ambient temperature is calculated by PD (MAX) = (TJ
+                                                                       (MAX) - TA) / JA. Exceeding the maximum allowable power
+Supply voltage (VIN) ......................... 1.8V to 22V             dissipation will cause excessive die temperature, and the
+Operating junction temp (TJ).....-40°C to +125°C                       regulator will go into thermal shutdown. Internal thermal
+                                                                       shutdown circuitry protects the device from permanent
+                                                                       damage.
+                                                                  3) The device is not guaranteed to function outside of its
+                                                                       operating conditions.
+                                                                  4) Continuous current depends on PCB layout and ambient
+                                                                       temperature.
+                                                                  5) Measured on JESD51-7, 4-layer PCB.
+
+MP6550 Rev. 1.0                www.MonolithicPower.com                                                              3
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                               © 2019 MPS. All Rights Reserved.
+                                            MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+ELECTRICAL CHARACTERISTICS
+
+VIN = 5V, TA = 25°C, unless otherwise noted.
+
+Parameters                                  Symbol Condition                  Min Typ Max                                 Units
+
+Power Supply                                                                                                                V
+
+Input supply voltage                        VIN                               1.8                                    22    mA
+
+                                                   no PWM, no load,                0.85 1.1                                mA
+                                                   nSLEEP_HB = 5V,
+Operating supply current                           nSLEEP_LDO = 0                                                           A
+
+                                                   50-kHz PWM, no load,            1.2 1.5                                  nA
+                                                   nSLEEP_HB = 5V,                                                          V
+                                                   nSLEEP_LDO = 0                                                          mV
+                                                                                                                           kHz
+Operating supply current                           VIN = 5V to 22V, IV3P3 =         80 120
+                                                   0A, nSLEEP_HB = 0,                                                       V
+                                                   nSLEEP_LDO = 5V                  10 120
+                                                                                   1.68 1.8                                 V
+Sleep mode supply current                   IQ nSLEEP_HB = 0, nSLEEP_LDO = 0       150                                      V
+                                                                                                                           A
+Under-voltage lockout threshold rising                                                      100                            A
+                                                                                                                           k
+Under-voltage lockout threshold hysteresis
+                                                                                                                            
+Externally applied PWM frequency            fPWM                                                                            
+                                                                                                                            ns
+V3P3 Regulator                                                                                                              ns
+                                                                                                                            ns
+LDO output                                         VIN > 3.7V, IOUT = 0A to   3.1 3.3 3.5                                   ns
+                                                   50mA                                                                     ns
+                                                                                                                            ns
+Control Inputs (IN1, IN2, nSLEEP_HB, nSLEEP_LDO)                                                                            s
+                                                                                                                            ns
+Input high voltage                          VIH                               1.6
+                                                                                                                           s
+Input low voltage                           VIL                                                                      0.4  µA/A
+                                                                                                                           mV
+Input high current                          IIH VIN = 3.3V                                                           50    mV
+
+Input low current                           IIL VIN = 0V                      -5                                     +5
+
+Input pull-down resistance                  RPD                                    520
+
+Motor Driver Outputs (OUT1, OUT2)
+
+HS switch on resistance                     RDS(ON) IO = 800mA, TA = 25°C          0.12 0.17
+                                                                                   0.12 0.17
+LS switch on resistance                     RDS(ON) IO = 800mA, TA = 25°C
+                                                                                            200
+Output enable time                          t1                                              200
+                                                                                            300
+Output disable time                         t2                                              300
+                                                                                            100
+Delay time                                  t3 INx high to OUTx high                        100
+                                            t4 INx low to OUTx low
+                                                                                            200
+Output rise time                                   RL = 20
+                                                                                   100
+Output fall time                                   RL = 20
+
+Wake time, nSLEEP_HB rising edge to part    tWAKE
+H-bridge active
+
+Dead time
+
+Current Control
+
+Off time                                    tITRIP After ITRIP                         17
+                                                                              95 100 105
+ISET current                                IISET                             475 500 525
+                                                                              380 400 420
+Current trip voltage (rising)               VITRIP-R At VISEN pin
+
+Current trip voltage (falling)              VITRIP-F At VISEN pin
+
+MP6550 Rev. 1.0                             www.MonolithicPower.com                                                              4
+
+7/16/2019         MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                                        © 2019 MPS. All Rights Reserved.
+                                       MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+ELECTRICAL CHARACTERISTICS (continued)
+
+VIN = 5V, TA = 25°C, unless otherwise noted.
+
+Parameters                             Symbol Condition                      Min Typ Max Units
+
+VISEN Output
+
+Output voltage accuracy                VVISEN VISET > 0.1V                   -5                                     +5  %
+
+Protection Circuits
+
+Current limit                          IOCP                                  4 5 6                                      A
+
+OCP retry time                         tOCR                                      2.5                                    ms
+
+Thermal shutdown threshold (6)         TTSD                                      160                                    °C
+
+Thermal shutdown hysteresis (6)                                                  25                                     °C
+
+Note:
+6) Guaranteed by design.
+
+                          IN1
+
+                          IN2
+
+                                    t         t4                      t2
+
+                          OUT1   Z                                       Z
+                                                  t3
+
+                          OUT2   Z                                        Z
+
+                                    Figure 1: Input/Output Timing
+
+MP6550 Rev. 1.0                        www.MonolithicPower.com                                                              5
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                                    © 2019 MPS. All Rights Reserved.
+                                                        MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+TYPICAL CHARACTERISTICS                                                                 ISET vs. Temperature
+
+             Current Sense (ISET = 2k)                                                  IOUT = 1A
+
+                 0      0.5     1  1.5    2        2.5                           102.5
+
+           250                                          500                      102
+
+                                                        450
+
+           200                                          400                      101.5
+
+                                                        350  VISEN (mV)          101
+                                                                       ISET (A)
+ISET (A)   150                                          300
+
+                                                        250                      100.5
+
+           100                                          200                      100
+
+                                                        150                      99.5
+
+             50                              Iset       100
+
+                                             Visen 50                            99
+
+             0                                          0                        98.5
+                                                                                       -50
+                 0      0.5     1  1.5    2        2.5                                      0  50                          100
+
+                                IOUT (A)                                                    TEMPERATURE (°C)
+
+                    Current Trip Voltage (Rising) vs.                                   Current Trip Voltage (Falling) vs.
+                    Temperature                                                         Temperature
+
+             506                                                                 410
+
+             504                                                                 408
+
+             502                                                                 406
+
+VITRIP (mV)  500                                             VITRIP (mV)         404
+
+                                                                                 402
+
+             498                                                                 400
+
+             496                                                                 398
+
+             494                                                                 396
+
+                                                                                 394
+
+             492                                                                 392
+
+             490                                                                 390
+                  -50
+                             0     50          100                                    -50   0  50                          100
+
+                             TEMPERATURE (°C)                                               TEMPERATURE (°C)
+
+                   HS RON vs. Temperature                                              LS RON vs. Temperature
+
+                     IOUT = 800mA                                                        IOUT = 800mA
+
+             160                                                                 140
+
+             140                                                                 120
+
+HS_RON ()    120                                             LS_RON ()           100
+
+             100                                                                 80
+
+             80                                                                  60
+
+             60
+
+             40                                                                  40
+
+             20                                                                  20
+
+                 0           0     50          100                               0          0  50                          100
+                   -50                                                             -50
+
+                             TEMPERATURE (°C)                                               TEMPERATURE (°C)
+
+MP6550 Rev. 1.0                                     www.MonolithicPower.com                                                     6
+
+7/16/2019               MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                                                   © 2019 MPS. All Rights Reserved.
+                               MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+TYPICAL CHARACTERISTICS (continued)
+
+           HS RON vs. VIN                                                                             LS RON vs. VIN
+
+           IOUT = 800mA                                                                               IOUT = 800mA
+
+200                                                                                              100
+190
+180                                                                                              98
+170
+HS_RON ()160                                                                                     96
+                                                                                      LS_RON ()150
+140                                                                                              94
+130
+120                                                                                              92
+110
+100                                                                                              90
+
+ 90                                                                                              88
+ 80
+                                                                                                 86
+      0
+                                                                                                 84
+
+                                                                                                 82
+
+                 10        20                                                                    80      10                    20
+                                                                                                      0
+
+                 VIN (V)                                                                                              VIN (V)
+
+MP6550 Rev. 1.0                www.MonolithicPower.com                                                                             7
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                           © 2019 MPS. All Rights Reserved.
+                             MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+TYPICAL PERFORMANCE CHARACTERISTICS
+
+VIN = 5V, TA = 25°C, unless otherwise noted.
+
+                Normal Operation                                            VIN Start-Up
+
+                IN1 = H, IN2 = L, VIN = 5V, load = 2 + 700H                 IN1 = H, IN2 = L, VIN = 5V, load = 2 + 700H
+
+CH1: OUT1                                                    CH1: OUT1
+       5V/div.                                                     5V/div.
+
+  CH2: ISET                                                     CH2: VIN
+ 200mV/div.                                                        5V/div.
+
+CH3: VISEN                                                           CH3:
+ 200mV/div.                                                        VISEN
+                                                             200mV/div.
+      CH4: IO                                                     CH4: IO
+500mA/div.                                                   500mA/div.
+
+                 40s/div.                                                   4ms/div.
+
+                VIN Shutdown                                                Sleep Start-Up
+
+                IN1 = H, IN2 = L, VIN = 5V, load = 2 + 700H                 IN1 = H, IN2 = L, VIN = 5V, load = 2 + 700H
+
+CH1: OUT1                                                    CH1: OUT1
+       5V/div.
+                                                                   5V/div.
+    CH2: VIN                                                         CH2:
+       5V/div.
+                                                                  SLEEP
+CH3: VISEN                                                         5V/div.
+ 200mV/div.
+                                                                     CH3:
+      CH4: IO                                                      VISEN
+500mA/div.                                                   200mV/div.
+
+                                                                  CH4: IO
+                                                             500mA/div.
+
+                 100ms/div.                                                 400s/div.
+
+                Sleep Shutdown                                              SCP-OUT Short to VIN
+
+                IN1 = H, IN2 = L, VIN = 5V, load = 2 + 700H                 IN1 = H, IN2 = L, VIN = 22V
+
+ CH1: OUT1                                                   CH1: OUT1
+                                                                 20V/div.
+       5V/div.
+CH2: SLEEP                                                   CH2: OUT2
+                                                                 20V/div.
+       5V/div.
+CH3: VISEN                                                     CH4: ISC
+  200mV/div.                                                     10A/div.
+
+       CH4: IO
+ 500mA/div.
+
+                 400s/div.                                                  1ms/div.
+
+MP6550 Rev. 1.0              www.MonolithicPower.com                                                                     8
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                             © 2019 MPS. All Rights Reserved.
+                                           MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+TYPICAL PERFORMANCE CHARACTERISTICS (continued)
+
+VIN = 5V, TA = 25°C, unless otherwise noted.
+
+              SCP-OUT Short to GND                                  SCP-OUT Short to OUT
+
+              IN1 = H, IN2 = L, VIN = 22V                           IN1 = H, IN2 = L, VIN = 22V
+
+CH1: OUT1                                  CH1: OUT1
+    20V/div.                                   20V/div.
+
+CH2: OUT2                                  CH2: OUT2
+    20V/div.                                   20V/div.
+
+  CH4: ISC                                   CH4: ISC
+    10A/div.                                   10A/div.
+
+                 1ms/div.                                                    1ms/div.
+
+MP6550 Rev. 1.0                            www.MonolithicPower.com                                                  9
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                                           © 2019 MPS. All Rights Reserved.
+                                               MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+SINGLE-CHANNEL BLOCK DIAGRAM
+
+             VIN
+                         VIN
+
+            3.3V  VCC         VREF             UVLO                        Charge
+                  V3P3       Int. VCC           OTS                         Pump
+                        LS Gate Drive V
+                                                                                        OUT1
+                          3.3V                                                          OUT2
+                          OUT
+
+Controller        nSLEEP_LDO  Control          Gate
+                  IN1          Logic           Driver
+                  IN2
+                  nSLEEP_HB                    Curr.   ISENSE
+                                               Reg.
+                  VISEN
+
+                                  ITRIP +      ISET
+                                            -
+
+                              GND
+
+                                               RISET
+
+                              Figure 2: Single-Channel Block Diagram
+
+MP6550 Rev. 1.0                          www.MonolithicPower.com                                                     10
+
+7/16/2019         MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                                         © 2019 MPS. All Rights Reserved.
+                                             MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+OPERATION                                             Current Limit / Regulation
+
+Bridge Control                                        The current in the outputs is limited using
+                                                      constant-off-time PWM (pulse-width modulation)
+The MP6550 is controlled using a PWM input            control circuitry. Figure 3 shows this operation.
+interface, which is compatible with industry-
+standard devices. Each output is controlled by a
+corresponding input pin.
+
+The following table shows the logic for the
+MP6550:
+
+           Table 1: Input Logic Truth Table
+
+IN1 IN2 OUT1 OUT2                 Function                       Figure 3: Current Limit Operation
+                                 (DC Motor)
+                                                      Initially, a diagonal pair of MOSFETs turns on
+L             L     Z      Z      Coast               and drives current through the load. The current
+                                 Reverse              increases in the load, which is sensed by the
+L          H        L      H     Forward              internal current-sense circuit.
+
+H             L     H      L      Brake               If the load current reaches the current trip
+                                                      threshold, the H-bridge switches to slow decay
+H          H        L      L                          mode, and the two low-side MOSFETs turn on.
+
+Table 2 shows the recommended PWM input               After a fixed off time (tITRIP), if the load current
+control for a DC motor driver.                        has fallen at least 20% below the current limit
+                                                      threshold, the FETs are re-enabled and the
+                 Table 2: PWM Input Control           cycle repeats. If the current remains above this
+                                                      level, the off time is extended until the current
+   IN1 IN2 OUT1 OUT2 Function (DC Motor)              falls to 20% below the current limit threshold.
+
+                      L H     L              Forward  The current limit threshold is reached when the
+   H PWM                                              VISEN pin reaches 0.5V. For example, with a
+                              L Slow decay            5k resistor from ISET to ground, the VISEN
+                      H L                             voltage is about 0.5V/A of output current. So
+                                                      when the current reaches 1A, the VISET pin
+PWM        L     H     L      H              Reverse  voltage reaches 0.5V, and a current trip occurs.
+
+     H                 L      L Slow decay            During current regulation, the nFAULT pin is not
+                                                      activated.
+Current Sensing
+                                                      Blanking Time
+The current flowing in the two low-side
+MOSFETs is sensed with an internal current-           There is often a current spike during start-up
+sensing circuit. A voltage proportional to the        due to the body diode's reverse-recovery
+output current is sourced on the VISEN pin.           current or the shunt capacitance of the load.
+                                                      This current spike requires filtering to prevent it
+The VISEN output voltage scaling is set by a          from erroneously shutting down the high-side
+resistor connected between the ISET pin and           MOSFET. An internal fixed blanking time (tOCPD)
+ground. For 1A of output current, 100µA of            blanks the output of the current sense
+current is sourced into the resistor connected to     comparator when the outputs are switched.
+VISEN. For example, if a 5k resistor is               This blanking time also sets the minimum on
+connected between ISET and ground, the                time for high-side MOSFET.
+output voltage on the VISEN pin will be 0.5V/A
+of output current.
+
+Current is sensed any time one of the low-side
+MOSFETs is turned on, including during slow
+decay (brake) mode.
+
+The load current applied to the VISEN pin
+should be kept below 2mA, with no more than
+500pF of capacitance.
+
+MP6550 Rev. 1.0                              www.MonolithicPower.com                                                11
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                                             © 2019 MPS. All Rights Reserved.
+                 MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+nSLEEP Operation                                    side and low-side MOSFETs are measured and
+                                                    if the current exceeds the current limit, all
+The MP6550 has one H-bridge driver and a            MOSFETs in the H-bridge are turned off. After
+3.3V reference output, which can be separately      approximately 1ms, the bridge is automatically
+put into a low-power sleep state. Driving           re-enabled.
+nSLEEP_HB low turns the H-bridge outputs off
+and disables all related internal circuits,         Thermal Shutdown (TSD)
+including the gate drive charge pump. All inputs
+are ignored when nSLEEP_HB is active low.           Thermal monitoring is also integrated into the
+Driving nSLEEP_LDO low disables the 3.3V            MP6550. If the die temperature exceeds 160°C,
+regulator. When waking up from sleep mode,          all switches turn off. Once the die temperature
+some time needs to pass before the outputs will     has fallen to a safe level, operation resumes
+operate.                                            automatically.
+
+Protection Circuits                                 Under-Voltage Lockout (UVLO)
+
+The MP6550 is fully protected against under-        If at any time the voltage on the VIN pin falls
+voltage, over-current, and over-temperature         below the under-voltage lockout (UVLO)
+events.                                             threshold voltage, all circuitry in the device is
+                                                    disabled and the internal logic is reset. Normal
+Over-Current Protection (OCP)                       operation resumes when VIN exceeds the
+                                                    UVLO threshold.
+The MP6550 has internal overload and short-
+circuit protection. The currents in both the high-
+
+MP6550 Rev. 1.0  www.MonolithicPower.com                                                                            12
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                 © 2019 MPS. All Rights Reserved.
+                     MP6550 - 1.8V TO 22V, 2A, H-BRIDGE MOTOR DRIVER
+
+PACKAGE INFORMATION
+
+                     QFN-12 (2mmx2mm)
+
+NOTICE: The information in this document is subject to change without notice. Please contact MPS for current specifications.
+Users should warrant and guarantee that third-party Intellectual Property rights are not infringed upon when integrating MPS
+products into any application. MPS will not assume any legal responsibility for any said applications.
+
+MP6550 Rev. 1.0      www.MonolithicPower.com                                                                        13
+
+7/16/2019        MPS Proprietary Information. Patent Protected. Unauthorized Photocopy and Duplication Prohibited.
+
+                     © 2019 MPS. All Rights Reserved.
+

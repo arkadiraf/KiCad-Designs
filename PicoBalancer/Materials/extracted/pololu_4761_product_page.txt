@@ -1,0 +1,118 @@
+Overview
+This kit includes two dual-channel Hall effect sensor boards and two 
+6-pole magnetic discs
+ that can be used to add quadrature encoding to two 
+micro metal gearmotors with extended back shafts
+ (motors and cables are not included with this kit).  The encoder board senses the rotation of the magnetic disc and provides a resolution of 12 counts per revolution of the motor shaft when counting both edges of both channels.  To compute the counts per revolution of the gearbox output shaft, multiply the gear ratio by 12.  This compact encoder solution fits within the 12 mm × 10 mm cross section of the motors on three of the four sides, and it extends 4.2 mm past the edge of the fourth side.
+The encoders include a 
+side-entry
+, 6-pin male JST SH-type connector.  We also carry a version of this encoder 
+with a top-entry connector
+; the following pictures show comparisons of the top-entry and side-entry versions:
+Magnetic Encoders with Top-Entry Connector (left) and Side-Entry Connector (right) assembled on Micro Metal Gearmotors with Extended Motor Shafts (JST cables not included).
+Magnetic Encoder with Top-Entry Connector (top) and Side-Entry Connector (bottom) assembled Micro Metal Gearmotors with Extended Motor Shafts (JST cables not included).
+Note:
+ This sensor system is intended for users comfortable with the physical encoder installation.  It only works with micro metal gearmotors that have 
+extended back shafts
+.
+Cable options
+We have two types of cables with matching JST SH-style connectors that can be used with these encoders.
+Single-ended cables, with a connector on one end and unterminated wires on the other end, are available in three lengths:
+12 cm (4.5â€³)
+30 cm (12â€³)
+75 cm (30â€³)
+Twisted female-female cables with connectors on both ends are available in five lengths:
+10 cm (4â€³)
+16 cm (6.3â€³)
+25 cm (10â€³)
+40 cm (16â€³)
+63 cm (25â€³)
+These double-ended cables can be used with our JST SH-style connector breakout boards (available in 
+top-entry
+ and 
+side-entry
+ versions) to easily access the motor and encoder pins on a standard 
+solderless breadboard
+.
+Pinout and installation
+The encoder board is designed to be soldered directly to the back of the motor, with the back shaft of the motor protruding through the hole in the middle of the circuit board.  One way to achieve good alignment between the board and the motor is to tack down the board to one motor pin and to solder the other pin only when the board is flat and well aligned.  Be careful to avoid prolonged heating of the motor pins, which could deform the plastic end cap of the motor or the motor brushes.  Once the board is soldered down to the two terminals, the motor leads are connected to the M1 and M2 connector pins as labeled below, and they can be accessed via the red and black wires when used with our corresponding JST cables. The remaining four connector pins are used to power the sensors and access the two quadrature outputs:
+Pin
+Wire color
+Function
+1
+Green
+encoder GND
+2
+White
+encoder channel B output
+3
+Yellow
+encoder channel A output
+4
+Blue
+encoder Vcc (2.7 V to 18 V)
+5
+Black
+motor power M2 (other terminal)
+6
+Red
+motor power M1 (“+” terminal)
+The sensors are powered through the VCC (blue wire) and GND (green wire) pins.  VCC can be 2.7 V to 18 V, and the quadrature outputs A and B (yellow and white wires) are digital signals that are either driven low (0 V) by the sensors or pulled to VCC through 10 kÎ© pull-up resistors, depending on the applied magnetic field.  The sensors’ comparators have built-in hysteresis, which prevents spurious signals in cases where the motor stops near a transition point.
+A and B outputs of the magnetic encoder on a high-power (HP) 6V Micro Metal Gearmotor running at 6 V.
+Schematic diagram
+This schematic is also available as a 
+downloadable pdf
+ (84k pdf).
+Comparison to previous version
+This encoder version is a modification of the 
+previous version
+ that adds a connector to enable the use of removable cables.  The basic schematic is unchanged, and the electrical performance is identical.  The following picture shows the two new encoders with JST SH-type connectors next to the previous (green) one:
+Side-by-side comparison of Magnetic Encoder with Top-Entry Connector (left), Side-Entry Connector (center), and 2mm-pitch through-holes (right).
+Related products
+Magnetic Encoder Pair Kit with Top-Entry Connector for Micro Metal Gearmotors, 12 CPR, 2.7-18V
+JST SH-Style Cable for Micro Metal Gearmotor Encoders, 6-Pin, Single-Ended Female, 12cm
+JST SH-Style Cable for Micro Metal Gearmotor Encoders, 6-Pin, Single-Ended Female, 30cm
+JST SH-Style Cable for Micro Metal Gearmotor Encoders, 6-Pin, Single-Ended Female, 75cm
+Magnetic Encoder Disc for Micro Metal Gearmotors, OD 7.65 mm, ID 1.0 mm, 12 CPR (Bulk)
+Magnetic Encoder Pair Kit for Micro Metal Gearmotors, 12 CPR, 2.7-18V
+Optical Encoder Pair Kit for Micro Metal Gearmotors, 5V
+Optical Encoder Pair Kit for Micro Metal Gearmotors, 3.3V
+Magnetic Encoder Pair Kit for Mini Plastic Gearmotors, 12 CPR, 2.7-18V
+Magnetic Encoder Pair Kit for 20D mm Metal Gearmotors, 20 CPR, 2.7-18V
+Related categories
+Encoders for Micro Metal Gearmotors
+Micro Metal Gearmotors with Extended Motor Shafts
+6-Pin JST SH-Style Cables for Micro Metal Gearmotor Encoders
+Print
+Email a friend
+Feeds
+Home
+|
+Forum
+|
+Blog
+|
+Support
+|
+Ordering Information
+|
+Lists
+|
+Distributors
+|
+BIG Order Form
+|
+About
+|
+Contact
+© 2001
+â€“
+2026 Pololu Corporation
+Related Products
+Magnetic Encoder Pair Kit with Top-Entry Connector for Micro Metal Gearmotors, 12 CPR, 2.7-18V
+JST SH-Style Cable for Micro Metal Gearmotor Encoders, 6-Pin, Single-Ended Female, 12cm
+JST SH-Style Cable for Micro Metal Gearmotor Encoders, 6-Pin, Single-Ended Female, 30cm
+JST SH-Style Cable for Micro Metal Gearmotor Encoders, 6-Pin, Single-Ended Female, 75cm
+Magnetic Encoder Disc for Micro Metal Gearmotors, OD 7.65 mm, ID 1.0 mm, 12 CPR (Bulk)
+Magnetic Encoder Pair Kit for Micro Metal Gearmotors, 12 CPR, 2.7-18V
+Optica

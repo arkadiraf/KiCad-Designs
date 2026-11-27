@@ -1,0 +1,8 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "KD_Mechanical")(type "KiCad")(uri "${KIPRJMOD}/../Libraries/KD_Mechanical.pretty")(options "")(descr ""))
+  (lib (name "KD_Power")(type "KiCad")(uri "${KIPRJMOD}/../Libraries/KD_Power.pretty")(options "")(descr ""))
+  (lib (name "KD_Sensors")(type "KiCad")(uri "${KIPRJMOD}/../Libraries/KD_Sensors.pretty")(options "")(descr ""))
+  (lib (name "KD_Modules")(type "KiCad")(uri "${KIPRJMOD}/../Libraries/KD_Modules.pretty")(options "")(descr ""))
+  (lib (name "KD_Connectors")(type "KiCad")(uri "${KIPRJMOD}/../Libraries/KD_Connectors.pretty")(options "")(descr ""))
+)
