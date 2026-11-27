@@ -31,7 +31,7 @@ MPN = {
     "C12 C13": (MURATA, "GRM1885C1H101JA01D", "ok", "100 pF C0G 0603 (stock)"),
     "R10": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "J3 J4": ("JST", "BM06B-SRSS-G-TB(LF)(SN)", "ok", "vertical (top entry); from Mouser 306-6BSRSSGTBLPP (the one non-Digi-Key line)"),
-    "J3W J4W": ("-", "pads only", "ok", "2 mm solder pads for direct wiring"),
+    "J7 J8": ("-", "pads only", "ok", "2 mm solder pads for direct wiring"),
     "U5": (TI, "TPS61235PRWLR", "ok", "ordered as the R reel variant (same part as RWLT)"),
     "L2": ("Wurth Elektronik", "74438357010", "ok", ""),
     "C14 C15": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
@@ -79,6 +79,7 @@ MPN = {
     "R32 R33": (YAGEO, "RC0603FR-071ML", "ok", ""),
     "D4": ("Lite-On", "LTST-C171TBKT", "ok", "blue 0805 (stock; any 0805 LED colour)"),
     "R35": (YAGEO, "RC0603FR-071KL", "ok", ""),
+    "R36": (YAGEO, "RC0603FR-0710KL", "ok", "CHG_STAT series"),
     "J6": ("Sullins", "PRPC040SAAN-RC", "DNP", "cut 4 pins from a 1x40 strip"),
     "TP1": ("-", "pad only", "ok", "copper pad"),
 }

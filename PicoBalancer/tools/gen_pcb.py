@@ -155,7 +155,7 @@ def main():
                 for n in libs]
         with open(os.path.join(ROOT, name), "w") as f:
             f.write("\n".join([f"({name.replace('-', '_')}", "  (version 7)"] + rows + [")"]) + "\n")
-    table("fp-lib-table", ("KD_Mechanical", "KD_Power", "KD_Sensors", "KD_Modules", "KD_Connectors"), ".pretty")
+    table("fp-lib-table", ("KD_Mechanical", "KD_Power", "KD_Sensors", "KD_Modules", "KD_Connectors", "KD_Switches"), ".pretty")
     table("sym-lib-table", ("KD_Power", "KD_Sensors", "KD_Modules"), ".kicad_sym")
     if not os.path.exists(PRO):
         json.dump({"meta": {"filename": f"{PROJECT}.kicad_pro", "version": 1}, "board": {}, "sheets": [],

@@ -1,5 +1,5 @@
 """
-PicoBalancer - single source of truth for the board (stage 0: outline, holes, BOM).
+PicoBalancer - single source of truth for the board (stage 2: outline, holes, BOM, netlist).
 
 Board
 -----
@@ -135,7 +135,7 @@ PINMAP = {
 
 # ---------------------------------------------------------------------------
 # BOM lines: (refs, value, symbol, footprint, role). "KD_*" = shared ../../Libraries; names marked
-# (TO CREATE) do not exist yet and are drawn in stage 2 from the datasheets in ../Materials/bom_datasheets.
+# do not exist yet and are drawn in stage 2 from the datasheets in ../Materials/bom_datasheets.
 # Passives rule (root README): R / C 0603, bulk >= 10 uF 0805 or 1206, LEDs 0805.
 # ---------------------------------------------------------------------------
 _R = "Resistor_SMD:R_0603_1608Metric"
@@ -146,12 +146,12 @@ _LED = "LED_SMD:LED_0805_2012Metric"
 
 BOM = [
     # --- MCU module on sockets ---
-    ("U1", "Raspberry Pi Pico W / Pico 2 W", "KD_Modules:RPi_Pico_2_W", "(module on J1/J2)",
-     "MCU; plugs into J1/J2, no footprint of its own"),
-    ("J1 J2", "1x20 female 2.54 mm", "Connector_Generic:Conn_01x20",
-     "Connector_PinSocket_2.54mm:PinSocket_1x20_P2.54mm_Vertical", "Pico sockets, rows 17.78 mm apart"),
+    ("U1", "Raspberry Pi Pico W / Pico 2 W", "KD_Modules:RPi_Pico_W_Socket", "KD_Modules:RPi_Pico_Socket_2x20_P2.54mm_Vertical",
+     "MCU; the footprint is the two socket rows J1/J2 (2 x 20 pads, rows 17.78 mm)"),
+    ("J1 J2", "1x20 female 2.54 mm", "-", "(soldered into the U1 footprint)",
+     "Pico sockets, rows 17.78 mm apart; bought parts, no schematic symbol of their own"),
     # --- IMU: BNO086, reference = SparkFun BNO086 breakout (CC BY-SA 4.0) + CEVA BNO08X datasheet ---
-    ("U2", "BNO086", "KD_Sensors:BNO086 (TO CREATE)", "KD_Sensors:CEVA_LGA-28_3.8x5.2mm_P0.5mm (TO CREATE)",
+    ("U2", "BNO086", "KD_Sensors:BNO086", "KD_Sensors:CEVA_LGA-28_3.8x5.2mm_P0.5mm",
      "9-axis IMU with fusion, SPI1 (PS1 high, PS0/WAKE high at reset)"),
     ("Y1", "32.768kHz 12.5pF", "Device:Crystal", "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm", "BNO086 XIN32 / XOUT32"),
     ("C1 C2", "22pF 50V", "Device:C", _C, "crystal load (check vs crystal CL)"),
@@ -161,7 +161,7 @@ BOM = [
     ("R5 R6", "4.7k", "Device:R", _R, "BNO086 S_SDA / S_SCL pull-ups (sensor bus, unused)"),
     ("R7", "10k", "Device:R", _R, "BNO086 PS1 pull-up (SPI mode)"),
     # --- motor drivers: 2 x MP6550 (Pololu 4733 carrier values: 10 uF VIN, 1 uF VCC, 0.47 uF V3P3, 100 pF VISEN) ---
-    ("U3 U4", "MP6550GG", "KD_Power:MP6550 (TO CREATE)", "KD_Power:MPS_QFN-12_2x2mm_P0.5mm (TO CREATE)",
+    ("U3 U4", "MP6550GG", "KD_Power:MP6550", "KD_Power:MPS_QFN-12_2x2mm_P0.5mm",
      "H-bridge per motor, 5V1 supply"),
     ("C6 C7", "10uF 16V", "Device:C", _C08, "MP6550 VIN, at the pin"),
     ("C8 C9", "1uF 16V", "Device:C", _C, "MP6550 VCC bypass"),
@@ -179,8 +179,8 @@ BOM = [
      "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
      "motor + encoder (Pololu 4761 pinout: GND, B, A, VCC=3V3, M2, M1)"),
     # user 2026-11-27: also 2 mm spaced solder pads for wiring the motors/encoders directly, pads named on silk
-    ("J3W J4W", "6 solder pads, 2.0 mm pitch (no part)", "Connector_Generic:Conn_01x06",
-     "KD_Connectors:SolderWire_Pads_1x06_P2.00mm_Named (TO CREATE)",
+    ("J7 J8", "6 solder pads, 2.0 mm pitch (no part)", "Connector_Generic:Conn_01x06",
+     "KD_Connectors:SolderWire_Pads_1x06_P2.00mm_Named",
      "direct-wire alternative to J3/J4, same pinout, silk GND B A VCC M2 M1"),
     # --- 5.1 V boost: TPS61235P (values from Drone_1S_Pico2W, checked against SLVSCK4A) ---
     ("U5", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5V1 for the motor drivers"),
@@ -192,7 +192,7 @@ BOM = [
     ("C19", "10nF 16V", "Device:C", _C, "CC pin, parallel to R12"),
     # --- charger: BQ25606 + vertical USB-C (values from Drone_1S_Pico2W, checked against SLUSCK6C) ---
     ("J5", "USB-C receptacle vertical (GCT USB4235-03-C)", "Connector:USB_C_Receptacle_USB2.0_16P",
-     "KD_Connectors:USB_C_Receptacle_GCT_USB4235_Vertical (TO CREATE)", "charge input, D+/D- to the charger"),
+     "KD_Connectors:USB_C_Receptacle_GCT_USB4235_Vertical", "charge input, D+/D- to the charger"),
     ("U6", "BQ25606", "KD_Power:BQ25606",
      "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias", "1S 3 A charger, power path"),
     ("L1", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "charger buck inductor"),
@@ -212,7 +212,11 @@ BOM = [
     ("C25", "10uF 16V", "Device:C", _C08, "BAT"),
     ("C26", "4.7uF 10V", "Device:C", _C, "REGN"),
     ("C27", "47nF 16V", "Device:C", _C, "BTST"),
-    ("D1", "LED red 0805", "Device:LED", _LED, "STAT charging"),
+    ("D1", "LED red 0805", "Device:LED", _LED, "STAT charging, from SYS (TI application diagram)"),
+    # CHG_STAT (GP4) reads the STAT node through R36: STAT is open drain with D1 pulled up to SYS (up to 4.4 V); with the
+    # Pico off (switch off while charging) R36 limits the back-feed through D1 into the unpowered GPIO to < 0.2 mA.
+    # Firmware: GP4 input with pull-up (3V3 < SYS - Vf(D1), so D1 stays dark), low = charging.
+    ("R36", "10k", "Device:R", _R, "STAT -> CHG_STAT (GP4) series resistor"),
     ("R20", "2.2k", "Device:R", _R, "STAT LED series"),
     # --- Pico switch: TPS22810 + slide switch + back-feed Schottky ---
     ("U7", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, input BAT (user 2026-11-27), UVLO 2.54 / 2.41 V"),
@@ -221,7 +225,7 @@ BOM = [
     # 3 pins at 2.54 mm, 0.9 mm holes - also fits the earlier EG1218 (2.50 mm). Common = middle pin -> EN/UVLO (via R21);
     # throws -> BAT through R34 and GND. R34 limits the SS12S make-before-break short of BAT to GND to ~4 mA.
     ("SW1", "SPDT slide (NKK AS12AP; alt. SS12SDP4)", "Switch:SW_SPDT",
-     "KD_Switches:SW_Slide_SPDT_3pin_P2.54mm_Vertical (TO CREATE)", "power switch on EN/UVLO"),
+     "KD_Switches:SW_Slide_SPDT_3pin_P2.54mm_Vertical", "power switch on EN/UVLO"),
     ("R34", "1k", "Device:R", _R, "slide switch BAT leg: limits the make-before-break short (SS12SDP4) to ~4 mA"),
     ("C28 C29", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
     # UVLO by population (user 2026-11-27, both options on the board). Slide switch common -> R21 -> EN/UVLO:
@@ -244,7 +248,7 @@ BOM = [
     # identical pad layout in both drawings, so one footprint takes either. With the 1042 a cell can go in backwards
     # -> per-cell protection below.
     ("BT1 BT2", "18650 holder Keystone 1042 (alt. 1042P)", "Device:Battery_Cell",
-     "KD_Power:Keystone_1042_1x18650_SMD (TO CREATE)", "one cell each, in parallel"),
+     "KD_Power:Keystone_1042_1x18650_SMD", "one cell each, in parallel"),
     # --- per-cell reverse-polarity protection (one channel per holder, x = 1 for BT1, 2 for BT2) ---
     # Cells are in parallel, so one shared FET cannot protect them: a reversed cell next to a good one would see
     # 2 x Vcell through the shared node. Each holder gets its own high-side P-FET, and its gate is enabled only by
@@ -265,11 +269,11 @@ BOM = [
     # Land pattern per the Littelfuse 1812L datasheet (p.6): two 1.78 x 3.15 mm pads, 3.45 mm gap (7.01 mm overall),
     # larger than KiCad's generic Fuse_1812_4532Metric (1.125 x 3.4, 3.15 gap) - PPTC trip depends on pad heat sinking.
     ("F1 F2", "PPTC 2.6A hold / 5.2A trip 8V (Littelfuse 1812L260TH)", "Device:Polyfuse",
-     "KD_Power:Fuse_Littelfuse_1812L (TO CREATE)",
+     "KD_Power:Fuse_Littelfuse_1812L",
      "per-cell resettable fuse, BTx+ -> Qp drain"),
-    ("Q1 Q2", "DMP2008UFG P-MOSFET 20V 9.8mOhm@-2.5V", "Device:Q_PMOS", "Package_SON:Diodes_PowerDI3333-8",
+    ("Q1 Q2", "DMP2008UFG P-MOSFET 20V 9.8mOhm@-2.5V", "Transistor_FET:DMP3013SFV", "Package_SON:Diodes_PowerDI3333-8",
      "per-cell reverse-polarity switch, BTx+ (drain) -> BAT (source)"),
-    ("Q3 Q4", "DMG2302U N-MOSFET 20V Vth<=1V", "Device:Q_NMOS", "Package_TO_SOT_SMD:SOT-23",
+    ("Q3 Q4", "DMG2302U N-MOSFET 20V Vth<=1V", "Transistor_FET:DMG2302U", "Package_TO_SOT_SMD:SOT-23",
      "turns Qp on only when its own cell is the right way round"),
     ("R28 R29", "100k", "Device:R", _R, "Qp gate -> source (default off)"),
     ("R30 R31", "10k", "Device:R", _R, "Qn gate series from CELLx"),
@@ -323,7 +327,7 @@ REVIEW_PARTS = [
     ("U4", 20.0, 75.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 24.5, 75.0, 2.0, 1.25, 1.25, "cap", 0),
     ("J4", 14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
     # direct-wire solder pad rows (6 pads, 2.0 mm pitch, 3.0 mm long = twice the first draft), above each connector
-    ("J3W", -14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0), ("J4W", 14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0),
+    ("J7", -14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0), ("J8", 14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0),
     # boost on the left beside the Pico, above the left driver
     ("U5", -20.0, 56.0, 2.5, 2.5, 1.0, "ic", 0), ("L2", -20.0, 64.0, 4.1, 4.1, 3.1, "ind", 0),
     ("C16", -26.5, 50.0, 3.2, 1.6, 1.6, "cap", 0), ("C17", -26.5, 54.0, 3.2, 1.6, 1.6, "cap", 0),
@@ -335,3 +339,164 @@ REVIEW_PARTS = [
     ("D3", 20.25, 55.5, 2.0, 1.25, 0.8, "led_green", 0),
     ("D4", 20.25, 62.0, 2.0, 1.25, 0.8, "led_blue", 0),
 ]
+
+# ---------------------------------------------------------------------------
+# Netlist (stage 2). Pin numbers = symbol pin numbers = footprint pad names.
+# Sources: BNO086 -> BNO086_PINS; MP6550 datasheet rev 1.0; BQ25606 SLUSCK6C, TPS61235P SLVSCK4A and TPS22810 SLVSDH0C
+# as checked on Drone_1S_Pico2W (VSET open = 4.208 V, CE and OTG to GND, VAC = VBUS, FB = VOUT, INACT = AGND, QOD = VOUT,
+# CT open); USB-C sink with 5.1 k on CC1 / CC2; Pico W datasheet pinout.
+# ---------------------------------------------------------------------------
+PICO_GP_PIN = {0: 1, 1: 2, 2: 4, 3: 5, 4: 6, 5: 7, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14, 11: 15, 12: 16, 13: 17, 14: 19,
+               15: 20, 16: 21, 17: 22, 18: 24, 19: 25, 20: 26, 21: 27, 22: 29, 26: 31, 27: 32, 28: 34}
+PICO_GND = (3, 8, 13, 18, 23, 28, 33, 38)          # 33 = AGND
+DNP = {"TH1", "R22", "R23", "R24", "J6"}
+VALUES = {"R22": "100k", "R23": "1.27M", "R21": "0R", "Q1": "DMP2008UFG", "Q2": "DMP2008UFG",
+          "Q3": "DMG2302U", "Q4": "DMG2302U", "J5": "USB4235-03-C", "U1": "Pico W / Pico 2 W", "SW1": "AS12AP",
+          "BT1": "Keystone 1042", "BT2": "Keystone 1042", "F1": "1812L260TH", "F2": "1812L260TH",
+          "L1": "1uH 74438357010", "L2": "1uH 74438357010", "Y1": "32.768kHz", "J3": "BM06B-SRSS-G-TB",
+          "J4": "BM06B-SRSS-G-TB", "J7": "wire pads", "J8": "wire pads", "J6": "UART (DNP)", "TH1": "103AT-2 (DNP)",
+          "U3": "MP6550GG", "U4": "MP6550GG", "U6": "BQ25606", "U7": "TPS22810DBV"}
+NO_CONNECT = {"U1": [24, 30, 35, 37, 40], "U2": [1, 7, 8, 12, 13, 21, 22, 23, 24], "U7": [4], "U6": [2, 12],
+              "J5": ["A8", "B8"]}
+
+
+def build_nets():
+    nets = {}
+
+    def add(net, ref, *pins):
+        for p in pins:
+            nets.setdefault(net, []).append((ref, str(p)))
+
+    # --- Pico W: GPIO per PINMAP (GP18 SPARE left open), supplies ---
+    for gp, net in PINMAP.items():
+        if net != "SPARE":
+            add(net, "U1", PICO_GP_PIN[gp])
+    add("GND", "U1", *PICO_GND)
+    add("3V3", "U1", 36)
+    add("VSYS", "U1", 39)
+    # --- BNO086 (SPI) ---
+    add("3V3", "U2", 3, 28)
+    add("GND", "U2", 2, 25, 10)                          # CLKSEL0 low = 32 kHz crystal
+    add("SPI1_MOSI", "U2", 17)
+    add("SPI1_MISO", "U2", 20)
+    add("SPI1_SCK", "U2", 19)
+    add("SPI1_CS", "U2", 18)
+    add("IMU_INT", "U2", 14)
+    add("IMU_RST", "U2", 11)
+    add("IMU_WAKE", "U2", 6)
+    add("IMU_PS1", "U2", 5)
+    add("IMU_BOOTN", "U2", 4)
+    add("IMU_ENV_SDA", "U2", 16)
+    add("IMU_ENV_SCL", "U2", 15)
+    add("IMU_CAP", "U2", 9)
+    add("IMU_XIN", "U2", 27)
+    add("IMU_XOUT", "U2", 26)
+    add("IMU_XIN", "Y1", 1), add("IMU_XOUT", "Y1", 2)
+    add("IMU_XIN", "C1", 1), add("GND", "C1", 2)
+    add("IMU_XOUT", "C2", 1), add("GND", "C2", 2)
+    for c in ("C3", "C4"):
+        add("3V3", c, 1), add("GND", c, 2)
+    add("IMU_CAP", "C5", 1), add("GND", "C5", 2)
+    for r, net in (("R1", "IMU_RST"), ("R2", "IMU_BOOTN"), ("R3", "IMU_WAKE"), ("R4", "SPI1_CS"), ("R5", "IMU_ENV_SDA"),
+                   ("R6", "IMU_ENV_SCL"), ("R7", "IMU_PS1")):
+        add("3V3", r, 1), add(net, r, 2)
+    add("IMU_BOOTN", "TP1", 1)
+    # --- motor drivers: U3 = motor 1 (left, J3), U4 = motor 2 (right, J4) ---
+    for k, (u, cvin, cvcc, c33, riset, cvis, j, jw) in enumerate(
+            (("U3", "C6", "C8", "C10", "R8", "C12", "J3", "J7"), ("U4", "C7", "C9", "C11", "R9", "C13", "J4", "J8")), 1):
+        m = f"M{k}"
+        add("5V1", u, 9)
+        add("GND", u, 3, 5)                              # nSLEEP_LDO low: internal 3.3 V LDO off
+        add(f"{m}_IN1", u, 1), add(f"{m}_IN2", u, 10)
+        add("MOTOR_EN", u, 12)
+        add(f"{m}_OUT1", u, 2), add(f"{m}_OUT2", u, 8)
+        add(f"{m}_ISET", u, 7), add(f"{m}_ISENSE", u, 11)
+        add(f"{m}_VCC", u, 6), add(f"{m}_V3P3", u, 4)
+        add("5V1", cvin, 1), add("GND", cvin, 2)
+        add(f"{m}_VCC", cvcc, 1), add("GND", cvcc, 2)
+        add(f"{m}_V3P3", c33, 1), add("GND", c33, 2)
+        add(f"{m}_ISET", riset, 1), add("GND", riset, 2)
+        add(f"{m}_ISENSE", cvis, 1), add("GND", cvis, 2)
+        # connector / wire pads, Pololu 4761 order: 1 GND, 2 B, 3 A, 4 VCC (3V3), 5 M2, 6 M1
+        for ref in (j, jw):
+            add("GND", ref, 1), add(f"ENC{k}_B", ref, 2), add(f"ENC{k}_A", ref, 3), add("3V3", ref, 4)
+            add(f"{m}_OUT2", ref, 5), add(f"{m}_OUT1", ref, 6)
+        add("GND", j, "MP")
+    add("MOTOR_EN", "R10", 1), add("GND", "R10", 2)
+    # --- 5.1 V boost ---
+    add("BAT", "U5", 3), add("BOOST_SW", "U5", 2), add("BOOST_EN", "U5", 7)
+    add("GND", "U5", 8, 1, 5)                            # INACT unused -> AGND
+    add("5V1", "U5", 9, 6)                               # FB to VOUT (fixed 5.1 V part)
+    add("BOOST_CC", "U5", 4)
+    add("BAT", "L2", 1), add("BOOST_SW", "L2", 2)
+    for c in ("C14", "C15"):
+        add("BAT", c, 1), add("GND", c, 2)
+    for c in ("C16", "C17", "C18"):
+        add("5V1", c, 1), add("GND", c, 2)
+    add("BOOST_EN", "R11", 1), add("GND", "R11", 2)
+    add("BOOST_CC", "R12", 1), add("GND", "R12", 2)
+    add("BOOST_CC", "C19", 1), add("GND", "C19", 2)
+    # --- USB-C (sink) + BQ25606 ---
+    add("VBUS", "J5", "A4", "A9", "B4", "B9")
+    add("GND", "J5", "A1", "A12", "B1", "B12", "SH")
+    add("USB_CC1", "J5", "A5"), add("USB_CC2", "J5", "B5")
+    add("USB_DP", "J5", "A6", "B6"), add("USB_DM", "J5", "A7", "B7")
+    add("USB_CC1", "R13", 1), add("GND", "R13", 2)
+    add("USB_CC2", "R14", 1), add("GND", "R14", 2)
+    add("VBUS", "U6", 24, 1)                             # VAC tied to VBUS
+    add("PMID", "U6", 23)
+    add("USB_DP", "U6", 3), add("USB_DM", "U6", 4)
+    add("CHG_ILIM", "U6", 8), add("CHG_ICHG", "U6", 10)
+    add("GND", "U6", 9, 6, 17, 18, 25)                   # /CE low = charge on; OTG must not float
+    add("CHG_SW", "U6", 19, 20), add("CHG_BTST", "U6", 21), add("REGN", "U6", 22)
+    add("SYS", "U6", 15, 16), add("BAT", "U6", 13, 14)
+    add("CHG_TS", "U6", 11), add("CHG_STAT_OD", "U6", 5), add("CHG_PG", "U6", 7)
+    add("CHG_SW", "L1", 1), add("SYS", "L1", 2)
+    add("CHG_ICHG", "R15", 1), add("GND", "R15", 2)
+    add("CHG_ILIM", "R16", 1), add("GND", "R16", 2)
+    add("REGN", "R17", 1), add("CHG_TS", "R17", 2)
+    for r in ("R18", "R19", "TH1"):
+        add("CHG_TS", r, 1), add("GND", r, 2)
+    add("VBUS", "C20", 1), add("GND", "C20", 2)
+    for c in ("C21", "C22"):
+        add("PMID", c, 1), add("GND", c, 2)
+    for c in ("C23", "C24"):
+        add("SYS", c, 1), add("GND", c, 2)
+    add("BAT", "C25", 1), add("GND", "C25", 2)
+    add("REGN", "C26", 1), add("GND", "C26", 2)
+    add("CHG_BTST", "C27", 1), add("CHG_SW", "C27", 2)
+    add("SYS", "R20", 1), add("CHG_LED", "R20", 2)
+    add("CHG_LED", "D1", 2), add("CHG_STAT_OD", "D1", 1)     # LED anode 2, cathode 1
+    add("CHG_STAT_OD", "R36", 1), add("CHG_STAT", "R36", 2)
+    # --- Pico switch: TPS22810, slide switch, UVLO options, Schottky to VSYS ---
+    add("BAT", "U7", 1), add("GND", "U7", 2), add("EN_UVLO", "U7", 3), add("VSW", "U7", 6, 5)   # QOD to VOUT
+    add("BAT", "C28", 1), add("GND", "C28", 2)
+    add("VSW", "C29", 1), add("GND", "C29", 2)
+    add("SW_BAT", "SW1", 1), add("SW_COM", "SW1", 2), add("GND", "SW1", 3)
+    add("BAT", "R34", 1), add("SW_BAT", "R34", 2)
+    add("SW_COM", "R21", 1), add("EN_UVLO", "R21", 2)
+    add("EN_UVLO", "R22", 1), add("GND", "R22", 2)
+    add("VSW", "R23", 1), add("EN_UVLO", "R23", 2)
+    add("VSYS", "D2", 1), add("VSW", "D2", 2)                # cathode 1 -> VSYS
+    add("VSW", "R24", 1), add("VSYS", "R24", 2)
+    add("VSYS", "R25", 1), add("PWR_LED", "R25", 2)
+    add("PWR_LED", "D3", 2), add("GND", "D3", 1)
+    add("BAT", "R26", 1), add("VBAT_SENSE", "R26", 2)
+    add("VBAT_SENSE", "R27", 1), add("GND", "R27", 2)
+    add("VBAT_SENSE", "C30", 1), add("GND", "C30", 2)
+    # --- cells: holder -> PPTC -> P-FET (drain) -> BAT (source); N-FET enables the gate from its own cell ---
+    for k, (bt, f, qp, qn, rgs, rg, rpd) in enumerate((("BT1", "F1", "Q1", "Q3", "R28", "R30", "R32"),
+                                                       ("BT2", "F2", "Q2", "Q4", "R29", "R31", "R33")), 1):
+        c = f"CELL{k}"
+        add(c, bt, 1), add("GND", bt, 2)
+        add(c, f, 1), add(f"{c}_F", f, 2)
+        add("BAT", qp, 1, 2, 3), add(f"Q{k}P_G", qp, 4), add(f"{c}_F", qp, 5)
+        add(f"Q{k}P_G", qn, 3), add("GND", qn, 2), add(f"Q{k}N_G", qn, 1)     # SOT-23 G 1, S 2, D 3
+        add(f"Q{k}P_G", rgs, 1), add("BAT", rgs, 2)
+        add(c, rg, 1), add(f"Q{k}N_G", rg, 2)
+        add(c, rpd, 1), add("GND", rpd, 2)
+    # --- user LED, UART header ---
+    add("USER_LED", "R35", 1), add("USER_LED_A", "R35", 2)
+    add("USER_LED_A", "D4", 2), add("GND", "D4", 1)
+    add("GND", "J6", 1), add("UART0_TX", "J6", 2), add("UART0_RX", "J6", 3), add("3V3", "J6", 4)
+    return nets

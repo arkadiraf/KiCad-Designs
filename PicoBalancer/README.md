@@ -18,13 +18,13 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 **Datasheets and verification:** [Materials/bom_datasheets/README.md](Materials/bom_datasheets/README.md).
 **Order check:** `python tools/verify_order.py fabrication/DigiKey_order_2026-11-27T093456.xlsx 5` compares the Digi-Key cart with the BOM. Result for the 27 Nov cart (093456): ORDER OK for 5 boards. The Pico WH comes from Mouser / Piitel and J3/J4 from Mouser. Two cart lines are Pico_Alvik_Adapter parts.
 
-## Status: stage 0 (rev 0.1)
+## Status: stage 2 (rev 0.1)
 
 | Stage | Content | State |
 |---|---|---|
 | 0 | Folder, datasheets, outline + holes from the DXF (checked against Fusion), placement guides, BOM, design doc | **done** |
 | 1 | Decisions closed (motor, cells, TS fixed, UVLO option, placement); follow-up: BAT fuse | done |
-| 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, 1042P, USB4235, EG1218), schematic | |
+| 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, Pico socket, 1042, USB4235, slide switch, 1812L, wire pads), schematic | **done** |
 | 3 | Placement, 3D review against the Fusion model, routing | |
 | 4 | DRC, fab outputs | |
 
@@ -93,7 +93,34 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the Pico power path (TPS22810, D2, power LED) below it.
 * **Pin map v2** (`design.PINMAP`, placement-matched): BNO086 on SPI1 (GP12–GP15) with RST GP10, INT GP11, WAKE GP22. Left motor M1 on GP8/9 with encoder GP6/7; right motor M2 on GP20/21 with encoder GP16/17. MOTOR_EN GP2, BOOST_EN GP3, CHG STAT/PG GP4/5, user LED GP19 (no button), ADC GP26–28. SPI wiring follows the SparkFun breakout v10 (`design.BNO086_PINS`).
 * **Slide switch:** NKK AS12AP (non-shorting, 360-2121-ND) on the TPS22810 EN/UVLO pin, signal only. The alternative, SS12SDP4 (make-before-break), is usable thanks to R34 (1 k) in the BAT leg. One 3-pin 2.54 mm footprint fits both.
-* **Motor connectors:** vertical JST BM06B-SRSS-G-TB (Mouser), plus J3W / J4W rows of 2 mm solder pads (GND B A VCC M2 M1) for direct wiring.
+* **Motor connectors:** vertical JST BM06B-SRSS-G-TB (Mouser), plus J7 / J8 rows of 2 mm solder pads (GND B A VCC M2 M1) for direct wiring.
+
+## Schematic (stage 2)
+
+`PicoBalancer.kicad_sch` (PDF: [docs/PicoBalancer_Schematic.pdf](docs/PicoBalancer_Schematic.pdf)) is generated from
+`build_nets()` in `tools/design.py`. Every pin has a net label, there are no wires between parts, and
+`check_netlist.py` compares KiCad's netlist with `design.py`. The sheet has 97 parts and 78 nets.
+
+* **New shared library parts** in `Libraries/tools/gen_lib.py`. Each land pattern is taken from its datasheet; the sources are in the docstrings.
+  * Symbols: KD_Sensors:BNO086, KD_Power:MP6550, KD_Modules:RPi_Pico_W_Socket.
+  * Footprints: CEVA LGA-28, MPS QFN-12 2×2, Keystone 1042, GCT USB4235 vertical, 3-pin 2.54 mm slide switch, Littelfuse 1812L, 6 named wire pads, Pico 2×20 socket.
+* **U1 = the Pico on its sockets.** Its footprint is the two 1×20 socket rows. J1/J2 (the Sullins sockets) are BOM lines only and have no symbol.
+* **Wire pads J3W / J4W are renamed J7 / J8.** KiCad needs a reference to end in a number.
+* **New part, R36 10k: STAT → CHG_STAT (GP4).** D1 pulls STAT up to SYS (up to 4.4 V).
+  * Pico on: GP4 uses its internal pull-up, and D1 stays dark.
+  * Pico off while charging: R36 keeps the back-feed into the GPIO under 0.2 mA.
+  * CHG_PG (GP5) uses the Pico's internal pull-up.
+* **Stock symbols:**
+  * Q1/Q2 use Transistor_FET:DMP3013SFV, which has the same PowerDI3333-8 pinout as the DMP2008UFG: S 1-3, G 4, D 5.
+  * Q3/Q4 use Transistor_FET:DMG2302U, flattened from Q_NMOS_GSD.
+* **Unconnected pins:**
+  * Pico: GP18 (spare), RUN, ADC_VREF, 3V3_EN, VBUS.
+  * Charger U6: NC and VSET (4.208 V).
+  * U7: CT.
+  * J5: SBU1/2.
+  * BNO086: its NC pins.
+* **ERC (kicad-cli, KiCad 10.0.8): 0 errors, 2 warnings.** Both warnings are `lib_symbol_mismatch` for Q3/Q4: the flattened DMG2302U differs from the derived library symbol, and this is expected.
+* **Shared BQ25606 symbol changed:** the second SW pin and the second SYS pin are now passive, which removes the ERC power-output conflicts. The Drone_1S_Pico2W schematic picks this up when it is regenerated.
 
 ## Regenerate
 
@@ -101,11 +128,16 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 cd tools
 python export_bom.py          # fabrication/BOM*.{md,csv}, passives rule, prints BOM EXPORT OK
 python datasheet_index.py     # Materials/bom_datasheets/README.md
+python gen_schematic.py       # PicoBalancer.kicad_sch from build_nets()
+"C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" sch export netlist -o ../build/net.net ../PicoBalancer.kicad_sch
+python check_netlist.py ../build/net.net     # prints NETLIST OK
+"C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" sch erc -o ../build/erc.rpt ../PicoBalancer.kicad_sch
 "C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py     # PicoBalancer.kicad_pcb, lib tables, prints IMPORT OK
 "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" pcb drc --output ../build/drc.txt ../PicoBalancer.kicad_pcb
 ```
 
 Current results:
-* `BOM EXPORT OK`: 58 lines.
+* `BOM EXPORT OK`: 74 lines.
+* `NETLIST OK`: 78 nets; ERC 0 errors, 2 expected warnings.
 * `IMPORT OK`: 6 holes match the DXF.
 * DRC (KiCad 10.0.8): 0 violations, 0 unconnected.

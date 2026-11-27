@@ -117,6 +117,7 @@ def write_symlib(fname, syms):
 
 
 PI, PO, BI, IN, PA, OC, NC = "power_in", "power_out", "bidirectional", "input", "passive", "open_collector", "no_connect"
+OU = "output"
 
 TI = "https://www.ti.com/lit/ds/symlink/"
 
@@ -130,8 +131,8 @@ def sym_bq25606():
         "charger li-ion 1S buck usb power-path",
         left=[("VBUS", 24, PI), ("VAC", 1, PI), ("PMID", 23, PO), None, ("D+", 3, BI), ("D-", 4, BI), None,
               ("ILIM", 8, PA), ("ICHG", 10, PA), ("VSET", 12, IN), ("~{CE}", 9, IN), ("OTG", 6, IN)],
-        right=[("SW", 19, PO), ("SW", 20, PO), ("BTST", 21, PA), ("REGN", 22, PO), None,
-               ("SYS", 15, PO), ("SYS", 16, PO), ("BAT", 13, PA), ("BAT", 14, PA), None,
+        right=[("SW", 19, PO), ("SW", 20, PA), ("BTST", 21, PA), ("REGN", 22, PO), None,   # 2nd SW / SYS pin passive (ERC)
+               ("SYS", 15, PO), ("SYS", 16, PA), ("BAT", 13, PA), ("BAT", 14, PA), None,
                ("TS", 11, IN), ("STAT", 5, OC), ("~{PG}", 7, OC)],
         bottom=[("NC", 2, NC), ("GND", 17, PI), ("GND", 18, PI), ("EP", 25, PI)])
 
@@ -459,17 +460,237 @@ def fp_bitcraze_female():
                      "Bitcraze Crazyflie deck female socket 2.00mm", "smd", g, pads)
 
 
+
+# ===================================================================================
+# PicoBalancer additions (2026-11-27). Sources in PicoBalancer/Materials/bom_datasheets.
+# ===================================================================================
+
+
+def tht(num, shape, x, y, w, h, drill, key):
+    d = f"(drill {drill:g})" if not isinstance(drill, tuple) else f"(drill oval {drill[0]:g} {drill[1]:g})"
+    return (f'  (pad "{num}" thru_hole {shape} (at {x:g} {y:g}) (size {w:g} {h:g}) {d} '
+            f'(layers "*.Cu" "*.Mask") (tstamp {uid(key)}))')
+
+
+def npth(x, y, d, key):
+    return (f'  (pad "" np_thru_hole circle (at {x:g} {y:g}) (size {d:g} {d:g}) (drill {d:g}) '
+            f'(layers "*.Cu" "*.Mask") (tstamp {uid(key)}))')
+
+
+def sym_bno086():
+    # CEVA BNO08X datasheet v1.17 fig. 1-6 pin table (= SparkFun VR IMU breakout v10). RESV_NC 1/7/8/12/13/21-24.
+    return symbol(
+        "BNO086", "U", "KD_Sensors:CEVA_LGA-28_3.8x5.2mm_P0.5mm",
+        "https://www.ceva-ip.com/wp-content/uploads/BNO080_085-Datasheet.pdf",
+        "CEVA BNO086 9-axis IMU with sensor-fusion processor (SH-2), I2C / SPI / UART, LGA-28 3.8 x 5.2 mm",
+        "imu bno086 bno085 accelerometer gyroscope magnetometer fusion",
+        left=[("VDD", 3, PI), ("VDDIO", 28, PI), None, ("NRST", 11, IN), ("BOOTN", 4, IN), ("PS0/WAKE", 6, IN),
+              ("PS1", 5, IN), None, ("CLKSEL0", 10, IN), ("XIN32", 27, PA), ("XOUT32/CLKSEL1", 26, PA), ("CAP", 9, PA)],
+        right=[("H_CSN", 18, IN), ("H_SCL/SCLK/RX", 19, IN), ("SA0/H_MOSI", 17, IN), ("H_SDA/H_MISO/TX", 20, BI),
+               ("H_INTN", 14, OC), None, ("ENV_SCL", 15, BI), ("ENV_SDA", 16, BI), None,
+               ("NC", 1, NC), ("NC", 7, NC), ("NC", 8, NC), ("NC", 12, NC), ("NC", 13, NC), ("NC", 21, NC),
+               ("NC", 22, NC), ("NC", 23, NC), ("NC", 24, NC)],
+        bottom=[("GND", 2, PI), ("GNDIO", 25, PI)])
+
+
+def sym_mp6550():
+    # MPS MP6550 datasheet rev 1.0 pin functions (p.2-3).
+    return symbol(
+        "MP6550", "U", "KD_Power:MPS_QFN-12_2x2mm_P0.5mm", "https://www.monolithicpower.com/en/mp6550.html",
+        "MPS MP6550 H-bridge motor driver, 1.8-22 V, 2 A, current sense / limit, QFN-12 2x2 mm",
+        "motor driver h-bridge mp6550 dc brushed",
+        left=[("VIN", 9, PI), None, ("IN1", 1, IN), ("IN2", 10, IN), ("nSLEEP_HB", 12, IN), ("nSLEEP_LDO", 5, IN)],
+        right=[("OUT1", 2, PO), ("OUT2", 8, PO), None, ("ISET", 7, PA), ("VISEN", 11, OU), ("VCC", 6, PA),
+               ("V3P3", 4, PO)],
+        bottom=[("GND", 3, PI)])
+
+
+def sym_pico_w_socket():
+    left = [(PICO_PINS[p][0], p, PICO_PINS[p][1]) for p in range(1, 21)]
+    right = [(PICO_PINS[p][0], p, PICO_PINS[p][1]) for p in range(40, 20, -1)]
+    return symbol(
+        "RPi_Pico_W_Socket", "U", "KD_Modules:RPi_Pico_Socket_2x20_P2.54mm_Vertical",
+        "https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf",
+        "Raspberry Pi Pico W / Pico 2 W (same 40-pin edge) plugged into two 1x20 2.54 mm sockets",
+        "raspberry pi pico w pico2w rp2040 rp2350 socket module", left=left, right=right, width=22.86)
+
+
+def fp_bno086():
+    """CEVA BNO08X LGA-28, 3.8 x 5.2 x 1.1 mm. Landing pattern = BNO08X datasheet v1.17 fig. 7-2 (Bosch): side pads
+    0.675 x 0.25 mm flush with the body edge (x +-1.5625), 10 per side at 0.5 mm pitch (y +-0.25 .. +-2.25); top / bottom
+    rows 4 pads 0.25 x 0.575 mm (from the edge inward) at x +-0.25 / +-0.75. Top view: pin 1 top-right, then CCW:
+    2-5 top row right->left, 6-15 left column top->bottom, 16-19 bottom row left->right, 20-28 right column bottom->top."""
+    xs, ys, yr = 1.5625, [-2.25 + 0.5 * k for k in range(10)], 2.3125
+    pos = {1: (xs, -2.25)}
+    for k, x in enumerate((0.75, 0.25, -0.25, -0.75)):
+        pos[2 + k] = (x, -yr)
+    for k, y in enumerate(ys):
+        pos[6 + k] = (-xs, y)
+    for k, x in enumerate((-0.75, -0.25, 0.25, 0.75)):
+        pos[16 + k] = (x, yr)
+    for k, y in enumerate(reversed(ys)):
+        pos[20 + k] = (xs, y)
+    pads = []
+    for n in range(1, 29):
+        x, y = pos[n]
+        w, h = (0.25, 0.575) if n in (2, 3, 4, 5, 16, 17, 18, 19) else (0.675, 0.25)
+        pads.append(smd(n, "rect", x, y, w, h, f"bno{n}"))
+    g = [text("reference", "REF**", 0, -3.4, "F.SilkS", size=0.6, thick=0.1),
+         text("value", "BNO086", 0, 3.4, "F.Fab", size=0.5, thick=0.08), fab_ref(0, 0.4),
+         rect(-1.9, -2.6, 1.9, 2.6, "F.Fab", 0.1), line(1.4, -2.6, 1.9, -2.1, "F.Fab", 0.1),
+         circle(2.25, -2.85, 0.1, "F.SilkS", 0.1, True),
+         line(-2.05, -2.75, -1.6, -2.75, "F.SilkS", 0.12), line(-2.05, 2.75, -1.6, 2.75, "F.SilkS", 0.12),
+         line(1.6, 2.75, 2.05, 2.75, "F.SilkS", 0.12),
+         rect(-2.15, -2.85, 2.15, 2.85, "F.CrtYd", 0.05)]
+    return footprint("CEVA_LGA-28_3.8x5.2mm_P0.5mm", "CEVA BNO086 / BNO085 LGA-28, 3.8 x 5.2 mm, 0.5 mm pitch, landing "
+                     "pattern from the BNO08X datasheet v1.17 fig. 7-2", "CEVA BNO086 BNO085 IMU LGA", "smd", g, pads)
+
+
+def fp_mp6550():
+    """MPS QFN-12 2 x 2 mm (MP6550GG), no exposed pad. Recommended land pattern, MP6550 datasheet rev 1.0 p.13: side
+    pads 0.70 x 0.25 mm centred x +-1.0 (0.65..1.35), y +-0.25 / +-0.75; end pads 0.25 x 0.70 mm at x +-0.25, y +-1.0.
+    Top view: 1-4 left column top->bottom, 5-6 bottom row left->right, 7-10 right column bottom->top, 11-12 top row
+    right->left (pin 1 = IN1 top-left)."""
+    pos = {1: (-1.0, -0.75), 2: (-1.0, -0.25), 3: (-1.0, 0.25), 4: (-1.0, 0.75), 5: (-0.25, 1.0), 6: (0.25, 1.0),
+           7: (1.0, 0.75), 8: (1.0, 0.25), 9: (1.0, -0.25), 10: (1.0, -0.75), 11: (0.25, -1.0), 12: (-0.25, -1.0)}
+    pads = []
+    for n, (x, y) in pos.items():
+        w, h = (0.25, 0.70) if n in (5, 6, 11, 12) else (0.70, 0.25)
+        pads.append(smd(n, "roundrect", x, y, w, h, f"mp6550_{n}", " (roundrect_rratio 0.25)"))
+    g = [text("reference", "REF**", 0, -2.1, "F.SilkS", size=0.6, thick=0.1),
+         text("value", "MP6550", 0, 2.1, "F.Fab", size=0.4, thick=0.06), fab_ref(0, 0.3),
+         rect(-1.0, -1.0, 1.0, 1.0, "F.Fab", 0.1), line(-1.0, -0.6, -0.6, -1.0, "F.Fab", 0.1),
+         circle(-1.6, -1.25, 0.1, "F.SilkS", 0.1, True),
+         rect(-1.6, -1.6, 1.6, 1.6, "F.CrtYd", 0.05)]
+    return footprint("MPS_QFN-12_2x2mm_P0.5mm", "MPS QFN-12 2 x 2 mm, 0.5 mm pitch, no exposed pad (MP6550GG), land "
+                     "pattern from the MP6550 datasheet rev 1.0 p.13", "MPS QFN-12 MP6550", "smd", g, pads)
+
+
+def fp_keystone_1042():
+    """Keystone 1042 / 1042P SMT 18650 holder (drawings 1042 rev H, 1042P rev C - same mounting pad layout): two pads
+    >= 6.47 x 7.46 mm with >= 86.80 mm overall (pads 6.5 x 7.5 mm, outer edges at y +-43.4), two locating holes on a
+    diagonal 16.00 across x 55.20 along: 2.39 mm near pad 1 (+) and 3.45 mm near pad 2 (-), as placed in the Fusion
+    model - WHICH END TAKES WHICH HOLE IS TO VERIFY on a real holder. Pad 1 = + contact (board-centre end, +y).
+    Body 77.05 x 20.65 x 14.86 mm."""
+    pads = [smd(1, "rect", 0, 39.65, 6.5, 7.5, "k1042p1"), smd(2, "rect", 0, -39.65, 6.5, 7.5, "k1042p2"),
+            npth(8.0, 27.6, 2.39, "k1042h1"), npth(-8.0, -27.6, 3.45, "k1042h2")]
+    g = [text("reference", "REF**", 0, 0, "F.SilkS", size=1.2, thick=0.18, ang=90),
+         text("value", "Keystone_1042", 0, 0, "F.Fab", size=1.0, thick=0.15, ang=90),
+         rect(-10.325, -38.525, 10.325, 38.525, "F.Fab", 0.12),
+         line(-10.45, -35.5, -10.45, 35.5, "F.SilkS", 0.15), line(10.45, -35.5, 10.45, 35.5, "F.SilkS", 0.15),
+         text("user", "+", -6.0, 34.5, "F.SilkS", size=2.0, thick=0.3),
+         text("user", "-", -6.0, -34.5, "F.SilkS", size=2.0, thick=0.3),
+         rect(-10.7, -43.7, 10.7, 43.7, "F.CrtYd", 0.05)]
+    return footprint("Keystone_1042_1x18650_SMD", "Keystone 1042 / 1042P SMT holder for one 18650 cell, pads and "
+                     "locating holes from the Keystone drawings (1042 rev H, 1042P rev C)", "battery holder 18650 "
+                     "Keystone 1042", "smd", g, pads)
+
+
+def fp_usb4235():
+    """GCT USB4235 USB 2.0 Type-C receptacle, vertical, SMT, 16 pin (drawing rev A 21-08-2024, sheet 2 recommended PCB
+    layout): 16 pads 0.30 x 0.87 mm in two rows 0.60 mm apart (edge to edge, centres +-0.735), row A on top (A1, A4-A9,
+    A12 left->right), row B below (B12, B9-B4, B1 left->right); outer pads 5.50 mm apart, inner six at 0.50 mm pitch;
+    2 x 0.60 mm peg holes 7.50 mm apart; 2 shell tabs in plated slots 0.60 x 0.85 mm (pads 1.10 x 1.35 mm) 10.00 mm
+    apart. Drawn for a 1.0 mm PCB (pegs do not protrude on 1.6 mm). TO CHECK: 1:1 print against the part."""
+    xs = [-2.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 2.75]
+    rows = {-0.735: ["A1", "A4", "A5", "A6", "A7", "A8", "A9", "A12"],
+            0.735: ["B12", "B9", "B8", "B7", "B6", "B5", "B4", "B1"]}
+    pads = []
+    for y, names in rows.items():
+        for x, n in zip(xs, names):
+            pads.append(smd(n, "rect", x, y, 0.30, 0.87, f"u4235{n}"))
+    pads += [npth(-3.75, 0, 0.60, "u4235peg1"), npth(3.75, 0, 0.60, "u4235peg2"),
+             tht("SH", "oval", -5.0, 0, 1.10, 1.35, (0.60, 0.85), "u4235s1"),
+             tht("SH", "oval", 5.0, 0, 1.10, 1.35, (0.60, 0.85), "u4235s2")]
+    g = [text("reference", "REF**", 0, -2.6, "F.SilkS", size=0.8, thick=0.12),
+         text("value", "USB4235-03-C", 0, 2.6, "F.Fab", size=0.6, thick=0.1), fab_ref(0, 0.5),
+         rect(-4.47, -1.58, 4.47, 1.58, "F.Fab", 0.1),
+         line(-4.6, -1.7, -3.5, -1.7, "F.SilkS", 0.12), line(3.5, -1.7, 4.6, -1.7, "F.SilkS", 0.12),
+         line(-4.6, 1.7, -3.5, 1.7, "F.SilkS", 0.12), line(3.5, 1.7, 4.6, 1.7, "F.SilkS", 0.12),
+         rect(-5.8, -1.95, 5.8, 1.95, "F.CrtYd", 0.05)]
+    return footprint("USB_C_Receptacle_GCT_USB4235_Vertical", "GCT USB4235 USB 2.0 Type-C receptacle, vertical SMT, "
+                     "16 pin, 6.5 mm tall (GCT drawing sheet 2)", "usb type-c receptacle vertical GCT USB4235", "smd",
+                     g, pads)
+
+
+def fp_slide_switch_3pin():
+    """Slide switch, SPDT, 3 straight PC pins in line at 2.54 mm, 0.9 mm holes: fits NKK AS12AP (2.54 mm, 0.8 mm
+    recommended holes), NKK SS12SDP4 (2.54 mm, 0.6 x 0.4 mm pins) and E-Switch EG1218 (2.50 mm, 0.9 mm holes). Pin 2 =
+    common. Pins along y; outline = AS12AP body ~5.4 x 9.8 mm."""
+    pads = [tht(n, "rect" if n == 1 else "circle", 0, -2.54 + 2.54 * (n - 1), 1.6, 1.6, 0.9, f"sw3_{n}")
+            for n in (1, 2, 3)]
+    g = [text("reference", "REF**", 0, -6.2, "F.SilkS", size=0.8, thick=0.12),
+         text("value", "SW_Slide_SPDT", 0, 6.2, "F.Fab", size=0.6, thick=0.1),
+         rect(-2.7, -4.9, 2.7, 4.9, "F.Fab", 0.1), rect(-2.85, -5.05, 2.85, 5.05, "F.SilkS", 0.12),
+         rect(-3.1, -5.3, 3.1, 5.3, "F.CrtYd", 0.05)]
+    return footprint("SW_Slide_SPDT_3pin_P2.54mm_Vertical", "Slide switch SPDT, 3 in-line PC pins 2.54 mm, 0.9 mm holes "
+                     "(NKK AS12AP / SS12SDP4, E-Switch EG1218)", "switch slide SPDT THT", "through_hole", g, pads)
+
+
+def fp_littelfuse_1812l():
+    """Littelfuse 1812L PolySwitch PPTC: recommended pad layout (1812L datasheet p.6): two 1.78 x 3.15 mm pads, 3.45 mm
+    gap (centres +-2.615 mm). Larger than the generic 1812 IPC footprint: trip current depends on the pad heat sinking."""
+    pads = [smd(1, "rect", -2.615, 0, 1.78, 3.15, "lf1812p1"), smd(2, "rect", 2.615, 0, 1.78, 3.15, "lf1812p2")]
+    g = [text("reference", "REF**", 0, -2.4, "F.SilkS", size=0.8, thick=0.12),
+         text("value", "1812L", 0, 2.4, "F.Fab", size=0.6, thick=0.1), fab_ref(0, 0.5),
+         rect(-2.25, -1.6, 2.25, 1.6, "F.Fab", 0.1),
+         line(-1.6, -1.75, 1.6, -1.75, "F.SilkS", 0.12), line(-1.6, 1.75, 1.6, 1.75, "F.SilkS", 0.12),
+         rect(-3.8, -1.9, 3.8, 1.9, "F.CrtYd", 0.05)]
+    return footprint("Fuse_Littelfuse_1812L", "Littelfuse 1812L PolySwitch PPTC, datasheet pad layout (1.78 x 3.15 mm "
+                     "pads, 3.45 mm gap)", "fuse ptc polyswitch 1812 littelfuse", "smd", g, pads)
+
+
+def fp_wire_pads_6():
+    """Six SMD solder pads for wires, 2.0 mm pitch, 1.5 x 3.0 mm, pad names on silk in the Pololu micro-metal-gearmotor
+    encoder order: 1 GND, 2 B, 3 A, 4 VCC, 5 M2, 6 M1 (same numbering as the JST SH 6-pin connector)."""
+    names = ["GND", "B", "A", "VCC", "M2", "M1"]
+    pads, g = [], [text("reference", "REF**", 0, 3.3, "F.SilkS", size=0.7, thick=0.12, hide=True),
+                   text("value", "SolderWire_Pads_1x06", 0, 3.3, "F.Fab", size=0.5, thick=0.08)]
+    for k, nm in enumerate(names):
+        x = -5.0 + 2.0 * k
+        pads.append(smd(k + 1, "rect", x, 0, 1.5, 3.0, f"wp6_{k}", paste=False))
+        g.append(text("user", nm, x, -2.3, "F.SilkS", size=0.7, thick=0.12, ang=90 if len(nm) > 2 else 0))
+    g.append(rect(-6.0, -3.4, 6.0, 1.75, "F.CrtYd", 0.05))
+    return footprint("SolderWire_Pads_1x06_P2.00mm_Named", "6 wire solder pads 1.5 x 3.0 mm, 2.0 mm pitch, named GND B A "
+                     "VCC M2 M1 (Pololu encoder order)", "solder wire pads 2.0mm", "smd", g, pads)
+
+
+def fp_pico_socket():
+    """Raspberry Pi Pico W / Pico 2 W on two 1x20 female 2.54 mm sockets (Sullins PPPC201LFBN-RC): rows 17.78 mm apart,
+    pads 1.7 mm, 1.0 mm drill. Origin at the module centre, USB at -Y: pin 1 top-left, pins 1-20 down the left side,
+    21-40 up the right side (Pico W datasheet fig. 2). Module outline 21 x 51 mm and antenna keep-out on Fab."""
+    pads = []
+    for p in range(1, 21):
+        pads.append(tht(p, "rect" if p == 1 else "oval", -8.89, -24.13 + 2.54 * (p - 1), 1.7, 1.7, 1.0, f"psock{p}"))
+    for p in range(21, 41):
+        pads.append(tht(p, "oval", 8.89, 24.13 - 2.54 * (p - 21), 1.7, 1.7, 1.0, f"psock{p}"))
+    g = [text("reference", "REF**", 0, -27.6, "F.SilkS"),
+         text("value", "RPi_Pico_W_Socket", 0, 0, "F.Fab", ang=90), text("user", "${REFERENCE}", 0, -4, "F.Fab", ang=90),
+         rect(-10.5, -25.5, 10.5, 25.5, "F.Fab", 0.1), rect(-4.0, -26.8, 4.0, -21.5, "F.Fab", 0.1),
+         text("user", "USB", 0, -19.0, "F.Fab", size=0.8, thick=0.12),
+         rect(-7.0, 16.5, 7.0, 25.5, "F.Fab", 0.1), text("user", "ANTENNA KEEP-OUT", 0, 21.0, "F.Fab", size=0.8, thick=0.12),
+         rect(-10.16, -25.4, -7.62, 25.4, "F.SilkS", 0.12), rect(7.62, -25.4, 10.16, 25.4, "F.SilkS", 0.12),
+         rect(-11.0, -26.0, 11.0, 26.0, "F.CrtYd", 0.05)]
+    return footprint("RPi_Pico_Socket_2x20_P2.54mm_Vertical", "Raspberry Pi Pico W / Pico 2 W on two 1x20 2.54 mm female "
+                     "sockets, rows 17.78 mm", "raspberry pi pico socket 2x20", "through_hole", g, pads)
+
 FOOTPRINTS = {
     "KD_Power": [("Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm", fp_ryz),
-                 ("Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", fp_rwl)],
-    "KD_Sensors": [("Bosch_LGA-16_3x4.5mm_P0.5mm", fp_bmi088), ("Bosch_LGA-10_2x2mm_P0.5mm", fp_bmp388)],
-    "KD_Modules": [("RPi_Pico_2_W_SMD_Castellated", fp_pico)],
-    "KD_Connectors": [("Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", fp_bitcraze_female)],
+                 ("Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", fp_rwl),
+                 ("MPS_QFN-12_2x2mm_P0.5mm", fp_mp6550), ("Keystone_1042_1x18650_SMD", fp_keystone_1042),
+                 ("Fuse_Littelfuse_1812L", fp_littelfuse_1812l)],
+    "KD_Sensors": [("Bosch_LGA-16_3x4.5mm_P0.5mm", fp_bmi088), ("Bosch_LGA-10_2x2mm_P0.5mm", fp_bmp388),
+                   ("CEVA_LGA-28_3.8x5.2mm_P0.5mm", fp_bno086)],
+    "KD_Modules": [("RPi_Pico_2_W_SMD_Castellated", fp_pico), ("RPi_Pico_Socket_2x20_P2.54mm_Vertical", fp_pico_socket)],
+    "KD_Connectors": [("Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", fp_bitcraze_female),
+                      ("USB_C_Receptacle_GCT_USB4235_Vertical", fp_usb4235),
+                      ("SolderWire_Pads_1x06_P2.00mm_Named", fp_wire_pads_6)],
+    "KD_Switches": [("SW_Slide_SPDT_3pin_P2.54mm_Vertical", fp_slide_switch_3pin)],
 }
 SYMBOLS = {
-    "KD_Power": [sym_bq25606, sym_tps22997, sym_tps22810, sym_tps61235p],
-    "KD_Sensors": [sym_bmi088, sym_bmp390, sym_bmp388],
-    "KD_Modules": [sym_pico2w],
+    "KD_Power": [sym_bq25606, sym_tps22997, sym_tps22810, sym_tps61235p, sym_mp6550],
+    "KD_Sensors": [sym_bmi088, sym_bmp390, sym_bmp388, sym_bno086],
+    "KD_Modules": [sym_pico2w, sym_pico_w_socket],
 }
 
 
