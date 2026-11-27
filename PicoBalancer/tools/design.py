@@ -213,7 +213,7 @@ BOM = [
     ("C26", "4.7uF 10V", "Device:C", _C, "REGN"),
     ("C27", "47nF 16V", "Device:C", _C, "BTST"),
     ("D1", "LED red 0805", "Device:LED", _LED, "STAT charging, from SYS (TI application diagram)"),
-    # CHG_STAT (GP4) reads the STAT node through R36: STAT is open drain with D1 pulled up to SYS (up to 4.4 V); with the
+    # CHG_STAT (GP4) reads the STAT node through R36: STAT is open drain with D1 pulled up to SYS (<= VBAT + 50 mV, ~4.28 V); with the
     # Pico off (switch off while charging) R36 limits the back-feed through D1 into the unpowered GPIO to < 0.2 mA.
     # Firmware: GP4 input with pull-up (3V3 < SYS - Vf(D1), so D1 stays dark), low = charging.
     ("R36", "10k", "Device:R", _R, "STAT -> CHG_STAT (GP4) series resistor"),
@@ -356,6 +356,9 @@ VALUES = {"R22": "100k", "R23": "1.27M", "R21": "0R", "Q1": "DMP2008UFG", "Q2": 
           "L1": "1uH 74438357010", "L2": "1uH 74438357010", "Y1": "32.768kHz", "J3": "BM06B-SRSS-G-TB",
           "J4": "BM06B-SRSS-G-TB", "J7": "wire pads", "J8": "wire pads", "J6": "UART (DNP)", "TH1": "103AT-2 (DNP)",
           "U3": "MP6550GG", "U4": "MP6550GG", "U6": "BQ25606", "U7": "TPS22810DBV"}
+# U6 VSET (pin 12) MUST stay floating: SLUSCK6C pin table - float (> 50 k to GND) = 4.208 V (4.187-4.229 V), the
+# right setting for plain 4.20 V Li-ion 18650s; 5-25 k to GND = 4.400 V and < 500 Ohm (short to GND) = 4.352 V are
+# for high-voltage cells and would overcharge these. Layout: no GND pour or via touching pin 12 (stage 3 rule).
 NO_CONNECT = {"U1": [24, 30, 35, 37, 40], "U2": [1, 7, 8, 12, 13, 21, 22, 23, 24], "U7": [4], "U6": [2, 12],
               "J5": ["A8", "B8"]}
 

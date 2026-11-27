@@ -106,7 +106,7 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   * Footprints: CEVA LGA-28, MPS QFN-12 2×2, Keystone 1042, GCT USB4235 vertical, 3-pin 2.54 mm slide switch, Littelfuse 1812L, 6 named wire pads, Pico 2×20 socket.
 * **U1 = the Pico on its sockets.** Its footprint is the two 1×20 socket rows. J1/J2 (the Sullins sockets) are BOM lines only and have no symbol.
 * **Wire pads J3W / J4W are renamed J7 / J8.** KiCad needs a reference to end in a number.
-* **New part, R36 10k: STAT → CHG_STAT (GP4).** D1 pulls STAT up to SYS (up to 4.4 V).
+* **New part, R36 10k: STAT → CHG_STAT (GP4).** D1 pulls STAT up to SYS, which stays at or below VBAT + 50 mV (about 4.28 V max, SLUSCK6C VSYS).
   * Pico on: GP4 uses its internal pull-up, and D1 stays dark.
   * Pico off while charging: R36 keeps the back-feed into the GPIO under 0.2 mA.
   * CHG_PG (GP5) uses the Pico's internal pull-up.
@@ -115,7 +115,7 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   * Q3/Q4 use Transistor_FET:DMG2302U, flattened from Q_NMOS_GSD.
 * **Unconnected pins:**
   * Pico: GP18 (spare), RUN, ADC_VREF, 3V3_EN, VBUS.
-  * Charger U6: NC and VSET (4.208 V).
+  * Charger U6: NC, and VSET. VSET must float to give 4.208 V, which suits plain 4.20 V cells. A short to GND would set 4.352 V and 5–25 k would set 4.400 V, both of which overcharge. Layout: keep GND copper off pin 12.
   * U7: CT.
   * J5: SBU1/2.
   * BNO086: its NC pins.
