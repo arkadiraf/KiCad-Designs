@@ -138,7 +138,7 @@ FC = dict(
     sensors=[
         ("U2", "KD_Sensors", "Bosch_LGA-16_3x4.5mm_P0.5mm", "BMI088", (0.0, 0.0), 0),
         ("C1", "Capacitor_SMD", "C_0603_1608Metric", "100n", (0.0, 2.6), 0),
-        ("U3", "KD_Sensors", "Bosch_LGA-10_2x2mm_P0.5mm", "BMP388", (-6.0, 0.0), 0),
+        ("U3", "KD_Sensors", "Bosch_LGA-10_2x2mm_P0.5mm", "BMP390", (-6.0, 0.0), 0),   # BMP388 obsolete -> BMP390, same footprint
         ("C2", "Capacitor_SMD", "C_0603_1608Metric", "100n", (-6.0, 2.1), 0),
     ],
     # J9 SWD, NOT POPULATED: JST-SH 3 (Raspberry Pi 3-pin debug connector style: SWCLK, GND,
@@ -288,15 +288,24 @@ FRAME_BOM = [
     ("U3 U4 U5 U6", "TPS22997", "KD_Power:TPS22997", "KD_Power:Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm",
      "per-ESC high-side switch, ~7.5 A"),
     ("C10 C11 C12 C13", "10uF 16V", "Device:C", _C08, "TPS22997 VIN, at the pins"),
-    ("C14 C15 C16 C17", "CT soft-start, value TO CHECK (16V)", "Device:C", _C, "limits inrush into the ESC capacitors"),
+    # TPS22997 datasheet (SLVSGT0) 8.3.2: tR = (0.1302 VIN + 0.0063) CT + 27.8 VIN + 30.5 us -> 3.3 nF at 4.2 V
+    # = ~2.0 ms (inrush ~40 mA into ~20 uF of ESC capacitance). CT pin reaches 15 V: capacitor rated >= 30 V.
+    ("C14 C15 C16 C17", "3.3nF 50V", "Device:C", _C, "CT soft-start ~2 ms (>= 30 V rating, datasheet)"),
     ("R11 R12 R13 R14", "100k", "Device:R", _R, "ON pull-downs: Pico off = motors off"),
     ("R15 R16 R17 R18", "47k (or Pico internal pull-ups)", "Device:R", _R,
      "PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE)"),
     # --- optional 5.1 V boost for the Pi Zero ---
     ("U7", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5.1 V boost, true disconnect"),
-    ("L2", "1uH (TO CHECK vs the TPS61235P datasheet)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "boost inductor"),
+    # TPS61235P datasheet SLVSCK4A: FB (6) to VOUT on the fixed 5.1 V part; INACT (8) to AGND (unused); EN (7)
+    # must not float (100 k pull-down, <= 1 M); VIN <= VOUT - 0.6 = 4.5 V; L 0.7-1.3 uH effective; CI >= 4.7 uF and
+    # CO >= 20 uF effective (after DC-bias derating).
+    ("L2", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030",
+     "boost inductor (peak ~5.3 A at 2.5 A out, 3.0 V in)"),
     ("C18 C19", "10uF 16V", "Device:C", _C08, "boost input"),
     ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C12, "boost output"),
     ("R19", "100k", "Device:R", _R, "BOOST_EN pull-down: Pico off = Pi off"),
-    ("R20", "current limit ~2.5 A, TO CHECK", "Device:R", _R, "boost output current limit set resistor"),
+    # IOUT_CC = 1.244 V / RCC x 100000 -> 49.9 k = 2.49 A (E24 51 k = 2.44 A); 10 nF in parallel (datasheet).
+    # CC mode suits resistive / power-managed loads: 2.5 A is a fault limit above the Pi Zero 2 W's draw.
+    ("R20", "49.9k", "Device:R", _R, "boost CC (output current limit) 2.49 A"),
+    ("C24", "10nF 16V", "Device:C", _C, "CC pin, in parallel with R20 (datasheet: 10 nF)"),
 ]

@@ -20,7 +20,7 @@ the symbol points at it instead of duplicating it.
 | `KD_Power` | **TPS22810DBV** 2 A load switch with UVLO | 6 | stock `Package_TO_SOT_SMD:SOT-23-6` | Drone_1S frame |
 | `KD_Power` | **TPS61235P** 5.1 V boost | 9 | `KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm` | Drone_1S frame (optional) |
 | `KD_Sensors` | **BMI088** IMU | 16 | `KD_Sensors:Bosch_LGA-16_3x4.5mm_P0.5mm` | Drone_1S FC |
-| `KD_Sensors` | **BMP388** barometer | 10 | `KD_Sensors:Bosch_LGA-10_2x2mm_P0.5mm` | Drone_1S FC |
+| `KD_Sensors` | **BMP390** barometer (and the obsolete BMP388, same pins) | 10 | `KD_Sensors:Bosch_LGA-10_2x2mm_P0.5mm` | Drone_1S FC |
 | `KD_Modules` | **Raspberry Pi Pico 2 W**, castellated SMD (plus the underside TP1–3 USB, TP6 BOOTSEL and SWD pads) | 47 | `KD_Modules:RPi_Pico_2_W_SMD_Castellated` | Drone_1S FC |
 | `KD_Connectors` | **Bitcraze female deck connector** 1×10 2.00 mm SMD (Crazyflie decks) | stock `Connector_Generic:Conn_01x10` | `KD_Connectors:Bitcraze_FemaleDeck_1x10_P2.00mm_SMD` | Drone_1S frame |
 
@@ -49,11 +49,11 @@ are listed in [sources/SOURCES.md](sources/SOURCES.md).
 | Part | Pinout sources (agree) | Land pattern sources | Status |
 |---|---|---|---|
 | BQ25606 | **TI datasheet SLUSCK6C (rev C)**, plus381-robotics, Y2K-x/psxpress, oliver-nederal/OpenRide-PCB, Decktrix-Lab | KiCad stock RGE0024H = TI land pattern RGE0024H (pad pitch and positions; KiCad pads longer outward) | **confirmed** against the datasheet |
-| TPS22997 | girishji/tmr-keyboard, emaneric/EN_Designs, teehee567/Aevia (3/3) | teehee567 (cites TI MPQF651A) = girishji: same pad centres | **TO CHECK** against TI MPQF651A. Fine pitch for hand assembly (doc open item) |
+| TPS22997 | **TI datasheet SLVSGT0**, girishji/tmr-keyboard, emaneric/EN_Designs, teehee567/Aevia | **TI RYZ0010A land pattern (MPQF651A)** = footprint | **confirmed** against the datasheet and package drawing |
 | TPS22810DBV | **TI datasheet SLVSDH0C (rev C)**, official KiCad 9 `Power_Management:TPS22810DBV` | stock SOT-23-6 = TI DBV0006A land pattern (pitch, pin order) | **confirmed** against the datasheet |
-| TPS61235P | Redherring32/Xbox-Portable, k5utd/Cobalt-Cowboy, unsurv/unsurv-offline (3/3) | asukiaaa (cites the TPS61235P datasheet) = Redherring32/TinyTendo = unsurv: same pad centres. Sizes from asukiaaa (the others make the power pads 0.14 mm wider) | **TO CHECK** against the datasheet |
-| BMI088 | **Bitcraze Crazyflie Bolt 1.1 schematic (rev H)**, murexrobotics, bit-bots, ArduPilot NxtPX4v2 (ground names 4 GND_IO / 6 GND as the Bolt) | ArduPilot NxtPX4v2 = bit-bots = KiCad generator (BST-BMI088-DS000-19) | pin numbers confirmed; pad-1 corner **TO CHECK** (Bosch drawing) |
-| BMP388 | Bitcraze Bolt 1.1 schematic, leelili444, Caped-Crussader/VENDETTAFC, fdiwth/tvc-drone, ArduPilot NxtPX4v2 (5/5) | OpenAXES = KiCad generator (BST-BMP388-DS001) | good |
+| TPS61235P | **TI datasheet SLVSCK4A**, Redherring32/Xbox-Portable, k5utd/Cobalt-Cowboy, unsurv/unsurv-offline | **TI RWL0009A land pattern** = footprint after adding the SW-pad tab (0.975 × 0.3 mm) | **confirmed** against the datasheet |
+| BMI088 | **Bosch BST-BMI088-DS001 rev 1.9** (4 GNDA, 6 GNDIO; pin 2 NC to GND), Crazyflie Bolt 1.1, murexrobotics, bit-bots | **Bosch landing pattern 8.2**: 0.25 × 0.675 mm pads at ±1.2625 / ±2.0125 (replaces the ArduPilot 0.35 × 0.59 pads) | **confirmed** |
+| BMP388 / **BMP390** | **Bosch BST-BMP390-DS002** (same pinout as BMP388), Crazyflie Bolt 1.1, leelili444, VENDETTAFC, tvc-drone, NxtPX4v2 | Bosch BMP390 bottom-view pads = OpenAXES = KiCad generator | **confirmed**; BMP388 obsolete, BMP390 symbol added |
 | Pico 2 W | Pico 2 W datasheet §2.1 (same pinout as Pico / Pico W) | datasheet Fig. 5; TP1–3 / TP6 and SWD names from the module's bottom silkscreen (photo); TP1–3 also = Pico 2 datasheet Fig. 5 | good (TP positions corrected after the photo) |
 | Bitcraze female deck | — | Bitcraze female deck connector drawing (bitcraze/hardware) | good |
 

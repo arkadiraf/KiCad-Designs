@@ -7,15 +7,15 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Texas Instruments,TPS22810DBVR,296-45297-1-ND,Frame U2,"TPS22810DBV (SOT-23-6); Pico VSYS switch, 2.54 V UVLO",ok,SOT-23-6 (DBV)
 1,APEM,MA12RTR,563-1102-1-ND,Frame SW1,SPDT slide (APEM MA12R/TR) (SW_SPDT_PCM12); power switch on EN/UVLO (signal only),ok,"replaces PCM12SMTR (last-time buy); same PCM12 land pattern; active (user, Nov 2026)"
 4,Texas Instruments,TPS22997RYZR,296-TPS22997RYZRCT-ND,Frame U3 U4 U5 U6,"TPS22997 (Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm); per-ESC high-side switch, ~7.5 A",ok,
-1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",verify,also sold as the larger reel TPS61235PRWLR
+1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",ok,also sold as the larger reel TPS61235PRWLR
 3,Murata,GRM31CR61A226KE19L,,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,verify,22 uF 10 V X5R 1206; count from the datasheet; not found at Digi-Key under this MPN - pick an active 22 uF 1206
 1,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,Frame J1 J2 J3 J4,"2.54 mm male header strip 1x40 (ESC seats: 28 pins, 4 + 3 per ESC)",ok,"1x40 break-away strip, cut to 4 + 3; bulk"
 2,Samtec,SMM-110-02-S-S,,Frame J5 J6,"B2B socket 1x10 2.00 mm, frame bottom",TBD,"SMT socket, needs 6 mm standoffs; current design = Bitcraze socket from Bitcraze (5 mm); not listed (Digi-Key stocks the -LC clip version); Samtec direct / Mouser"
 1,JST,SM04B-SRSS-TB(LF)(SN),455-SM04B-SRSS-TBCT-ND,Frame J7,"JST-SH 4, Pi USB",ok,
 1,JST,B2B-PH-K-S(LF)(SN),455-1704-ND,Frame J8,"JST-PH 2 vertical, Pi 5.1 V",ok,bulk
 1,Raspberry Pi,SC1633,2648-SC1633CT-ND,FC U1,Raspberry Pi Pico 2 W,verify,Pico 2 W without headers
-1,Bosch Sensortec,BMI088,828-1082-1-ND,FC U2,BMI088 IMU,ok,
-1,Bosch Sensortec,BMP388,828-1079-1-ND,FC U3,BMP388 barometer,ok,"OBSOLETE - BMP390 (828-BMP390CT-ND) is the same 10-LGA 2x2 package, active"
+1,Bosch Sensortec,BMI088,828-1082-1-ND,FC U2,BMI088 IMU,ok,pin 2 (NC) to GND per Bosch
+1,Bosch Sensortec,BMP390,828-BMP390CT-ND,FC U3,BMP390 barometer,ok,"replaces the obsolete BMP388, same LGA-10 footprint; active (user, Nov 2026)"
 2,Samtec,TMM-110-01-L-S-SM,,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),verify,"0.5 mm square posts; check the post length vs the Flow deck sockets; not listed in this variant; Samtec direct / Mouser, or a listed variant"
 2,Samtec,TMM-110-01-L-S,,FC J1 J2,2.00 mm male 1x10 THT (to the frame),verify,"mates SMM; post length vs the chosen socket / standoff; not listed in this variant; Samtec direct / Mouser, or a listed variant"
 0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed

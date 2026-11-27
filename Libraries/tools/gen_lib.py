@@ -170,9 +170,9 @@ def sym_tps61235p():
 
 
 def sym_bmi088():
-    # Pin numbers: Bitcraze Crazyflie Bolt 1.1 schematic (rev H, imu sheet) = murexrobotics = bit-bots =
-    # ArduPilot NxtPX4v2. Ground names as the Bolt and NxtPX4 (4 GND_IO, 6 GND); murex / bit-bots
-    # swap the two names. Both pins go to ground either way.
+    # CONFIRMED against Bosch BST-BMI088-DS001 (rev 1.9) table 14: 4 GNDA, 6 GNDIO (as murex / bit-bots; the Bolt
+    # schematic and NxtPX4 label them the other way round). Pin 2 NC is listed "GND" in both SPI and I2C mode:
+    # tie it to GND (passive pin, not no-connect). Pin numbers also match the Crazyflie Bolt 1.1 schematic.
     return symbol(
         "BMI088", "U", "KD_Sensors:Bosch_LGA-16_3x4.5mm_P0.5mm",
         "https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi088/",
@@ -181,8 +181,20 @@ def sym_bmi088():
         left=[("VDD", 3, PI), ("VDDIO", 11, PI), None, ("PS", 7, IN), ("CSB1", 14, IN), ("CSB2", 5, IN),
               ("SCK", 8, IN), ("SDI", 9, BI)],
         right=[("SDO1", 15, BI), ("SDO2", 10, BI), None, ("INT1", 16, BI), ("INT2", 1, BI), ("INT3", 12, BI),
-               ("INT4", 13, BI), ("NC", 2, NC)],
-        bottom=[("GNDIO", 4, PI), ("GND", 6, PI)])
+               ("INT4", 13, BI), ("NC(GND)", 2, PA)],
+        bottom=[("GNDA", 4, PI), ("GNDIO", 6, PI)])
+
+
+def sym_bmp390():
+    # Bosch BST-BMP390-DS002 table 52: same pins and LGA-10 2.0 x 2.0 mm pads as the BMP388 (BMP388 is obsolete).
+    return symbol(
+        "BMP390", "U", "KD_Sensors:Bosch_LGA-10_2x2mm_P0.5mm",
+        "https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp390/",
+        "Barometric pressure sensor, +-3 Pa, SPI / I2C, LGA-10 2x2 mm (successor of the BMP388, same footprint)",
+        "barometer pressure altitude bosch",
+        left=[("VDD", 10, PI), ("VDDIO", 1, PI), None, ("CSB", 6, IN), ("SCK", 2, IN), ("SDI", 4, BI)],
+        right=[("SDO", 5, BI), None, ("INT", 7, OC)],
+        bottom=[("VSS", 3, PI), ("VSS", 8, PI), ("VSS", 9, PI)])
 
 
 def sym_bmp388():
@@ -293,15 +305,17 @@ def fp_ryz():
 
 
 def fp_rwl():
-    """TPS61235P RWL VQFN-HR-9, body 2.5 x 2.5 mm. Pad centres identical in asukiaaa (cites the
-    TPS61235P datasheet), red (Xbox-PMS, SnapEDA-style) and unsurv. Sizes from asukiaaa: the three
-    long power pads 0.3 mm wide (PGND 1, SW 2, VOUT 9), the six signal pads 0.6 x 0.25."""
+    """TPS61235P RWL0009A VQFN-HR-9, body 2.5 x 2.5 mm. CONFIRMED against the TI land pattern example in the
+    TPS61235P datasheet (SLVSCK4A p.36): PGND 1 1.1 x 0.3 at (-0.9, -0.77), VOUT 9 1.45 x 0.3 at (0.725, -0.77),
+    SW 2 2.9 x 0.3 at y -0.17 with a 0.975 x 0.3 tab centred at y -0.02 (T shape, as asukiaaa), pads 3/8
+    0.6 x 0.25 at x +-1.15 / y 0.475, pads 4-7 0.25 x 0.6 at y 1.15, 0.5 mm pitch."""
     pads = []
     pos = [(1, -0.9, -0.77, 1.1, 0.3), (2, 0.0, -0.17, 2.9, 0.3), (3, -1.15, 0.475, 0.6, 0.25),
            (4, -0.75, 1.15, 0.25, 0.6), (5, -0.25, 1.15, 0.25, 0.6), (6, 0.25, 1.15, 0.25, 0.6),
            (7, 0.75, 1.15, 0.25, 0.6), (8, 1.15, 0.475, 0.6, 0.25), (9, 0.725, -0.77, 1.45, 0.3)]
     for n, x, y, w, h in pos:
         pads.append(smd(n, "roundrect", x, y, w, h, f"rwl{n}", " (roundrect_rratio 0.25)"))
+    pads.append(smd(2, "rect", 0.0, -0.02, 0.975, 0.3, "rwl2tab"))      # SW pad tab (TI land pattern)
     g = [text("reference", "REF**", 0, -2.0, "F.SilkS", size=0.6, thick=0.1),
          text("value", "VQFN-HR-9_2.5x2.5mm", 0, 2.1, "F.Fab", size=0.4, thick=0.06),
          fab_ref(0, 0.4),
@@ -385,30 +399,32 @@ def fp_pico():
 
 
 def fp_bmi088():
-    """BMI088 LGA-16, 4.5 x 3.0 x 1.0 mm. Pads 0.35 x 0.59 mm, 7 per long side at y = +-1.165,
-    1 per short side at x = +-1.915: identical in ArduPilot/Schematics (NxtPX4v2) and bit-bots; a
-    third copy (KiCad generator, BST-BMI088-DS000-19) has the same centres. Pin 1 at (-1.5, -1.165),
-    1-7 along -y towards +x, 8 at +x, 9-15 along +y back, 16 at -x."""
+    """BMI088 LGA-16, 4.5 x 3.0 x 1.0 mm. Bosch BST-BMI088-DS001 rev 1.9, 8.2 landing pattern: pads 0.25 x 0.675 mm,
+    0.5 mm pitch; side pads 1-7 / 9-15 with their inner edge 0.925 mm from the centre (centres +-1.2625 across the
+    3.0 mm width), end pads 8 / 16 with their inner edge 1.675 mm from the centre (centres +-2.0125 along the 4.5 mm
+    length). Pin 1 at (-1.5, -1.2625) next to the pin-1 corner: 1-7 along -y towards +x, 8 at +x, 9-15 along +y back,
+    16 at -x (Bosch fig. 6 top view). (Earlier pads 0.35 x 0.59 from ArduPilot / bit-bots left 0.15 mm gaps.)"""
     pads = []
-    pos = [(-1.5 + 0.5 * k, -1.165) for k in range(7)] + [(1.915, 0.0)] + \
-          [(1.5 - 0.5 * k, 1.165) for k in range(7)] + [(-1.915, 0.0)]
+    yc, xe = 1.2625, 2.0125
+    pos = [(-1.5 + 0.5 * k, -yc) for k in range(7)] + [(xe, 0.0)] + \
+          [(1.5 - 0.5 * k, yc) for k in range(7)] + [(-xe, 0.0)]
     for n, (x, y) in enumerate(pos, 1):
-        w, h = (0.59, 0.35) if n in (8, 16) else (0.35, 0.59)
+        w, h = (0.675, 0.25) if n in (8, 16) else (0.25, 0.675)
         pads.append(smd(n, "rect", x, y, w, h, f"bmi{n}"))
-    g = [text("reference", "REF**", 0, -2.4, "F.SilkS", size=0.6, thick=0.1),
-         text("value", "BMI088", 0, 2.4, "F.Fab", size=0.5, thick=0.08),
+    g = [text("reference", "REF**", 0, -2.5, "F.SilkS", size=0.6, thick=0.1),
+         text("value", "BMI088", 0, 2.5, "F.Fab", size=0.5, thick=0.08),
          rect(-2.25, -1.5, 2.25, 1.5, "F.Fab", 0.1),
          line(-2.25, -1.0, -1.75, -1.5, "F.Fab", 0.1),
-         line(-2.45, -1.7, -1.8, -1.7, "F.SilkS", 0.15),
+         line(-2.5, -1.85, -1.85, -1.85, "F.SilkS", 0.15),
          rect(-2.6, -1.85, 2.6, 1.85, "F.CrtYd", 0.05)]
-    return footprint("Bosch_LGA-16_3x4.5mm_P0.5mm", "Bosch BMI088 LGA-16, 4.5 x 3.0 x 1.0 mm, 0.5 mm pitch "
-                     "(pads as ArduPilot NxtPX4v2 / bit-bots; see Libraries/README.md)", "Bosch BMI088 IMU LGA",
-                     "smd", g, pads)
+    return footprint("Bosch_LGA-16_3x4.5mm_P0.5mm", "Bosch BMI088 LGA-16, 4.5 x 3.0 x 1.0 mm, 0.5 mm pitch, Bosch landing "
+                     "pattern (BST-BMI088-DS001 rev 1.9, 8.2)", "Bosch BMI088 IMU LGA", "smd", g, pads)
 
 
 def fp_bmp388():
-    """BMP388 LGA-10, 2.0 x 2.0 x 0.75 mm. Pads 0.25 x 0.275 mm at +-0.7625 (OpenAXES; same centres as
-    the KiCad generator footprint from BST-BMP388-DS001). 1-2 on -y, 3-5 on -x, 6-7 on +y, 8-10 on +x."""
+    """BMP388 / BMP390 LGA-10, 2.0 x 2.0 x 0.75 mm. Pads 0.25 x 0.275 mm at +-0.7625 = Bosch BMP390 bottom-view pad
+    dimensions (BST-BMP390-DS002 7.1/7.2: 1.525 / 1.000 / 0.500 mm spacing, 0.275 x 0.250 side pads) and OpenAXES / the
+    KiCad generator footprint from BST-BMP388-DS001. 1-2 on -y, 3-5 on -x, 6-7 on +y, 8-10 on +x."""
     pads = []
     pos = [(0.25, -0.7625), (-0.25, -0.7625), (-0.7625, -0.5), (-0.7625, 0.0), (-0.7625, 0.5),
            (-0.25, 0.7625), (0.25, 0.7625), (0.7625, 0.5), (0.7625, 0.0), (0.7625, -0.5)]
@@ -452,7 +468,7 @@ FOOTPRINTS = {
 }
 SYMBOLS = {
     "KD_Power": [sym_bq25606, sym_tps22997, sym_tps22810, sym_tps61235p],
-    "KD_Sensors": [sym_bmi088, sym_bmp388],
+    "KD_Sensors": [sym_bmi088, sym_bmp390, sym_bmp388],
     "KD_Modules": [sym_pico2w],
 }
 

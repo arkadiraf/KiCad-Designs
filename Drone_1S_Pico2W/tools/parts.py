@@ -42,15 +42,16 @@ FRAME_MPN = {
     "R8 R9 R10": (YAGEO, "RC0603FR-07156KL / -07100KL / -071M27L", "DNP", "UVLO divider option"),
     "U3 U4 U5 U6": (TI, "TPS22997RYZR", "ok", ""),
     "C10 C11 C12 C13": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
-    "C14 C15 C16 C17": (MURATA, "GRM188R71H103KA01D", "TBD", "10 nF placeholder; CT value from the TPS22997 datasheet"),
+    "C14 C15 C16 C17": (MURATA, "GRM188R71H332KA01D", "ok", "3.3 nF 50 V X7R 0603 (stock book; >= 30 V needed)"),
     "R11 R12 R13 R14": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R15 R16 R17 R18": (YAGEO, "RC0603FR-0747KL", "TBD", "or Pico internal pull-ups (decision open)"),
-    "U7": (TI, "TPS61235PRWLT", "verify", "also sold as the larger reel TPS61235PRWLR"),
-    "L2": ("Wurth Elektronik", "74438357010", "TBD", "same part as L1 if the TPS61235P datasheet accepts 1 uH / 6.2 A"),
+    "U7": (TI, "TPS61235PRWLT", "ok", "also sold as the larger reel TPS61235PRWLR"),
+    "L2": ("Wurth Elektronik", "74438357010", "ok", "same part as L1; TPS61235P wants 0.7-1.3 uH effective"),
     "C18 C19": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
     "C20 C21 C22": (MURATA, "GRM31CR61A226KE19L", "verify", "22 uF 10 V X5R 1206; count from the datasheet"),
     "R19": (YAGEO, "RC0603FR-07100KL", "ok", ""),
-    "R20": (YAGEO, "RC0603FR-07xxxxL", "TBD", "boost current-limit resistor (~2.5 A) from the datasheet"),
+    "R20": (YAGEO, "RC0603FR-0749K9L", "ok", "CC 2.49 A (E24 fallback 51k = 2.44 A)"),
+    "C24": (MURATA, "GRM188R71H103KA01D", "ok", "10 nF 0603, stock book"),
 }
 
 # frame parts already placed on the board (not in design.FRAME_BOM): refs, qty, value, (mfr, MPN, status, note)
@@ -66,8 +67,8 @@ FRAME_PLACED = [
 # FC module: refs, qty, value, (mfr, MPN, status, note)
 FC_PARTS = [
     ("U1", 1, "Raspberry Pi Pico 2 W", ("Raspberry Pi", "SC1633", "verify", "Pico 2 W without headers")),
-    ("U2", 1, "BMI088 IMU", ("Bosch Sensortec", "BMI088", "ok", "")),
-    ("U3", 1, "BMP388 barometer", ("Bosch Sensortec", "BMP388", "ok", "")),
+    ("U2", 1, "BMI088 IMU", ("Bosch Sensortec", "BMI088", "ok", "pin 2 (NC) to GND per Bosch")),
+    ("U3", 1, "BMP390 barometer", ("Bosch Sensortec", "BMP390", "ok", "replaces the obsolete BMP388, same LGA-10 footprint")),
     ("C1 C2", 2, "100nF 16V", (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 50 V X7R 0603")),
     ("P1 P2", 2, "2.00 mm male 1x10 SMD vertical (to the Flow deck)",
      ("Samtec", "TMM-110-01-L-S-SM", "verify", "0.5 mm square posts; check the post length vs the Flow deck sockets")),
@@ -115,7 +116,7 @@ DIGIKEY = {
     "RC0603FR-07100KL": ("311-100KHRCT-ND", ""),
     "RC0603FR-071M27L": ("311-1.27MHRCT-ND", ""),
     "TPS22997RYZR": ("296-TPS22997RYZRCT-ND", ""),
-    "GRM188R71H103KA01D": ("", "end of life at distributors - pick an active 10 nF 0603"),
+    "GRM188R71H103KA01D": ("", "end of life at distributors - replaced by 3.3 nF 50 V (stock)"),
     "RC0603FR-0747KL": ("311-47.0KHRCT-ND", ""),
     "TPS61235PRWLT": ("296-44628-1-ND", ""),
     "GRM31CR61A226KE19L": ("", "not found at Digi-Key under this MPN - pick an active 22 uF 1206"),
@@ -125,7 +126,8 @@ DIGIKEY = {
     "B2B-PH-K-S(LF)(SN)": ("455-1704-ND", "bulk"),
     "SC1633": ("2648-SC1633CT-ND", ""),
     "BMI088": ("828-1082-1-ND", ""),
-    "BMP388": ("828-1079-1-ND", "OBSOLETE - BMP390 (828-BMP390CT-ND) is the same 10-LGA 2x2 package, active"),
+    "BMP388": ("828-1079-1-ND", "OBSOLETE - replaced by BMP390"),
+    "BMP390": ("828-BMP390CT-ND", "active (user, Nov 2026)"),
     "GRM188R71H104KA93D": ("", "end of life at distributors - pick an active 100 nF 0603"),
     "TMM-110-01-L-S-SM": ("", "not listed in this variant; Samtec direct / Mouser, or a listed variant"),
     "TMM-110-01-L-S": ("", "not listed in this variant; Samtec direct / Mouser, or a listed variant"),
@@ -139,6 +141,27 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "TPS61235PRWLT": [
+        ("TPS61235PRWLT_TI_datasheet_SLVSCK4A.pdf",
+         "CONFIRMED (SLVSCK4A rev A): pinout 1 PGND, 2 SW, 3 VIN, 4 CC, 5 AGND, 6 FB, 7 EN, 8 INACT, 9 VOUT = KD_Power:TPS61235P; "
+         "RWL0009A land pattern = KD_Power footprint after adding the SW-pad tab (0.975 x 0.3 at y -0.02). VIN 2.3 V to "
+         "VOUT - 0.6 (4.5 V); 5.1 V fixed, FB to VOUT; L 0.7-1.3 uH effective -> Wurth 1 uH OK (peak ~5.3 A at 2.5 A out "
+         "< Isat 6.2 A); CI >= 4.7 uF, CO >= 20 uF effective (3 x 22 uF 10 V 1206 ~30 uF at 5.1 V); valley limit 6.5-9.5 A; "
+         "CC: IOUT = 1.244 V / RCC x 100000 -> R20 49.9 k = 2.49 A, C24 10 nF in parallel; EN pull-down <= 1 M (R19 100 k); "
+         "INACT to AGND. Note: CC mode is meant for resistive / power-managed loads - 2.5 A acts as a fault limit."),
+    ],
+    "TPS22997RYZR": [
+        ("TPS22997RYZR_TI_datasheet.pdf",
+         "CONFIRMED (SLVSGT0, Dec 2022): pinout 1 VBIAS, 2-3 VIN, 4 PG, 5 GND, 6 QOD, 7-8 VOUT, 9 CT, 10 ON = KD_Power:TPS22997. "
+         "VIN 0.1-5.5 V (abs 6 V), VBIAS 1.5-5.5 V -> VBIAS tied to BAT; 10 A continuous, RON 4 mOhm typ / 6 max "
+         "(0.34 W at 7.5 A, RthJA 83.7 C/W -> ~+28 C); ON VIH 0.8 V / VIL 0.35 V (Pico 3.3 V GPIO direct), internal "
+         "500 k smart pull-down (the 100 k R11-R14 stay so the switch is off with the Pico unpowered); PG open drain, "
+         "needs VBIAS, pull-up to any rail <= 5.5 V; QOD tied to VOUT uses RQOD; thermal shutdown 170 C typ, 20 C hyst. "
+         "CT: tR = (0.1302 VIN + 0.0063) CT + 27.8 VIN + 30.5 us -> 3.3 nF = ~2.0 ms at 4.2 V; CT capacitor >= 30 V."),
+        ("TPS22997_RYZ0010A_TI_package_MPQF651A.pdf",
+         "CONFIRMED: RYZ0010A land pattern = KD_Power:Texas_RYZ0010A footprint (corner pads 0.575 x 0.25 at x +-0.6625 / "
+         "y +-0.75, VIN/VOUT 0.825 x 0.25 at x +-0.5375 / y +-0.25, pads 5/10 0.25 x 0.575 at y +-0.9125); 0.8 mm max height."),
+    ],
     "MA12RTR": [
         ("MA12RTR_APEM_datasheet.pdf",
          "CONFIRMED (APEM MA series): 1P2T, right-angle actuator, 1.5 mm travel, body 6.7 x 2.6 x 1.4 mm; "
@@ -195,7 +218,19 @@ DATASHEETS = {
          "gct.co/files/drawings/usb4105.pdf (cited by the KiCad footprint)."),
     ],
     "SC1633": [("../RPi_Pico_2_W_datasheet.pdf", "CONFIRMED: pinout, Fig. 5 footprint; TP/SWD names from the module photo")],
-    "BMI088": [("../crazyflie_bolt_1_1_revh_schematic.pdf", "CONFIRMED: pin numbers and wiring (reference design). OPEN: Bosch datasheet for the pad-1 corner")],
-    "BMP388": [("../crazyflie_bolt_1_1_revh_schematic.pdf", "CONFIRMED: wiring (reference design). OPEN: Bosch datasheet; part obsolete -> BMP390")],
+    "BMI088": [
+        ("BMI088_Bosch_datasheet_BST-BMI088-DS001.pdf",
+         "CONFIRMED (rev 1.9, Jan 2024): table 14 pinout = KD_Sensors:BMI088 (grounds 4 GNDA, 6 GNDIO); pin 2 NC -> GND in "
+         "both modes (tie to GND); PS = GND selects SPI; VDD 2.4-3.6 V, VDDIO 1.2-3.6 V; unused INT pins DNC. Landing "
+         "pattern 8.2: pads 0.25 x 0.675 mm, centres +-1.2625 (sides) / +-2.0125 (ends) - footprint updated (the earlier "
+         "0.35 x 0.59 pads left 0.15 mm gaps). Pin 1 corner = fig. 6 top view = footprint."),
+        ("../crazyflie_bolt_1_1_revh_schematic.pdf", "reference circuit: SPI, INT1 -> INT_ACC, INT2+INT3 -> INT_GYR, 100 nF"),
+    ],
+    "BMP390": [
+        ("BMP390_Bosch_datasheet_BST-BMP390-DS002.pdf",
+         "CONFIRMED (rev 1.7): table 52 pinout identical to the BMP388 (1 VDDIO, 2 SCK, 3/8/9 VSS, 4 SDI, 5 SDO, 6 CSB, 7 INT, "
+         "10 VDD); LGA-10 2.0 x 2.0 x 0.75 mm, bottom-view pads 0.275 x 0.25 (sides, 1.525 / 1.000 mm) and 0.25 x 0.275 "
+         "(ends, 0.5 mm) = KD_Sensors:Bosch_LGA-10 footprint: drop-in for the obsolete BMP388."),
+    ],
     "SMM-110-02-S-S": [("../samtec_SMM_2mm_socket_strip.pdf", "CONFIRMED: 3.68 mm SMT height, 2.00 mm pitch, 0.5 mm sq posts")],
 }

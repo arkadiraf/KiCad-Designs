@@ -145,7 +145,9 @@ exactly these sensors, so their open schematics (bitcraze/hardware, CC-BY-NC-SA 
 reference circuits:
 * **BMI088** on SPI (PS to GND), separate accel/gyro chip selects. INT1 → INT_ACC; INT2 and INT3 →
   INT_GYR. 100 nF decoupling, supply from a filtered analog rail (Bolt: LDO + 1 µH + 4.7 µF).
-* **BMP388** on I2C (CSB and SDO to VDD, address 0x77), 100 nF.
+* **BMP390** on I2C (CSB and SDO to VDD, address 0x77), 100 nF. It replaces the obsolete BMP388: same pins and
+  footprint (Bosch BST-BMP390-DS002).
+* BMI088 pin 2 (NC) to GND, as Bosch's pin table says (BST-BMI088-DS001 rev 1.9).
 
 **Placement**, on the FC bottom, in the cavity between the deck rows under the Flow deck:
 * **U2 BMI088 at (0, 0):** the frame centre, near the CG and on the Flow deck axis. Its long side
@@ -352,7 +354,7 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
   * **B, motors:** one TPS22997 per ESC, high side, about 7.5 A each.
     * ON comes from a Pico GPIO, with a 100 k pull-down: Pico off means motors off.
     * PG is open-drain with a 47 k pull-up to 3V3, read by the Pico.
-    * CT sets the soft start. QOD is tied to VOUT.
+    * CT 3.3 nF (≥ 30 V rating) → about 2 ms rise at 4.2 V (SLVSGT0 eq. 1). QOD tied to VOUT. VBIAS on BAT.
 * **Charger:** BQ25606 from USB-C (checked against the TI datasheet SLUSCK6C, `Materials/bom_datasheets/`).
   * 5.1 k pull-downs on CC.
   * R_ICHG 226 Ω → 3.0 A (677 A·Ω / 226 Ω). R_ILIM 150 Ω → 3.19 A, used only when the adapter reads as
@@ -366,6 +368,9 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
     input (2 × 10 µF) also sit on SYS, about 41 µF in total.
   * SYS feeds the TPS22810 only. The motors stay on BAT. PG goes to the header.
 * **Boost (optional):** TPS61235P, 5.1 V for the Pi Zero, enabled by a Pico GPIO (100 k pull-down).
+  * Checked against SLVSCK4A: FB to VOUT, INACT to AGND, L 1 µH (Würth), CO ≥ 20 µF effective (3 × 22 µF 1206),
+    CC current limit R20 49.9 kΩ = 2.49 A with C24 10 nF in parallel. CC mode is meant for resistive loads, so the
+    2.5 A limit acts as a fault limit above the Pi's draw.
   * Pico ↔ Pi link: the doc had a JST-SH 4 UART with PI_STATUS. Superseded: the Pi talks to the
     Pico over USB (J7), with no PI_STATUS line.
 * **Header:** the frame ↔ FC header is 2 × 10, 2.54 mm. It carries VSYS, 4 × ON, 4 × PG,
