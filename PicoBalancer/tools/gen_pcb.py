@@ -134,7 +134,7 @@ def main():
         text(board, "+ end down", x, y + 4, pcbnew.Dwgs_User, 1.0)
     cx, cy = HOLDER_CHANNEL["x"], HOLDER_CHANNEL["y"]
     rect(board, cx[0], cy[0], cx[1], cy[1], pcbnew.Dwgs_User, 0.05)
-    text(board, "USB-C", 0, -94.5, pcbnew.Dwgs_User, 1.0)
+    text(board, "USB-C", 0, -97.0, pcbnew.Dwgs_User, 1.0)
     text(board, "charger", 0, -30, pcbnew.Dwgs_User, 1.0)
     for i, (x, y, d) in enumerate(CLAMP_HOLES):           # battery-clamp bolts (Fusion PCB body, user)
         hole(board, f"H{len(HOLES) + i + 1}", x, y)

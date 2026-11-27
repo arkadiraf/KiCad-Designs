@@ -290,8 +290,10 @@ HOLDER_HOLES = [(-_hx + 8.0, _hy + 27.6, 2.39), (-_hx - 8.0, _hy - 27.6, 3.45),
 
 REVIEW_PARTS = [
     # top channel between the holders: USB-C + charger
-    # (USB-C above the battery-cover pillar, the charger below it; VBUS runs down beside the pillar)
-    ("J5", 0.0, -91.0, 8.94, 3.16, 6.50, "conn", 0), ("C20", -7.0, -91.0, 1.6, 0.8, 0.8, "cap", 0),
+    # (USB-C centred in the space between the board top edge (y -100) and the cover pillar (y -86), user; the charger
+    #  below the pillar; VBUS runs down beside the pillar)
+    ("J5", 0.0, -93.0, 8.94, 3.16, 6.50, "conn", 0), ("C20", -7.0, -93.0, 1.6, 0.8, 0.8, "cap", 0),
+    ("R13", 6.5, -92.0, 1.6, 0.8, 0.5, "res", 0), ("R14", 6.5, -94.0, 1.6, 0.8, 0.5, "res", 0),   # CC1 / CC2 5.1k
     ("U6", 0.0, -48.0, 4.0, 4.0, 0.9, "ic", 0), ("L1", 0.0, -40.0, 4.1, 4.1, 3.1, "ind", 0),
     ("C21", -6.0, -50.0, 2.0, 1.25, 1.25, "cap", 0), ("C22", -6.0, -46.0, 2.0, 1.25, 1.25, "cap", 0),
     ("C23", 6.0, -50.0, 2.0, 1.25, 1.25, "cap", 0), ("C24", 6.0, -46.0, 2.0, 1.25, 1.25, "cap", 0),
