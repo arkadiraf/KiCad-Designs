@@ -25,6 +25,8 @@ exported from the shared design doc. It has the design status, renders, the part
 **Orderable BOM:** [fabrication/BOM.md](fabrication/BOM.md) and
 [fabrication/BOM_DigiKey.csv](fabrication/BOM_DigiKey.csv) (upload to the Digi-Key BOM Manager; MPNs are not
 yet checked for stock).
+**0603 resistors and capacitors** come from the sample book: [fabrication/BOM_0603_book.md](fabrication/BOM_0603_book.md)
+(16 values, with E24 fallbacks for the E96 values); they are left out of the Digi-Key CSV.
 
 | Stage | Content | State |
 |---|---|---|

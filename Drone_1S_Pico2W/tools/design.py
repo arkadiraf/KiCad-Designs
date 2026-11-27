@@ -270,7 +270,7 @@ FRAME_BOM = [
     ("C3 C4", "10uF 16V", "Device:C", _C08, "SYS"),
     ("C5", "10uF 16V", "Device:C", _C08, "BAT"),
     ("C6", "4.7uF 10V", "Device:C", _C, "REGN"),
-    ("C7", "47nF", "Device:C", _C, "BTST bootstrap"),
+    ("C7", "47nF 16V", "Device:C", _C, "BTST bootstrap"),
     ("D1", "LED red 0603", "Device:LED", "LED_SMD:LED_0603_1608Metric", "STAT charge indicator (optional), from SYS as TI's diagram"),
     ("R7", "2.2k", "Device:R", _R, "STAT LED series resistor (STAT sinks 6 mA max)"),
     # --- logic rail: TPS22810 + slide switch ---
@@ -288,7 +288,7 @@ FRAME_BOM = [
     ("U3 U4 U5 U6", "TPS22997", "KD_Power:TPS22997", "KD_Power:Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm",
      "per-ESC high-side switch, ~7.5 A"),
     ("C10 C11 C12 C13", "10uF 16V", "Device:C", _C08, "TPS22997 VIN, at the pins"),
-    ("C14 C15 C16 C17", "CT soft-start, TO CHECK (few ms)", "Device:C", _C, "limits inrush into the ESC capacitors"),
+    ("C14 C15 C16 C17", "CT soft-start, value TO CHECK (16V)", "Device:C", _C, "limits inrush into the ESC capacitors"),
     ("R11 R12 R13 R14", "100k", "Device:R", _R, "ON pull-downs: Pico off = motors off"),
     ("R15 R16 R17 R18", "47k (or Pico internal pull-ups)", "Device:R", _R,
      "PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE)"),

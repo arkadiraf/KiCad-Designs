@@ -55,7 +55,7 @@ FRAME_MPN = {
 
 # frame parts already placed on the board (not in design.FRAME_BOM): refs, qty, value, (mfr, MPN, status, note)
 FRAME_PLACED = [
-    ("J1 J2 J3 J4", 28, "2.54 mm male header pins (ESC seats, 4 + 3 per ESC)",
+    ("J1 J2 J3 J4", 1, "2.54 mm male header strip 1x40 (ESC seats: 28 pins, 4 + 3 per ESC)",
      ("Sullins", "PRPC040SAAN-RC", "ok", "1x40 break-away strip, cut to 4 + 3")),
     ("J5 J6", 2, "B2B socket 1x10 2.00 mm, frame bottom",
      ("Samtec", "SMM-110-02-S-S", "TBD", "SMT socket, needs 6 mm standoffs; current design = Bitcraze socket from Bitcraze (5 mm)")),
@@ -68,7 +68,7 @@ FC_PARTS = [
     ("U1", 1, "Raspberry Pi Pico 2 W", ("Raspberry Pi", "SC1633", "verify", "Pico 2 W without headers")),
     ("U2", 1, "BMI088 IMU", ("Bosch Sensortec", "BMI088", "ok", "")),
     ("U3", 1, "BMP388 barometer", ("Bosch Sensortec", "BMP388", "ok", "")),
-    ("C1 C2", 2, "100 nF 0603", (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 50 V X7R 0603")),
+    ("C1 C2", 2, "100nF 16V", (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 50 V X7R 0603")),
     ("P1 P2", 2, "2.00 mm male 1x10 SMD vertical (to the Flow deck)",
      ("Samtec", "TMM-110-01-L-S-SM", "verify", "0.5 mm square posts; check the post length vs the Flow deck sockets")),
     ("J1 J2", 2, "2.00 mm male 1x10 THT (to the frame)",
