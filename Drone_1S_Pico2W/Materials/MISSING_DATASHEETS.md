@@ -23,7 +23,7 @@ into `Materials/` under the file name given. Each item lists what it validates.
 |---|---|---|---|
 | ~~9~~ | ✅ **received** – Bitcraze **Crazyflie Bolt 1.1** schematic | `crazyflie-bolt-1.1-schematic.pdf` | BMI088 / BMP388 reference circuits (analog supply filter, interrupt wiring) |
 | 10 | ◐ **partly** (vendor images: size, ratings, pad silk) – **DYS XSD7A** ESC datasheet or pad drawing | `dys-xsd7a.pdf` | ESC header J1–J4 pin functions (BAT+, GND, signal), 7 A continuous rating, DShot support |
-| 11 | **2.00 mm male SMD header** datasheet (the FC J1/J2 and P1/P2 part) | `header-2mm-smd.pdf` | plastic and pin heights against the 5 mm standoff and the Bitcraze socket (2.1 mm) |
+| 11 | (socket drawings received: Sullins 10483, Samtec SMM; the male header drawing is still needed) **2.00 mm male SMD header** datasheet, e.g. Samtec TMM (the FC J1/J2 and P1/P2 part) | `header-2mm-smd.pdf` | plastic and pin heights against the 5 mm standoff and the Bitcraze socket (2.1 mm) |
 | ~~12~~ | ✅ **received** (photo; TP positions fixed) – **Pico 2 W underside**: a photo or drawing of the bottom silkscreen (not covered by the datasheet) | `pico2w-bottom.jpg` | TP1/TP2/TP3 order (GND, USB DM, USB DP) and SWD pad order (SWCLK, GND, SWDIO) |
 | ~~13~~ | ✅ **received** (5 V 2.5 A) – Raspberry Pi **Zero 2 W** product brief | `pi-zero-2w-product-brief.pdf` | 5 V supply current, so the boost can be sized; GPIO header 5 V pins |
 

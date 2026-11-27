@@ -20,6 +20,12 @@ The design intent comes from
 
 ## Status: stage 1, bare boards (rev 0.1)
 
+**Design document (PDF, 27 Nov 2026):** [docs/Toothpick_Drone_Hardware_Design_1S_Pico2W.pdf](docs/Toothpick_Drone_Hardware_Design_1S_Pico2W.pdf),
+exported from the shared design doc. It has the design status, renders, the parts list and the to-do list.
+**Orderable BOM:** [fabrication/BOM.md](fabrication/BOM.md) and
+[fabrication/BOM_DigiKey.csv](fabrication/BOM_DigiKey.csv) (upload to the Digi-Key BOM Manager; MPNs are not
+yet checked for stock).
+
 | Stage | Content | State |
 |---|---|---|
 | 1 | Outlines, holes, fixed pads, placement guides, design rules | **done** |
@@ -386,6 +392,7 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 cd tools
 python3 gen_libs.py                   # shared ../Libraries (KD_*) + sym/fp-lib-tables of both boards
 /usr/bin/python3 check_bom.py         # every FRAME_BOM symbol/footprint resolves, prints BOM OK
+python3 export_bom.py                 # fabrication/BOM_DigiKey.csv + BOM.md (MPNs from parts.py)
 python3 dxf_import.py                 # outline + hole summary from the DXF
 /usr/bin/python3 gen_pcb.py           # both boards + DRC (build/*_drc.txt), prints DRC OK
 /usr/bin/python3 check_import.py      # frame holes == DXF, prints IMPORT OK
