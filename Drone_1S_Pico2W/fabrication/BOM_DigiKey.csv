@@ -1,34 +1,34 @@
-Quantity,Manufacturer,Manufacturer Part Number,Customer Reference,Description,Status,Note
-1,GCT,USB4105-GF-A,Frame J10,"USB-C receptacle (GCT USB4105-GF-A) (USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal); charging input, USB 2.0 D+/D- to the charger",ok,"USB-C receptacle, USB 2.0, 16P top mount"
-1,Texas Instruments,BQ25606RGER,Frame U1,"BQ25606 (Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias); 1S 3 A standalone charger, power path",ok,
-2,Coilcraft,XAL4020-102MEC,"Frame L1, Frame L2","1uH, Isat >= 3.6 A (Coilcraft XAL4020-102) (L_Coilcraft_XAL4020-XXX); charger buck inductor",ok,"1.0 uH, Isat well above 3.6 A"
-2,Yageo,RC0603FR-075K1L,Frame R1 R2,5.1k (R_0603_1608Metric); USB-C CC1 / CC2 pull-downs (sink),ok,
-1,Yageo,RC0603FR-07226RL,Frame R3,226 (R_0603_1608Metric); ICHG: 3.0 A charge current (doc),ok,
-1,Yageo,RC0603FR-07150RL,Frame R4,150 (R_0603_1608Metric); ILIM: 3.2 A input limit (doc),ok,
-1,Semitec,103AT-2,Frame TH1,"10k NTC 103AT-2 (SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm); cell temperature, wire-leaded NTC taped to the 18650",verify,Mouser stocks it; Digi-Key may list it as 103AT-2-ND
-11,Murata,GRM21BR61C106KE15L,"Frame C1, Frame C2, Frame C3 C4, Frame C5, Frame C10 C11 C12 C13, Frame C18 C19",10uF 16V (C_0805_2012Metric); VBUS input,ok,10 uF 16 V X5R 0805
-1,Murata,GRM188R61A475KE15D,Frame C6,4.7uF 10V (C_0603_1608Metric); REGN,ok,4.7 uF 10 V X5R 0603
-1,Murata,GRM188R71H473KA61D,Frame C7,47nF (C_0603_1608Metric); BTST bootstrap,ok,47 nF 50 V X7R 0603
-1,Lite-On,LTST-C191KRKT,Frame D1,"LED red 0603 (LED_0603_1608Metric); STAT charge indicator (optional, from REGN)",ok,red 0603
-1,Yageo,RC0603FR-072K2L,Frame R7,2.2k (R_0603_1608Metric); STAT LED series resistor,ok,
-1,Texas Instruments,TPS22810DBVR,Frame U2,"TPS22810DBV (SOT-23-6); Pico VSYS switch, 2.54 V UVLO",ok,SOT-23-6 (DBV)
-1,C&K,PCM12SMTR,Frame SW1,SPDT slide (C&K PCM12) (SW_SPDT_PCM12); power switch on EN/UVLO (signal only),ok,"SPDT slide, SMD"
-2,Murata,GRM188R71C105KA12D,Frame C8 C9,1uF 16V (C_0603_1608Metric); TPS22810 VIN / VOUT,ok,1 uF 16 V X7R 0603
-4,Texas Instruments,TPS22997RYZR,Frame U3 U4 U5 U6,"TPS22997 (Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm); per-ESC high-side switch, ~7.5 A",ok,
-4,Murata,GRM188R71H103KA01D,Frame C14 C15 C16 C17,"CT soft-start, TO CHECK (few ms) (C_0603_1608Metric); limits inrush into the ESC capacitors",TBD,10 nF placeholder; CT value from the TPS22997 datasheet
-5,Yageo,RC0603FR-07100KL,"Frame R11 R12 R13 R14, Frame R19",100k (R_0603_1608Metric); ON pull-downs: Pico off = motors off,ok,
-4,Yageo,RC0603FR-0747KL,Frame R15 R16 R17 R18,47k (or Pico internal pull-ups) (R_0603_1608Metric); PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE),TBD,or Pico internal pull-ups (decision open)
-1,Texas Instruments,TPS61235PRWLT,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",verify,also sold as the larger reel TPS61235PRWLR
-3,Murata,GRM31CR61A226KE19L,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,verify,22 uF 10 V X5R 1206; count from the datasheet
-28,Sullins,PRPC040SAAN-RC,Frame J1 J2 J3 J4,"2.54 mm male header pins (ESC seats, 4 + 3 per ESC)",ok,"1x40 break-away strip, cut to 4 + 3"
-2,Samtec,SMM-110-02-S-S,Frame J5 J6,"B2B socket 1x10 2.00 mm, frame bottom",TBD,"SMT socket, needs 6 mm standoffs; current design = Bitcraze socket from Bitcraze (5 mm)"
-1,JST,SM04B-SRSS-TB(LF)(SN),Frame J7,"JST-SH 4, Pi USB",ok,
-1,JST,B2B-PH-K-S(LF)(SN),Frame J8,"JST-PH 2 vertical, Pi 5.1 V",ok,
-1,Raspberry Pi,SC1633,FC U1,Raspberry Pi Pico 2 W,verify,Pico 2 W without headers
-1,Bosch Sensortec,BMI088,FC U2,BMI088 IMU,ok,
-1,Bosch Sensortec,BMP388,FC U3,BMP388 barometer,ok,
-2,Murata,GRM188R71H104KA93D,FC C1 C2,100 nF 0603,ok,100 nF 50 V X7R 0603
-2,Samtec,TMM-110-01-L-S-SM,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),verify,0.5 mm square posts; check the post length vs the Flow deck sockets
-2,Samtec,TMM-110-01-L-S,FC J1 J2,2.00 mm male 1x10 THT (to the frame),verify,mates SMM; post length vs the chosen socket / standoff
-0,JST,SM03B-SRSS-TB(LF)(SN),FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
-1,Omron,B3U-1000P,FC SW1,BOOTSEL tactile switch,ok,"top-actuated, 3.0 x 2.5 mm"
+Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Reference,Description,Status,Note
+1,GCT,USB4105-GF-A,2073-USB4105-GF-ACT-ND,Frame J10,"USB-C receptacle (GCT USB4105-GF-A) (USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal); charging input, USB 2.0 D+/D- to the charger",ok,"USB-C receptacle, USB 2.0, 16P top mount"
+1,Texas Instruments,BQ25606RGER,296-47743-1-ND,Frame U1,"BQ25606 (Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias); 1S 3 A standalone charger, power path",ok,
+2,Coilcraft,XAL4020-102MEC,2457-XAL4020-102MEC-ND,"Frame L1, Frame L2","1uH, Isat >= 3.6 A (Coilcraft XAL4020-102) (L_Coilcraft_XAL4020-XXX); charger buck inductor",ok,"1.0 uH, Isat well above 3.6 A"
+2,Yageo,RC0603FR-075K1L,311-5.10KHRCT-ND,Frame R1 R2,5.1k (R_0603_1608Metric); USB-C CC1 / CC2 pull-downs (sink),ok,
+1,Yageo,RC0603FR-07226RL,311-226HRCT-ND,Frame R3,226 (R_0603_1608Metric); ICHG: 3.0 A charge current (doc),ok,
+1,Yageo,RC0603FR-07150RL,311-150HRCT-ND,Frame R4,150 (R_0603_1608Metric); ILIM: 3.2 A input limit (doc),ok,
+1,Semitec,103AT-2,4316-103AT-2-ND,Frame TH1,"10k NTC 103AT-2 (SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm); cell temperature, wire-leaded NTC taped to the 18650",verify,Mouser stocks it; Digi-Key may list it as 103AT-2-ND; bulk
+11,Murata,GRM21BR61C106KE15L,490-3886-1-ND,"Frame C1, Frame C2, Frame C3 C4, Frame C5, Frame C10 C11 C12 C13, Frame C18 C19",10uF 16V (C_0805_2012Metric); VBUS input,ok,10 uF 16 V X5R 0805
+1,Murata,GRM188R61A475KE15D,490-10477-1-ND,Frame C6,4.7uF 10V (C_0603_1608Metric); REGN,ok,4.7 uF 10 V X5R 0603; OBSOLETE - Digi-Key upgrade: GRM188R61A475KAAJD (490-14373-1-ND)
+1,Murata,GRM188R71H473KA61D,,Frame C7,47nF (C_0603_1608Metric); BTST bootstrap,ok,47 nF 50 V X7R 0603; not found at Digi-Key under this MPN - pick an active 47 nF 0603
+1,Lite-On,LTST-C191KRKT,160-1447-1-ND,Frame D1,"LED red 0603 (LED_0603_1608Metric); STAT charge indicator (optional, from REGN)",ok,red 0603
+1,Yageo,RC0603FR-072K2L,311-2.20KHRCT-ND,Frame R7,2.2k (R_0603_1608Metric); STAT LED series resistor,ok,
+1,Texas Instruments,TPS22810DBVR,296-45297-1-ND,Frame U2,"TPS22810DBV (SOT-23-6); Pico VSYS switch, 2.54 V UVLO",ok,SOT-23-6 (DBV)
+1,C&K,PCM12SMTR,401-2016-1-ND,Frame SW1,SPDT slide (C&K PCM12) (SW_SPDT_PCM12); power switch on EN/UVLO (signal only),ok,"SPDT slide, SMD; LAST-TIME BUY, last order date 2026-05-08 (past) - choose a replacement"
+2,Murata,GRM188R71C105KA12D,,Frame C8 C9,1uF 16V (C_0603_1608Metric); TPS22810 VIN / VOUT,ok,1 uF 16 V X7R 0603; not found at Digi-Key under this MPN - pick an active 1 uF 0603
+4,Texas Instruments,TPS22997RYZR,296-TPS22997RYZRCT-ND,Frame U3 U4 U5 U6,"TPS22997 (Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm); per-ESC high-side switch, ~7.5 A",ok,
+4,Murata,GRM188R71H103KA01D,,Frame C14 C15 C16 C17,"CT soft-start, TO CHECK (few ms) (C_0603_1608Metric); limits inrush into the ESC capacitors",TBD,10 nF placeholder; CT value from the TPS22997 datasheet; end of life at distributors - pick an active 10 nF 0603
+5,Yageo,RC0603FR-07100KL,311-100KHRCT-ND,"Frame R11 R12 R13 R14, Frame R19",100k (R_0603_1608Metric); ON pull-downs: Pico off = motors off,ok,
+4,Yageo,RC0603FR-0747KL,311-47.0KHRCT-ND,Frame R15 R16 R17 R18,47k (or Pico internal pull-ups) (R_0603_1608Metric); PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE),TBD,or Pico internal pull-ups (decision open)
+1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",verify,also sold as the larger reel TPS61235PRWLR
+3,Murata,GRM31CR61A226KE19L,,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,verify,22 uF 10 V X5R 1206; count from the datasheet; not found at Digi-Key under this MPN - pick an active 22 uF 1206
+28,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,Frame J1 J2 J3 J4,"2.54 mm male header pins (ESC seats, 4 + 3 per ESC)",ok,"1x40 break-away strip, cut to 4 + 3; bulk"
+2,Samtec,SMM-110-02-S-S,,Frame J5 J6,"B2B socket 1x10 2.00 mm, frame bottom",TBD,"SMT socket, needs 6 mm standoffs; current design = Bitcraze socket from Bitcraze (5 mm); not listed (Digi-Key stocks the -LC clip version); Samtec direct / Mouser"
+1,JST,SM04B-SRSS-TB(LF)(SN),455-SM04B-SRSS-TBCT-ND,Frame J7,"JST-SH 4, Pi USB",ok,
+1,JST,B2B-PH-K-S(LF)(SN),455-1704-ND,Frame J8,"JST-PH 2 vertical, Pi 5.1 V",ok,bulk
+1,Raspberry Pi,SC1633,2648-SC1633CT-ND,FC U1,Raspberry Pi Pico 2 W,verify,Pico 2 W without headers
+1,Bosch Sensortec,BMI088,828-1082-1-ND,FC U2,BMI088 IMU,ok,
+1,Bosch Sensortec,BMP388,828-1079-1-ND,FC U3,BMP388 barometer,ok,"OBSOLETE - BMP390 (828-BMP390CT-ND) is the same 10-LGA 2x2 package, active"
+2,Murata,GRM188R71H104KA93D,,FC C1 C2,100 nF 0603,ok,100 nF 50 V X7R 0603; end of life at distributors - pick an active 100 nF 0603
+2,Samtec,TMM-110-01-L-S-SM,,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),verify,"0.5 mm square posts; check the post length vs the Flow deck sockets; not listed in this variant; Samtec direct / Mouser, or a listed variant"
+2,Samtec,TMM-110-01-L-S,,FC J1 J2,2.00 mm male 1x10 THT (to the frame),verify,"mates SMM; post length vs the chosen socket / standoff; not listed in this variant; Samtec direct / Mouser, or a listed variant"
+0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
+1,Omron,B3U-1000P,SW1020CT-ND,FC SW1,BOOTSEL tactile switch,ok,"top-actuated, 3.0 x 2.5 mm"

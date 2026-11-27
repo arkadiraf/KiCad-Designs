@@ -1,5 +1,8 @@
 # Datasheets still needed for validation
 
+Part datasheets for the BOM go in [bom_datasheets/](bom_datasheets/README.md), which tracks each
+orderable part's Digi-Key number, lifecycle and verification result.
+
 These manufacturer sites are blocked from the build container. Until the PDFs are here, the parts
 are checked only against open-source KiCad libraries (see `../../Libraries/README.md`). Drop each PDF
 into `Materials/` under the file name given. Each item lists what it validates.
