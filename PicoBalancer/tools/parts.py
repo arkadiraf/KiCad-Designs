@@ -26,7 +26,7 @@ MPN = {
     "C6 C7": (MURATA, "GRM21BR61C106KE15L", "ok", "10 uF 16 V X5R 0805"),
     "C8 C9": ("Samsung", "CL10B105KA8NNNC", "ok", "1 uF 0603 (stock)"),
     "C10 C11": ("Samsung", "CL10B474KA8NNNC", "ok", "0.47 uF 0603 (stock)"),
-    "R8 R9": (YAGEO, "RC0603FR-073K9L", "TBD", "ISET, value with the motor choice"),
+    "R8 R9": (YAGEO, "RC0603FR-074K3L", "ok", "ISET 1.16 A for the Pololu 3072 (30:1 HPCB 6V)"),
     "C12 C13": (MURATA, "GRM1885C1H101JA01D", "ok", "100 pF C0G 0603 (stock)"),
     "R10": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "J3 J4": ("JST", "SM06B-SRSS-TB(LF)(SN)", "ok", "mates the Pololu 4761 encoder cable"),
@@ -83,6 +83,10 @@ EXTRA = [
     ("Cables", 2, "JST SH 6-pin F-F twisted cable, Pololu encoder cable",
      ("Pololu", "JST SH 6-pin F-F (length TBD)", "TBD", "check pin-1-to-pin-1 mapping")),
     ("Cells", 2, "18650 Li-ion cell", ("any", "18650 (protected or not)", "TBD", "decision open")),
+    ("M1 M2", 2, "30:1 Micro Metal Gearmotor HPCB 6V, extended motor shaft",
+     ("Pololu", "3072", "ok", "6 V, 1100 rpm, 1.5 A stall (at 6 V); order from Pololu")),
+    ("Encoders", 1, "Magnetic encoder pair kit, side-entry JST SH 6-pin, 12 CPR (2 encoders)",
+     ("Pololu", "4761", "ok", "358 counts per wheel turn with the 29.86:1 gearbox; order from Pololu")),
 ]
 
 # MPN -> (Digi-Key PN or "", note). Numbers carried over from Drone_1S_Pico2W (looked up Nov 2026).
@@ -145,6 +149,14 @@ DATASHEETS = {
     "DMG2302U-7": [("DMG2302U_Diodes_datasheet.pdf",
         "CONFIRMED: N-ch SOT-23, BVDSS 20 V, VGSS +-8 V, VGS(th) 0.4-1.0 V (50 uA), RDS(on) 90 mOhm @ 4.5 V / 120 @ "
         "2.5 V - only switches a 100 k gate pull-up; reversed cell gives VGS -4.2 V, within rating.")],
+    "3072": [("../pololu_micro_metal_gearmotors_datasheet_rev6-2.pdf",
+        "CONFIRMED (Pololu micro metal gearmotor datasheet rev 6.2, p.45 + product page): #3072 = 30:1 (29.86:1) HPCB 6V "
+        "with extended motor shaft; at 6 V: no-load 1100 rpm / 0.13 A, stall 1.5 A and 4.5 kg.mm (extrapolated), max "
+        "power 1.2 W at 540 rpm / 0.82 A, max efficiency 33 % at 0.43 A; keep instantaneous torque < 20 kg.mm and "
+        "continuous current <= 25 % of stall. At 5.1 V: ~935 rpm, stall ~1.28 A.")],
+    "4761": [("../pololu_4760_4761_encoder_side_entry_schematic.pdf",
+        "CONFIRMED (schematic + product page): JST SH 6-pin 1 GND, 2 B, 3 A, 4 VCC (2.7-18 V), 5 M2, 6 M1; 10 k pull-ups on "
+        "A/B to VCC; 12 CPR")],
     "SC0919": [("../RPi_Pico_W_datasheet.pdf", "CONFIRMED: 51 x 21 mm, 2 x 20 pins at 2.54 mm, rows 17.78 mm"),
                ("../RPi_Pico_2_W_datasheet.pdf", "CONFIRMED: same outline and pinout (Pico 2 W upgrade)")],
 }

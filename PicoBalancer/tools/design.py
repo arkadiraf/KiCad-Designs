@@ -119,8 +119,12 @@ BOM = [
     ("C6 C7", "10uF 16V", "Device:C", _C08, "MP6550 VIN, at the pin"),
     ("C8 C9", "1uF 16V", "Device:C", _C, "MP6550 VCC bypass"),
     ("C10 C11", "0.47uF 16V", "Device:C", _C, "MP6550 V3P3 (LDO unused, nSLEEP_LDO = GND)"),
-    # ILIM = 0.5 V / (100 uA/A x RISET) = 5000 / R  -> 3.9 k = 1.28 A (TBD with the motor choice)
-    ("R8 R9", "3.9k", "Device:R", _R, "MP6550 ISET: current limit 1.28 A (TBD)"),
+    # Motor (user, 2026-11-27): Pololu #3072, 30:1 Micro Metal Gearmotor HPCB 6V, extended motor shaft (fits the
+    # 4761 encoder). Pololu datasheet rev 6.2 at 6 V: no-load 1100 rpm / 0.13 A, stall 1.5 A (extrapolated), 4.5 kg.mm,
+    # max power 1.2 W at 0.82 A -> winding ~4 Ohm; at 5.1 V stall ~1.28 A (1.2 A with the 0.24 Ohm bridge).
+    # ILIM = 0.5 V / (100 uA/A x RISET) = 5000 / R -> 4.3 k = 1.16 A: two stalled motors draw 2.33 A, under the
+    # 2.49 A boost CC limit, so 5V1 holds; Pololu advises <= 25 % of stall (~0.35 A) continuous - firmware limits that.
+    ("R8 R9", "4.3k", "Device:R", _R, "MP6550 ISET: current limit 1.16 A per motor (both stalled 2.33 A < boost 2.49 A)"),
     ("C12 C13", "100pF 50V", "Device:C", _C, "MP6550 VISEN filter (<= 500 pF)"),
     ("R10", "100k", "Device:R", _R, "MOTOR_EN (both nSLEEP_HB) pull-down"),
     ("J3 J4", "JST SH 6-pin side entry", "Connector_Generic_MountingPin:Conn_01x06_MountingPin",
@@ -129,7 +133,7 @@ BOM = [
     # --- 5.1 V boost: TPS61235P (values from Drone_1S_Pico2W, checked against SLVSCK4A) ---
     ("U5", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5V1 for the motor drivers"),
     ("L2", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "boost inductor"),
-    ("C14 C15", "10uF 16V", "Device:C", _C08, "boost input (on BAT)"),
+    ("C14 C15", "10uF 16V", "Device:C", _C08, "boost input, on BAT (user 2026-11-27)"),
     ("C16 C17 C18", "22uF 10V", "Device:C", _C12, "boost output, >= 20 uF effective at 5.1 V"),
     ("R11", "100k", "Device:R", _R, "BOOST_EN pull-down"),
     ("R12", "49.9k", "Device:R", _R, "boost CC limit 2.49 A"),
@@ -150,14 +154,14 @@ BOM = [
     ("R19", "10k (DNP option)", "Device:R", _R, "fixed TS resistor in place of TH1 (no temperature cut-off)"),
     ("C20", "1uF 25V", "Device:C", _C, "VBUS"),
     ("C21 C22", "10uF 16V", "Device:C", _C08, "PMID"),
-    ("C23 C24", "10uF 16V", "Device:C", _C08, "SYS"),
+    ("C23 C24", "10uF 16V", "Device:C", _C08, "SYS (only load on SYS: <= 20 uF per datasheet)"),
     ("C25", "10uF 16V", "Device:C", _C08, "BAT"),
     ("C26", "4.7uF 10V", "Device:C", _C, "REGN"),
     ("C27", "47nF 16V", "Device:C", _C, "BTST"),
     ("D1", "LED red 0805", "Device:LED", _LED, "STAT charging"),
     ("R20", "2.2k", "Device:R", _R, "STAT LED series"),
     # --- Pico switch: TPS22810 + slide switch + back-feed Schottky ---
-    ("U7", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, UVLO 2.54 / 2.41 V"),
+    ("U7", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, input BAT (user 2026-11-27), UVLO 2.54 / 2.41 V"),
     # E-Switch EG1218 (Digi-Key EG1903-ND, user pick): SPDT, top actuator, through hole, 0.2 A / 30 VDC,
     # 3 pins 2.50 mm pitch, 0.90 mm holes, body 11.6 x 4.0 x 5.4 mm + 2.0 mm actuator, 2.5 mm travel
     # (drawing P040040 rev C). Common = pin 2 (middle). Carries the EN/UVLO signal only (uA).

@@ -4,7 +4,7 @@ One 60 × 200 × 1.6 mm PCB for a two-wheel balancing robot:
 * **MCU:** Raspberry Pi Pico W (RP2040) on 2 × 20 female sockets, upgradable to a Pico 2 W (RP2350) with no board change.
 * **Cells:** 2 × 18650 in parallel (1S2P) in Keystone 1042P holders, or the non-polarized 1042 on the same footprint. Each cell has its own reverse-polarity FET.
 * **IMU:** BNO086 on SPI0.
-* **Motors:** 2 × MP6550 H-bridges for Pololu micro metal gearmotors, each with a magnetic encoder on one JST-SH 6-pin connector.
+* **Motors:** 2 × MP6550 H-bridges for Pololu #3072 micro metal gearmotors (30:1 HPCB 6V, extended shaft), each with a Pololu 4761 magnetic encoder on one JST-SH 6-pin connector. ISET 4.3 k caps each motor at 1.16 A.
 * **Power:** the blocks are reused from [Drone_1S_Pico2W](../Drone_1S_Pico2W/): BQ25606 USB-C charger (vertical GCT USB4235), TPS22810 Pico switch with UVLO, TPS61235P 5.1 V boost.
 
 **Design document:** [docs/PicoBalancer_Hardware_Design.pdf](docs/PicoBalancer_Hardware_Design.pdf), a PDF export of the shared
@@ -22,7 +22,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 | Stage | Content | State |
 |---|---|---|
 | 0 | Folder, datasheets, outline + holes from the DXF (checked against Fusion), placement guides, BOM, design doc | **done** |
-| 1 | Close the open decisions (motor / ISET, cells, TS, UVLO, boost input) | next |
+| 1 | Close the open decisions (cells, TS, UVLO, boost / slide-switch placement) | next |
 | 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, 1042P, USB4235, EG1218), schematic | |
 | 3 | Placement, 3D review against the Fusion model, routing | |
 | 4 | DRC, fab outputs | |
@@ -62,6 +62,7 @@ Fusion findings, reported but not changed:
 * **Back-feed Schottky D2** between the TPS22810 output and Pico VSYS. The Pico's own micro-USB stays usable for
   programming and cannot push current into the cells.
 * **Encoder VCC = 3V3.** The Pololu encoder pulls A/B up to its VCC, and RP2040 GPIOs are not 5 V tolerant.
+* **BAT feeds both paths:** the TPS22810 (Pico VSYS) and the TPS61235P boost take their input from BAT, after the per-cell FETs. The BQ25606 SYS pin carries only its own capacitors.
 * **Boost EN** comes only from the Pico (GP20, 100 k pull-down), so motor power is off by default. MOTOR_EN (GP2) gates
   both MP6550 nSLEEP_HB pins the same way.
 * **BNO086 on SPI0** (GP4–GP7), with INT on GP8, RST on GP9 and WAKE on GP3. PS1 and PS0/WAKE have pull-ups.

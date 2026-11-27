@@ -21,3 +21,5 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 0,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,J6,1x4 2.54 mm header (DNP),DNP,cut 4 pins from a 1x40 strip; bulk
 0,Keystone,1042,,BT1 BT2 alt.,"18650 holder, SMT, NOT polarized (alternative to 1042P, same footprint)",verify,order instead of 1042P if wanted; qty 0 = alternative
 2,Pololu,JST SH 6-pin F-F (length TBD),,Cables,"JST SH 6-pin F-F twisted cable, Pololu encoder cable",TBD,check pin-1-to-pin-1 mapping
+2,Pololu,3072,,M1 M2,"30:1 Micro Metal Gearmotor HPCB 6V, extended motor shaft",ok,"6 V, 1100 rpm, 1.5 A stall (at 6 V); order from Pololu"
+1,Pololu,4761,,Encoders,"Magnetic encoder pair kit, side-entry JST SH 6-pin, 12 CPR (2 encoders)",ok,358 counts per wheel turn with the 29.86:1 gearbox; order from Pololu
