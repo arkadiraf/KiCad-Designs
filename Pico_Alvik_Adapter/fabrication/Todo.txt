@@ -1,0 +1,22 @@
+header update מק"ט מוצר של DigiKey
+A124546-ND
+יצרן
+TE Connectivity AMP Connectors
+מק"ט מוצר של היצרן
+6-146132-3
+תיאור
+CONN HEADER SMD 15POS 2.54MM
+
+diode 
+
+‏
+1727-5217-1-ND - סרט חתוך (CT)‏
+1727-5217-6-ND - Digi-Reel®
+יצרן
+Nexperia USA Inc.
+מק"ט מוצר של היצרן
+PMEG6020ER,115
+תיאור
+DIODE SCHOTTKY 60V 2A SOD123W
+זמן הספקה סטנדרטי של היצרן
+שבועות 16
