@@ -40,8 +40,8 @@ Fusion: `y_kicad = 121 - y_fusion`.
 | Item | Position (mm) |
 |---|---|
 | Outline | 60 × 200 |
-| Holes | 6 × Ø2.65 NPTH at x ±26, y −96 / 0 / +96, each with an 8 × 8 keep-out (`KD_Mechanical:MountingHole_2.65mm_NPTH`) |
-| BT1 / BT2 (1042, alt. 1042P) | centres (±19.0, −50.2), + contact toward the board centre; pads ≥ 7.46 × 6.47 mm, ≥ 86.80 mm overall, holes Ø3.45 / Ø2.39 mm |
+| Holes | 6 × Ø2.65 NPTH (M2.5) at x ±26, y −96 / 0 / +96, 8 × 8 squares from the DXF and Ø15 mm head keep-outs; 2 clamp holes at (0, −61) / (0, −81) (`KD_Mechanical:MountingHole_2.65mm_NPTH`) |
+| BT1 / BT2 (1042, alt. 1042P) | centres (±19.675, −49.975): outer walls on the board edges, top end 11.5 mm from the top edge, + contact toward the board centre; pads ≥ 7.46 × 6.47 mm, ≥ 86.80 mm overall, holes Ø3.45 / Ø2.39 mm |
 | Channel between holders | x ±8.65, y −93.5…−6.9: vertical USB-C at the top, BQ25606 charger below, two battery-clamp holes in the middle (positions to come from Fusion) |
 | Pico | centred, x ±10.5, y 14…65, micro-USB up, antenna down |
 | IMU | centre bottom, about (0, 89): nearest the wheel axle |
@@ -50,6 +50,27 @@ Fusion: `y_kicad = 121 - y_fusion`.
 Fusion findings, reported but not changed:
 * The 1042P locating pegs pass through the PCB body.
 * The PCB body has no holes for those pegs.
+
+## Placement review in Fusion 360 (stage 0b)
+
+`tools/fusion/build_review.py` builds a `PCB_Review` component in the Fusion model (user permission, 27 Nov 2026) from
+`design.py`. It contains a 60 × 200 mm board with all holes and one sized block per part (`REVIEW_PARTS`). It also moves
+the two holder models to `BT_POS`. The original `PCB` body is hidden. Rerun it after changing `design.py`:
+
+```sh
+cd tools/fusion
+python build_review.py                 # needs Fusion running with the PicoBalancer model open (MCP server on :27182)
+python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_review_top.png 900 1500
+```
+
+* **Bolt keep-out:** Ø15 mm circle at each M2.5 hole (5 mm head, housing ≥ 7.5 mm from the centre).
+* **Holder position:** `HOLDER_TOP_OFFSET` is the distance from the PCB top edge to the housing top end; 11.5 mm minimum, set to your measured value.
+* **Battery clamp:** holes at (0, −61) and (0, −81), with the cover pillar (x ±5, y −86…−56) kept free of parts. The charger sits below the pillar and the USB-C above it.
+* **Holder joints:**
+  * The left holder is positioned through the offsets of the model's rigid joint "Rigid 6".
+  * The right holder is a mirrored copy in the model, so its locating bosses are on the wrong diagonal. The review PCB holes follow a real holder.
+
+![Fusion review, top](docs/fusion_review_top.png)
 
 ## Key electrical choices (details in the design doc)
 

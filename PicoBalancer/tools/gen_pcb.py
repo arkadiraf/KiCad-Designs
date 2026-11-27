@@ -14,7 +14,7 @@ import sys
 import pcbnew
 
 from design import (BOARD_H, BOARD_W, BT_POS, ENCODER_ZONE, HOLDER, HOLDER_CHANNEL, HOLE_D, HOLE_KEEPOUT,
-                    HOLES, PROJECT, REVISION, DATE, SHARED_LIBS, ZONES, to_kicad)
+                    HOLES, PROJECT, REVISION, DATE, SHARED_LIBS, ZONES, BOLT_KEEPOUT_R, HOLDER_HOLES, CLAMP_HOLES, COVER_PILLAR, to_kicad)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PCB = os.path.join(ROOT, f"{PROJECT}.kicad_pcb")
@@ -109,18 +109,38 @@ def main():
         hole(board, f"H{i + 1}", x, y)
         k = HOLE_KEEPOUT / 2
         rect(board, x - k, y - k, x + k, y + k, pcbnew.Cmts_User)
+        c = pcbnew.PCB_SHAPE(board)                   # M2.5 head keep-out: housing >= 7.5 mm from the hole centre
+        c.SetShape(pcbnew.SHAPE_T_CIRCLE)
+        c.SetCenter(pt(x, y))
+        c.SetEnd(pt(x + BOLT_KEEPOUT_R, y))
+        c.SetLayer(pcbnew.Dwgs_User)
+        c.SetWidth(MM(0.1))
+        board.Add(c)
+    for x, y, d in HOLDER_HOLES:                      # holder locating holes (guides until the holder footprint exists)
+        c = pcbnew.PCB_SHAPE(board)
+        c.SetShape(pcbnew.SHAPE_T_CIRCLE)
+        c.SetCenter(pt(x, y))
+        c.SetEnd(pt(x + d / 2, y))
+        c.SetLayer(pcbnew.Dwgs_User)
+        c.SetWidth(MM(0.05))
+        board.Add(c)
     bw, bl = HOLDER["body"]
     for ref, (x, y) in BT_POS.items():
         rect(board, x - bw / 2, y - bl / 2, x + bw / 2, y + bl / 2, pcbnew.Dwgs_User)
         s = HOLDER["pad_span_min"] / 2
         rect(board, x - 3.2, y - s, x + 3.2, y - s + 7.3, pcbnew.Dwgs_User)       # pad zones (catalog minimum)
         rect(board, x - 3.2, y + s - 7.3, x + 3.2, y + s, pcbnew.Dwgs_User)
-        text(board, f"{ref} 1042P", x, y - 4, pcbnew.Dwgs_User, 1.2)
+        text(board, f"{ref} 1042", x, y - 4, pcbnew.Dwgs_User, 1.2)
         text(board, "+ end down", x, y + 4, pcbnew.Dwgs_User, 1.0)
     cx, cy = HOLDER_CHANNEL["x"], HOLDER_CHANNEL["y"]
     rect(board, cx[0], cy[0], cx[1], cy[1], pcbnew.Dwgs_User, 0.05)
-    text(board, "USB-C + charger", 0, -85, pcbnew.Dwgs_User, 1.2)
-    text(board, "clamp holes TBD", 0, -50, pcbnew.Dwgs_User, 1.2)
+    text(board, "USB-C", 0, -94.5, pcbnew.Dwgs_User, 1.0)
+    text(board, "charger", 0, -30, pcbnew.Dwgs_User, 1.0)
+    for i, (x, y, d) in enumerate(CLAMP_HOLES):           # battery-clamp bolts (Fusion PCB body, user)
+        hole(board, f"H{len(HOLES) + i + 1}", x, y)
+    px0, py0, px1, py1 = COVER_PILLAR
+    rect(board, px0, py0, px1, py1, pcbnew.Dwgs_User, 0.1)
+    text(board, "cover pillar", 0, -71, pcbnew.Dwgs_User, 0.9)
     (ex0, ex1), (ey0, ey1) = ENCODER_ZONE
     for sx in (-1, 1):
         rect(board, sx * ex0, ey0, sx * ex1, ey1, pcbnew.Dwgs_User, 0.05)

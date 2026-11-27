@@ -55,24 +55,38 @@ HOLE_KEEPOUT = 8.0                       # DXF 8 x 8 squares centred on each hol
 # across; body 77.05 x 20.65 x 14.86 mm. 1042 bay 64.0 mm (plain cells), 1042P bay 68.9 mm (protected cells).
 HOLDER = dict(body=(20.65, 77.05), pad_span_min=86.80, pad_min=(6.47, 7.46), height=14.86,
               holes=((3.45, 2.39), 55.20, 16.00))
-BT_POS = {"BT1": (-19.0, -50.2), "BT2": (19.0, -50.2)}   # centre; + contact toward the board centre (+y)
+# Holder placement (user 2026-11-27): housing outer wall flush with the board's long edges. M2.5 bolts, 5 mm heads:
+# keep the housing >= 7.5 mm from every bolt-hole centre (15 mm keep-out circle, marked on Dwgs.User and in Fusion).
+# HOLDER_TOP_OFFSET = distance from the PCB top edge (y = -100) to the housing's top end - the user measures and sets
+# it; default 11.5 mm = the minimum that keeps 7.5 mm from the y = -96 holes.
+BOLT_HEAD_D = 5.0
+BOLT_KEEPOUT_R = 7.5
+HOLDER_TOP_OFFSET = 11.5
+_hx = BOARD_W / 2 - HOLDER["body"][0] / 2                                  # 19.675
+_hy = -BOARD_H / 2 + HOLDER_TOP_OFFSET + HOLDER["body"][1] / 2             # -49.975 with the default
+BT_POS = {"BT1": (-_hx, _hy), "BT2": (_hx, _hy)}   # centre; + contact toward the board centre (+y)
 
 # Pololu 4761 side-entry encoder connectors on the motors (Fusion): x +-6.95..10.70, y_f -4.8..9.4
 ENCODER_ZONE = ((6.95, 10.70), (121 - 9.4, 121 + 4.8))     # |x| range, y range (below the board edge at +100)
 
 # Channel between the holders (user layout 2026-11-27): vertical USB-C J5 at its top end, BQ25606 charger
 # below it, two battery-clamp holes in its middle (positions to come from the Fusion model, not yet drawn).
-HOLDER_CHANNEL = dict(x=(-8.65, 8.65), y=(-93.5, -6.9))
-CLAMP_HOLES = []                         # (x, y, d) - TBD from Fusion
+HOLDER_CHANNEL = dict(x=(-(_hx - HOLDER["body"][0] / 2), _hx - HOLDER["body"][0] / 2),
+                      y=(_hy - HOLDER["pad_span_min"] / 2, _hy + HOLDER["pad_span_min"] / 2))   # x +-9.35
+# Battery clamp (user, Fusion "Battery Cover" + 2 holes added to the Fusion PCB body, read 2026-11-27): M2.5 bolts from
+# the cover top through Ø2.65 holes at Fusion (0, 182) / (0, 202). The cover touches the PCB only with a central pillar,
+# 10 x 30 mm (Fusion x +-5, y 177..207) -> no parts there; traces may pass in the 4.35 mm lanes beside it.
+CLAMP_HOLES = [(0.0, -61.0, 2.65), (0.0, -81.0, 2.65)]
+COVER_PILLAR = (-5.0, -86.0, 5.0, -56.0)          # x0, y0, x1, y1 (board)
 
 # Bottom-half layout (user, 2026-11-27). Guide rectangles (x0, y0, x1, y1), refined at placement.
 ZONES = {
     "Pico W, USB end up": (-10.5, 14.0, 10.5, 65.0),     # centred, micro-USB toward the cells, antenna end down
     "IMU": (-4.0, 84.0, 4.0, 94.0),                      # centre bottom, closest to the wheel axle (least tilt noise)
-    "J3 motor L": (-21.0, 93.0, -12.0, 99.6),            # motor connectors at the bottom edge, left / right
-    "J4 motor R": (12.0, 93.0, 21.0, 99.6),
-    "U3 driver L": (-22.0, 80.0, -11.0, 91.0),           # drivers right above their connectors
-    "U4 driver R": (11.0, 80.0, 22.0, 91.0),
+    "J3 motor L": (-18.5, 93.0, -9.5, 99.6),            # motor connectors at the bottom edge, left / right
+    "J4 motor R": (9.5, 93.0, 18.5, 99.6),
+    "U3 driver L": (-20.0, 80.0, -9.0, 91.0),           # drivers right above their connectors
+    "U4 driver R": (9.0, 80.0, 20.0, 91.0),
     # user 2026-11-27: boost in the bottom part beside the Pico, next to the drivers (left side);
     # slide switch on the other side at the board edge (EG1218 body 11.6 x 4.0, long side along the edge)
     "U5 boost": (-29.0, 50.0, -12.0, 78.0),
@@ -250,4 +264,53 @@ BOM = [
     ("J6", "1x4 2.54 mm header (DNP)", "Connector_Generic:Conn_01x04",
      "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical", "UART0 debug: GND, TX, RX, 3V3"),
     ("TP1", "test pad", "Connector:TestPoint", "TestPoint:TestPoint_Pad_D1.5mm", "BNO086 BOOTN"),
+]
+
+# ---------------------------------------------------------------------------
+# Placement review (stage 0b): sized blocks for the Fusion 360 model (tools/fusion/build_review.py).
+# Board coordinates (centre origin, y down, top view). Fusion: x_f = x, y_f = 121 - y, z_f = -3.9 + z (PCB top face).
+# (ref, x, y, size_x, size_y, size_z, kind, z0)  - sizes from the datasheets in Materials/; z0 = height of the block's
+# bottom above the PCB top. kind sets the colour in Fusion.
+# ---------------------------------------------------------------------------
+# Holder locating holes (Keystone 1042 / 1042P drawings): diagonal, 16.00 across x 55.20 along, positions from the
+# Fusion holder model bosses (16 across, 55.2 along, about the holder centre). Which end takes
+# the 3.45 mm hole and which the 2.39 mm hole is TO VERIFY on the part. BT2 holes are for a real holder in the same
+# orientation as BT1 (+ end toward the board centre); the Fusion right holder is a mirrored copy, not a buildable part.
+# offsets from the holder centre (model bosses): + end (+8 toward the board centre line, +27.6 in y), - end (-8, -27.6)
+HOLDER_HOLES = [(-_hx + 8.0, _hy + 27.6, 2.39), (-_hx - 8.0, _hy - 27.6, 3.45),
+                (_hx + 8.0, _hy + 27.6, 2.39), (_hx - 8.0, _hy - 27.6, 3.45)]   # BT2 = BT1 translated (real part)
+
+REVIEW_PARTS = [
+    # top channel between the holders: USB-C + charger
+    # (USB-C above the battery-cover pillar, the charger below it; VBUS runs down beside the pillar)
+    ("J5", 0.0, -91.0, 8.94, 3.16, 6.50, "conn", 0), ("C20", -7.0, -91.0, 1.6, 0.8, 0.8, "cap", 0),
+    ("U6", 0.0, -48.0, 4.0, 4.0, 0.9, "ic", 0), ("L1", 0.0, -40.0, 4.1, 4.1, 3.1, "ind", 0),
+    ("C21", -6.0, -50.0, 2.0, 1.25, 1.25, "cap", 0), ("C22", -6.0, -46.0, 2.0, 1.25, 1.25, "cap", 0),
+    ("C23", 6.0, -50.0, 2.0, 1.25, 1.25, "cap", 0), ("C24", 6.0, -46.0, 2.0, 1.25, 1.25, "cap", 0),
+    ("C25", 6.0, -40.0, 2.0, 1.25, 1.25, "cap", 0), ("D1", -6.0, -36.0, 2.0, 1.25, 0.8, "led_red", 0),
+    # per-cell fuse + reverse FETs, between the holder + ends and the middle holes
+    ("F1", -12.0, -5.0, 4.5, 3.2, 0.9, "prot", 0), ("Q1", -12.0, 2.0, 3.3, 3.3, 0.8, "ic", 0),
+    ("Q3", -6.5, 2.0, 2.9, 1.3, 1.1, "ic", 0),
+    ("F2", 12.0, -5.0, 4.5, 3.2, 0.9, "prot", 0), ("Q2", 12.0, 2.0, 3.3, 3.3, 0.8, "ic", 0),
+    ("Q4", 6.5, 2.0, 2.9, 1.3, 1.1, "ic", 0),
+    # Pico W on 2 x 1x20 sockets (8.5 mm), micro-USB end up (toward -y), antenna end down
+    ("J1", -8.89, 39.5, 2.54, 50.8, 8.5, "socket", 0), ("J2", 8.89, 39.5, 2.54, 50.8, 8.5, "socket", 0),
+    ("U1 Pico W", 0.0, 39.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 15.3, 7.5, 5.5, 2.7, "metal", 9.5),
+    # IMU at the centre bottom, nearest the wheel axle
+    ("U2 BNO086", 0.0, 89.0, 3.8, 5.2, 1.1, "ic", 0), ("Y1", 5.0, 89.0, 3.2, 1.5, 0.9, "metal", 0),
+    # motor drivers above their connectors, connectors at the bottom edge (opening toward +y), x +-14 to stay
+    # outside the 7.5 mm bolt keep-out of the y = 96 holes
+    ("U3", -14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C6", -18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
+    ("J3", -14.0, 96.5, 8.0, 4.25, 2.95, "conn", 0),
+    ("U4", 14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
+    ("J4", 14.0, 96.5, 8.0, 4.25, 2.95, "conn", 0),
+    # boost on the left beside the Pico, above the left driver
+    ("U5", -20.0, 62.0, 2.5, 2.5, 1.0, "ic", 0), ("L2", -20.0, 70.0, 4.1, 4.1, 3.1, "ind", 0),
+    ("C16", -26.5, 56.0, 3.2, 1.6, 1.6, "cap", 0), ("C17", -26.5, 60.0, 3.2, 1.6, 1.6, "cap", 0),
+    ("C18", -26.5, 64.0, 3.2, 1.6, 1.6, "cap", 0),
+    ("C14", -14.5, 58.0, 2.0, 1.25, 1.25, "cap", 0), ("C15", -14.5, 62.0, 2.0, 1.25, 1.25, "cap", 0),
+    # Pico switch + slide switch on the right edge
+    ("U7", 18.0, 32.0, 2.9, 2.8, 1.1, "ic", 0), ("D2", 18.0, 40.0, 3.7, 1.6, 1.1, "ic", 0),
+    ("SW1", 27.4, 36.0, 4.0, 11.6, 5.4, "switch", 0), ("SW1 actuator", 27.4, 36.0, 2.0, 2.0, 2.0, "white", 5.4),
+    ("D3", 20.0, 46.0, 2.0, 1.25, 0.8, "led_green", 0),
 ]
