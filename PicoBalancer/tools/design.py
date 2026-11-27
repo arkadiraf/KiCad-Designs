@@ -83,6 +83,19 @@ PICO_SOCKET_PITCH = 17.78              # 2 x 1x20, 2.54 mm, Pico W / Pico 2 W
 # puts the BNO086 to sleep and sends the Pico dormant (wake: RTC, GP21 button or CHG_PG). The 100 k pull-downs on
 # MOTOR_EN / BOOST_EN keep motor power off through resets; the TPS22810 UVLO is the final backstop.
 
+# BNO086 pins (LGA-28) and their SPI-mode connections, from SparkFun VR IMU Breakout BNO086 schematic v10
+# (Materials/extracted/sparkfun_bno086/, CC BY-SA 4.0) and the CEVA BNO08X datasheet. SparkFun selects SPI with
+# PS0/PS1 solder jumpers to 3V3 (10 k pull-downs) and opens its I2C pull-up jumper; here SPI is fixed: PS1 pulled up,
+# PS0/WAKE pulled up and driven by GP3, no I2C pull-ups, no SA0/ADR resistor (H_SA0 is MOSI in SPI mode).
+BNO086_PINS = {
+    3: ("VDD", "3V3, 100 nF"), 28: ("VDDIO", "3V3, 100 nF"), 2: ("GND", "GND"), 25: ("GNDIO", "GND"),
+    10: ("CLKSEL0", "GND (crystal)"), 27: ("XIN32", "Y1 + 22 pF"), 26: ("CLKSEL1/XOUT32", "Y1 + 22 pF"), 9: ("CAP", "100 nF"),
+    17: ("H_SA0/MOSI", "SPI0 MOSI GP7"), 20: ("H_SDA/MISO/TX", "SPI0 MISO GP4"), 19: ("H_SCL/SCLK/RX", "SPI0 SCK GP6"),
+    18: ("H_CS", "SPI0 CS GP5, 10 k pull-up"), 14: ("H_INT", "IMU_INT GP8"), 11: ("RST", "IMU_RST GP9, 10 k pull-up"),
+    6: ("PS0/WAKE", "IMU_WAKE GP3, 10 k pull-up"), 5: ("PS1", "10 k pull-up (SPI)"), 4: ("BOOT", "10 k pull-up, TP1"),
+    16: ("S_SDA", "4.7 k pull-up, unused"), 15: ("S_SCL", "4.7 k pull-up, unused"),
+}
+
 # ---------------------------------------------------------------------------
 # Draft pin map (Pico W and Pico 2 W). GP23/24/25/29 belong to the CYW43439 on both modules.
 # ---------------------------------------------------------------------------
@@ -178,8 +191,12 @@ BOM = [
     ("SW1", "SPDT slide (E-Switch EG1218)", "Switch:SW_SPDT",
      "KD_Switches:SW_E-Switch_EG1218_SPDT_Vertical (TO CREATE)", "power switch on EN/UVLO"),
     ("C28 C29", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
-    ("R21 R22 R23", "156k / 100k / 1.27M (DNP option)", "Device:R", _R,
-     "3.30 / 2.70 V UVLO divider option; not fitted: internal 2.54 / 2.41 V kept (user 2026-11-27)"),
+    # UVLO by population (user 2026-11-27, both options on the board). Slide switch common -> R21 -> EN/UVLO:
+    #   default  R21 = 0R, R22 / R23 not fitted: internal UVLO 2.54 V on / 2.41 V off.
+    #   option   R21 = 156k (switch -> EN), R22 = 100k (EN -> GND), R23 = 1.27M (VOUT -> EN, hysteresis):
+    #            3.30 V on / 2.70 V off (checked on Drone_1S_Pico2W against SLVSDH0C). Switch off = EN to GND either way.
+    ("R21", "0R (or 156k for the 2.70 V option)", "Device:R", _R, "slide switch -> EN; 156k = divider top for 3.30 / 2.70 V"),
+    ("R22 R23", "100k / 1.27M (DNP option)", "Device:R", _R, "EN -> GND / VOUT -> EN, fitted only for the 2.70 V option"),
     # Pico datasheet "Powering Pico": external supply into VSYS through a Schottky, so the Pico's own USB
     # (VBUS -> its Schottky -> VSYS) cannot back-feed the TPS22810 and the cells.
     ("D2", "Schottky 20V 1A (MBR120VLSFT1G)", "Device:D_Schottky", "Diode_SMD:D_SOD-123F",

@@ -58,7 +58,8 @@ MPN = {
     "U7": (TI, "TPS22810DBVR", "ok", ""),
     "SW1": ("E-Switch", "EG1218", "ok", "user pick (Digi-Key EG1903-ND); footprint from drawing P040040"),
     "C28 C29": ("Samsung", "CL10B105KA8NNNC", "ok", "1 uF 0603 (stock)"),
-    "R21 R22 R23": (YAGEO, "RC0603FR-07156KL / -07100KL / -071M27L", "DNP", "UVLO divider option"),
+    "R21": (YAGEO, "RC0603FR-070RL", "ok", "0R default (internal UVLO); RC0603FR-07156KL for the 2.70 V option"),
+    "R22 R23": (YAGEO, "RC0603FR-07100KL / -071M27L", "DNP", "fit with R21 = 156k for 3.30 / 2.70 V"),
     "D2": ("onsemi", "MBR120VLSFT1G", "verify", "same diode family as on the Pico; SOD-123FL"),
     "R24": (YAGEO, "RC0603FR-070RL", "DNP", "D2 bypass"),
     "D3": ("Lite-On", "LTST-C171KGKT", "ok", "green 0805 (stock)"),
@@ -115,6 +116,10 @@ DATASHEETS = {
         "CONFIRMED (BNO08X datasheet, covers BNO085/BNO086): LGA-28 3.8 x 5.2 x 1.1 mm; VDD 2.4-3.6 V, VDDIO 1.65-3.6 V; "
         "PS1/PS0 select I2C / UART-RVC / UART / SPI (SPI: PS1 = PS0 = 1, PS0 then becomes WAKE); 32.768 kHz crystal across pins 26/27, CLKSEL0 low. OPEN: pad "
         "drawing for the KD footprint, pin table into the KD symbol."),
+        ("../extracted/sparkfun_bno086/SparkFun_VR_IMU_Breakout_BNO086_QWIIC_Schematic_v10.pdf",
+         "CONFIRMED (SparkFun schematic v10, 7/28/2023, user-supplied): pin numbers VDD 3, VDDIO 28, GND 2, GNDIO 25, CLKSEL0 10, "
+         "XIN32 27, CLKSEL1 26, CAP 9, H_SA0/MOSI 17, H_SDA/MISO 20, H_SCL/SCLK 19, H_CS 18, H_INT 14, RST 11, PS0/WAKE 6, PS1 5, "
+         "BOOT 4, S_SDA 16, S_SCL 15; SPI = PS0 = PS1 = 1 (table); copied into design.BNO086_PINS"),
         ("../extracted/sparkfun_bno086/SparkFun_VR_IMU_Breakout_BNO086_QWIIC.sch",
          "reference circuit (SparkFun, CC BY-SA 4.0): 100 nF VDD/VDDIO/CAP, 10 k NRST/BOOTN, PS0/PS1 jumpers to 3V3 for SPI, 4.7 k S_SDA/S_SCL, "
          "22 pF + 32.768 kHz, CLKSEL0 to GND")],
