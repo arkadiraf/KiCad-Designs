@@ -348,10 +348,16 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
     * ON comes from a Pico GPIO, with a 100 k pull-down: Pico off means motors off.
     * PG is open-drain with a 47 k pull-up to 3V3, read by the Pico.
     * CT sets the soft start. QOD is tied to VOUT.
-* **Charger:** BQ25606 from USB-C.
+* **Charger:** BQ25606 from USB-C (checked against the TI datasheet SLUSCK6C, `Materials/bom_datasheets/`).
   * 5.1 k pull-downs on CC.
-  * R_ICHG 226 Ω for 3.0 A. R_ILIM 150 Ω for 3.2 A.
-  * VSET floats (4.208 V). 10 k NTC on TS. 1 µH inductor.
+  * R_ICHG 226 Ω → 3.0 A (677 A·Ω / 226 Ω). R_ILIM 150 Ω → 3.19 A, used only when the adapter reads as
+    "unknown" on D+/D− (a USB host port gets 0.5 A, a DCP 2.4 A).
+  * VSET floats (4.208 V). CE to GND (charging on). **OTG (pin 6) to GND**: it must not float. **VAC (pin 1)
+    shorted to VBUS.**
+  * TS: 103AT-2 NTC with RT1 5.23 kΩ (REGN → TS) and RT2 30.9 kΩ (TS → GND), for a 0–60 °C window.
+  * 1 µH inductor. Capacitors: VBUS 1 µF, PMID 2 × 10 µF, SYS 20 µF, BAT 10 µF, REGN 4.7 µF, BTST 47 nF.
+  * **Open:** the internal loop compensation wants ≤ 20 µF on SYS. The TPS22810 input (1 µF) and the boost
+    input (2 × 10 µF) also sit on SYS, about 41 µF in total.
   * SYS feeds the TPS22810 only. The motors stay on BAT. PG goes to the header.
 * **Boost (optional):** TPS61235P, 5.1 V for the Pi Zero, enabled by a Pico GPIO (100 k pull-down).
   * Pico ↔ Pi link: the doc had a JST-SH 4 UART with PI_STATUS. Superseded: the Pi talks to the

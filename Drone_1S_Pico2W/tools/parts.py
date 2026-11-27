@@ -25,10 +25,11 @@ FRAME_MPN = {
     "R1 R2": (YAGEO, "RC0603FR-075K1L", "ok", ""),
     "R3": (YAGEO, "RC0603FR-07226RL", "ok", ""),
     "R4": (YAGEO, "RC0603FR-07150RL", "ok", ""),
-    "R5 R6": (YAGEO, "RC0603FR-07xxxxL", "TBD", "TS divider values from the BQ25606 datasheet + 103AT table"),
+    "R5": (YAGEO, "RC0603FR-075K23L", "ok", "BQ25606 datasheet 9.3.5"),
+    "R6": (YAGEO, "RC0603FR-0730K9L", "ok", "BQ25606 datasheet 9.3.5"),
     "TH1": ("Semitec", "103AT-2", "verify", "Mouser stocks it; Digi-Key may list it as 103AT-2-ND"),
-    "C1": (MURATA, "GRM21BR61C106KE15L", "ok", "10 uF 16 V X5R 0805"),
-    "C2": (MURATA, "GRM21BR61C106KE15L", "ok", "10 uF 16 V X5R 0805"),
+    "C1": ("Samsung", "CL10B105KA8NNNC", "verify", "1 uF 25 V X7R 0603"),
+    "C2 C23": (MURATA, "GRM21BR61C106KE15L", "ok", "10 uF 16 V X5R 0805"),
     "C3 C4": (MURATA, "GRM21BR61C106KE15L", "ok", "16 V part on the 10 V lines: less DC-bias loss"),
     "C5": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
     "C6": (MURATA, "GRM188R61A475KE15D", "ok", "4.7 uF 10 V X5R 0603"),
@@ -93,6 +94,9 @@ DIGIKEY = {
     "BQ25606RGER": ("296-47743-1-ND", ""),
     "XAL4020-102MEC": ("2457-XAL4020-102MEC-ND", ""),
     "RC0603FR-075K1L": ("311-5.10KHRCT-ND", ""),
+    "RC0603FR-075K23L": ("311-5.23KHRCT-ND", "Digi-Key PN by the Yageo 311-<value>HRCT-ND pattern - confirm"),
+    "RC0603FR-0730K9L": ("311-30.9KHRCT-ND", "Digi-Key PN by the Yageo 311-<value>HRCT-ND pattern - confirm"),
+    "CL10B105KA8NNNC": ("1276-1184-1-ND", "Digi-Key PN not looked up here - confirm"),
     "RC0603FR-07226RL": ("311-226HRCT-ND", ""),
     "RC0603FR-07150RL": ("311-150HRCT-ND", ""),
     "103AT-2": ("4316-103AT-2-ND", "bulk"),
@@ -132,6 +136,17 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "BQ25606RGER": [
+        ("BQ25606RGER_TI_datasheet.pdf",
+         "CONFIRMED (SLUSCK6C rev C, Sep 2021): pinout = KD_Power:BQ25606 (all 25 pins); RGE0024H land pattern "
+         "(24x 0.24x0.58 mm, EP 2.7 mm, vias 1.1 mm grid) = KiCad Texas_RGE0024H pad positions (KiCad pads longer "
+         "outward: fine for hand soldering); R3 226 R -> ICHG = 677/226 = 3.0 A (2.83-3.16 A); R4 150 R -> "
+         "ILIM = 478/150 = 3.19 A (3.06-3.33 A), used only for 'unknown' adapters (SDP 0.5 A, DCP 2.4 A); TS divider "
+         "5.23 k / 30.9 k for 103AT-2, 0-60 C; L 1 uH (ripple 0.83 A at 5 V, D=0.5 -> Isat >= 3.42 A); BTST 47 nF, "
+         "REGN 4.7 uF 10 V, BAT 10 uF, VSET float = 4.208 V, CE low = charge on. CHANGED: VBUS 1 uF + PMID 2x10 uF; "
+         "OTG (pin 6) must not float -> GND; VAC (pin 1) shorted to VBUS. OPEN: SYS total <= 20 uF for the internal "
+         "loop compensation, but the TPS22810 and boost input caps also sit on SYS (~41 uF) - decide."),
+    ],
     "USB4105-GF-A": [
         ("USB4105_GCT_product_spec_revA3.pdf",
          "CONFIRMED: VBUS pins A4/A9/B4/B9 5.0 A total (charger needs 3.2 A max), GND A1/A12/B1/B12 6.25 A, "

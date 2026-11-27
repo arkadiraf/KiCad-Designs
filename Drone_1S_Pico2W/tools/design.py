@@ -252,17 +252,22 @@ FRAME_BOM = [
     ("R1 R2", "5.1k", "Device:R", _R, "USB-C CC1 / CC2 pull-downs (sink)"),
     ("R3", "226", "Device:R", _R, "ICHG: 3.0 A charge current (doc)"),
     ("R4", "150", "Device:R", _R, "ILIM: 3.2 A input limit (doc)"),
-    ("R5 R6", "TS divider, TO CHECK", "Device:R", _R, "TS bias for the 103AT NTC (REGN divider per datasheet)"),
+    # BQ25606 datasheet SLUSCK6C 9.3.5: 0-60 C window for the 103AT-2: RT1 5.23 k REGN->TS, RT2 30.9 k TS->GND
+    # (the application diagram shows 30.1 k; the worked example gives 30.9 k - used here).
+    ("R5", "5.23k", "Device:R", _R, "TS divider top, REGN -> TS (0-60 C window)"),
+    ("R6", "30.9k", "Device:R", _R, "TS divider bottom, TS -> GND"),
     ("TH1", "10k NTC 103AT-2", "Device:Thermistor_NTC", "Connector_Wire:SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm",
      "cell temperature, wire-leaded NTC taped to the 18650"),
-    ("C1", "10uF 16V", "Device:C", _C08, "VBUS input"),
-    ("C2", "10uF 16V", "Device:C", _C08, "PMID"),
+    # Datasheet pin table: 1 uF on VBUS close to the IC, 10 uF on PMID; 10.2.2.2: ~22 uF input for 3 A charging
+    # -> 2 x 10 uF on PMID (the input capacitor of the buck, placed first in the layout order).
+    ("C1", "1uF 25V", "Device:C", _C, "VBUS, close to pin 24 (VBUS up to 13.5 V)"),
+    ("C2 C23", "10uF 16V", "Device:C", _C08, "PMID, buck input (~22 uF total for 3 A)"),
     ("C3 C4", "10uF 16V", "Device:C", _C08, "SYS"),
     ("C5", "10uF 16V", "Device:C", _C08, "BAT"),
     ("C6", "4.7uF 10V", "Device:C", _C, "REGN"),
     ("C7", "47nF", "Device:C", _C, "BTST bootstrap"),
-    ("D1", "LED red 0603", "Device:LED", "LED_SMD:LED_0603_1608Metric", "STAT charge indicator (optional, from REGN)"),
-    ("R7", "2.2k", "Device:R", _R, "STAT LED series resistor"),
+    ("D1", "LED red 0603", "Device:LED", "LED_SMD:LED_0603_1608Metric", "STAT charge indicator (optional), from SYS as TI's diagram"),
+    ("R7", "2.2k", "Device:R", _R, "STAT LED series resistor (STAT sinks 6 mA max)"),
     # --- logic rail: TPS22810 + slide switch ---
     ("U2", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, 2.54 V UVLO"),
     ("SW1", "SPDT slide (C&K PCM12)", "Switch:SW_SPDT", "Button_Switch_SMD:SW_SPDT_PCM12", "power switch on EN/UVLO (signal only)"),

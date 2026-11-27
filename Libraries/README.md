@@ -48,7 +48,7 @@ are listed in [sources/SOURCES.md](sources/SOURCES.md).
 
 | Part | Pinout sources (agree) | Land pattern sources | Status |
 |---|---|---|---|
-| BQ25606 | plus381-robotics, Y2K-x/psxpress, oliver-nederal/OpenRide-PCB, Decktrix-Lab (4/4) | KiCad stock RGE0024H. Pad centres = plus381 RGE0024H (TI style) = psx / SimonBrenninger (SnapEDA) | **TO CHECK** against the BQ25606 datasheet |
+| BQ25606 | **TI datasheet SLUSCK6C (rev C)**, plus381-robotics, Y2K-x/psxpress, oliver-nederal/OpenRide-PCB, Decktrix-Lab | KiCad stock RGE0024H = TI land pattern RGE0024H (pad pitch and positions; KiCad pads longer outward) | **confirmed** against the datasheet |
 | TPS22997 | girishji/tmr-keyboard, emaneric/EN_Designs, teehee567/Aevia (3/3) | teehee567 (cites TI MPQF651A) = girishji: same pad centres | **TO CHECK** against TI MPQF651A. Fine pitch for hand assembly (doc open item) |
 | TPS22810DBV | official KiCad 9 `Power_Management:TPS22810DBV` (KiCad 7 has only the DRV/WSON variant) | stock SOT-23-6 | **TO CHECK** against the datasheet |
 | TPS61235P | Redherring32/Xbox-Portable, k5utd/Cobalt-Cowboy, unsurv/unsurv-offline (3/3) | asukiaaa (cites the TPS61235P datasheet) = Redherring32/TinyTendo = unsurv: same pad centres. Sizes from asukiaaa (the others make the power pads 0.14 mm wider) | **TO CHECK** against the datasheet |
