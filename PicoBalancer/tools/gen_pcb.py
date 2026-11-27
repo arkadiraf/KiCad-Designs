@@ -15,7 +15,7 @@ import pcbnew
 
 from design import (BOARD_H, BOARD_W, BT_POS, ENCODER_ZONE, HOLDER, HOLDER_CHANNEL, HOLE_D, HOLE_KEEPOUT,
                     HOLES, PROJECT, REVISION, DATE, SHARED_LIBS, ZONES, BOLT_KEEPOUT_R, HOLDER_HOLES, CLAMP_HOLES, COVER_PILLAR, to_kicad,
-                    BOM, DNP, PLACEMENT, VALUES, build_nets)
+                    BOM, DNP, PLACEMENT, VALUES, build_nets, ANTENNA_KEEPOUT)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PCB = os.path.join(ROOT, f"{PROJECT}.kicad_pcb")
@@ -150,6 +150,26 @@ def place_parts(board):
 #   foreign silk), 1.0 mm text, falling back to 0.8 mm.
 # * pin-1 dot outside pad 1 of every part with 3+ pads; cathode bar outside pad 1 of every diode / LED.
 # ---------------------------------------------------------------------------
+# Block titles on the silkscreen: (text, centre x, y in board mm, text size mm, bold[, angle]), placed before the part labels.
+BLOCK_TITLES = [
+    # each title above its area (user)
+    ("USB CHARGE", (0.0, -97.6), 1.5, True),          # above the USB-C port
+    ("CHARGER", (0.0, -54.8), 1.2, False),            # just below the cover pillar, above U6
+    ("CELL PROTECTION", (0.0, -8.0), 1.0, False),     # in the channel above the two fuse / FET groups
+    ("BOOST 5V1", (-22.0, 45.5), 1.2, False),
+    ("MOTOR L", (-20.5, 68.3), 1.2, False),
+    ("MOTOR R", (20.5, 68.3), 1.2, False),
+    ("IMU", (2.0, 84.8), 1.2, False),
+    ("POWER", (20.25, 19.6), 1.2, False),
+    # SW1 direction (NKK Series AS: actuator at the terminal-1 end = LEFT position = 2-1 connected; pin 1 -> BAT = ON):
+    # slide toward pin 1 (up, toward the cells) = ON, toward pin 3 (down) = OFF
+    ("ON", (20.25, 21.8), 1.2, True),
+    ("OFF", (20.25, 34.9), 1.2, True),
+    ("Pico W / Pico 2 W", (0.0, 48.0), 2.0, True, 90),   # under the module, between the socket rows (user)
+]
+SILK_LABELS = {"TP1": "TP1 BOOT", "TP2": "TP2 GND"}    # custom silk labels (user: mark TP2 as GND)
+
+
 def short_value(ref, val):
     v = val.split(" ")[0]
     if ref.startswith("C"):
@@ -196,11 +216,32 @@ def silk_pass(board):
             return False
         return not any(o != owner and _hit(box, b, 0.15) for o, b in silk)
 
+    # board-level silk text (title) is an obstacle too
+    for d in board.Drawings():
+        if d.GetLayer() == pcbnew.F_SilkS and d.GetClass() == "PCB_TEXT":
+            labels.append(_bb(d))
+    # block titles first, at fixed positions (user: name each block; "USB CHARGE" in bold above the port); part labels
+    # then find free spots around them
+    for title, (x, y), size, bold, *ang in BLOCK_TITLES:
+        t = pcbnew.PCB_TEXT(board)
+        t.SetText(title)
+        t.SetLayer(pcbnew.F_SilkS)
+        t.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size)))
+        t.SetTextThickness(MM(max(0.15, size * 0.15)))
+        t.SetBold(bold)
+        t.SetTextAngleDegrees(ang[0] if ang else 0)
+        t.SetPosition(pt(x, y))
+        board.Add(t)
+        box = _bb(t)
+        if not free(box, None):
+            failed.append("title " + title)
+        labels.append(box)
+
     for fp in sorted(board.GetFootprints(), key=lambda f: f.GetReference()):
         ref = fp.GetReference()
         if ref.startswith("H"):
             continue
-        passive = re.match(r"[RC]\d", ref) is not None
+        passive = re.match(r"[RC]\d", ref) is not None or ref in SILK_LABELS
         fref = fp.Reference()
         if passive:
             fref.SetLayer(pcbnew.F_Fab)
@@ -208,7 +249,7 @@ def silk_pass(board):
             fref.SetTextThickness(MM(0.08))
             fref.SetPosition(fp.GetPosition())
             t = pcbnew.PCB_TEXT(board)
-            t.SetText(short_value(ref, fp.GetValue()))
+            t.SetText(SILK_LABELS.get(ref) or short_value(ref, fp.GetValue()))
             t.SetLayer(pcbnew.F_SilkS)
             board.Add(t)
         else:
@@ -320,6 +361,28 @@ def silk_pass(board):
     return len(labels), marks, failed
 
 
+def antenna_keepout(board):
+    """Rule area under the Pico W antenna on both copper layers: no tracks, vias, pads or pour."""
+    x0, y0, x1, y1 = ANTENNA_KEEPOUT
+    for layer in (pcbnew.F_Cu, pcbnew.B_Cu):
+        z = pcbnew.ZONE(board)
+        z.SetIsRuleArea(True)
+        z.SetDoNotAllowTracks(True)
+        z.SetDoNotAllowVias(True)
+        (z.SetDoNotAllowZoneFills if hasattr(z, "SetDoNotAllowZoneFills") else z.SetDoNotAllowCopperPour)(True)
+        z.SetDoNotAllowPads(True)
+        z.SetDoNotAllowFootprints(False)
+        z.SetLayer(layer)
+        z.SetZoneName("Pico W antenna keep-out")
+        ol = z.Outline()
+        ol.NewOutline()
+        for x, y in ((x0, y0), (x1, y0), (x1, y1), (x0, y1)):
+            ol.Append(pt(x, y))
+        board.Add(z)
+    rect(board, x0, y0, x1, y1, pcbnew.Cmts_User, 0.1)
+    text(board, "ANTENNA KEEP-OUT", (x0 + x1) / 2, (y0 + y1) / 2, pcbnew.Cmts_User, 1.0)
+
+
 def main():
     write_hole_fp()
     board = pcbnew.BOARD()
@@ -353,8 +416,10 @@ def main():
     for sx in (-1, 1):
         rect(board, sx * ex0, ey0, sx * ex1, ey1, pcbnew.Dwgs_User, 0.05)
     text(board, "encoder connectors (on motors)", 0, 108, pcbnew.Dwgs_User, 1.2)
-    t_title = text(board, f"{PROJECT} V01", 0, 21.0, pcbnew.F_SilkS, 3.0)        # board name (user: enlarged)
+    t_title = text(board, f"{PROJECT} V01", 0, 16.5, pcbnew.F_SilkS, 3.0)        # board name (user: enlarged)
+    t_title.SetBold(True)                                                          # user: bold
     n_parts = place_parts(board)
+    antenna_keepout(board)
     n_lab, n_marks, silk_failed = silk_pass(board)
     print(f"silk: {n_lab} labels, {n_marks} polarity / pin-1 marks; not placed cleanly: {silk_failed or 'none'}")
     board.Save(PCB)

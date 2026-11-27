@@ -89,10 +89,12 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 * **Boost EN** comes only from the Pico (GP3, 100 k pull-down), so motor power is off by default. MOTOR_EN (GP2) gates
   both MP6550 nSLEEP_HB pins the same way.
 * **Charger temperature left out:** TS is held in its normal window by R19 10 k (TH1 not fitted), so charging never stops for temperature.
-* **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop: internal 2.54 / 2.41 V by default (R21 = 0 Ω), or 3.30 / 2.70 V by fitting R21 = 156 k, R22 and R23. Firmware sleeps well above it.
+* **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop: **3.30 V on / 2.70 V off by default** (R21 = 156 k, R22 = 100 k, R23 = 1.27 M; your choice for plain cells). The internal 2.54 / 2.41 V needs R21 = 0 Ω and R22 / R23 left off. Firmware sleeps well above it.
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the Pico power path (TPS22810, D2, power LED) below it.
 * **Pin map v2** (`design.PINMAP`, placement-matched): BNO086 on SPI1 (GP12–GP15) with RST GP10, INT GP11, WAKE GP22. Left motor M1 on GP8/9 with encoder GP6/7; right motor M2 on GP20/21 with encoder GP16/17. MOTOR_EN GP2, BOOST_EN GP3, CHG STAT/PG GP4/5, user LED GP19 (no button), ADC GP26–28. SPI wiring follows the SparkFun breakout v10 (`design.BNO086_PINS`).
-* **Slide switch:** NKK AS12AP (non-shorting, 360-2121-ND) on the TPS22810 EN/UVLO pin, signal only. The alternative, SS12SDP4 (make-before-break), is usable thanks to R34 (1 k) in the BAT leg. One 3-pin 2.54 mm footprint fits both.
+* **Slide switch:** NKK AS12AP (non-shorting, 360-2121-ND), the only switch ordered, on the TPS22810 EN/UVLO pin, signal only. Its 0.6 mm pins go into 0.9 mm holes.
+  * **Slide up (toward the cells) = ON**, marked ON / OFF on the silkscreen. NKK Series AS: the actuator at the terminal-1 end connects 2-1, and pin 1 goes to BAT through R34.
+  * R34 (1 k) stays, so a shorting switch would also work. It adds 0.6 % to the divider top, which shifts the turn-on threshold from 3.30 to about 3.32 V.
 * **Motor wiring:** the motor and encoder cables are soldered directly to J7 / J8, two rows of 2 mm pads named GND B A VCC M2 M1 on the silkscreen. Cut a Pololu 4765 cable in half, one half per motor, and solder the wires in color order: pad n = encoder pin n, pin 1 green … pin 6 red. The JST connectors J3/J4 were dropped and are not in the BOM.
 
 ## Schematic (stage 2)

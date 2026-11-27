@@ -630,15 +630,16 @@ def fp_usb4235():
 
 
 def fp_slide_switch_3pin():
-    """Slide switch, SPDT, 3 straight PC pins in line at 2.54 mm, 0.9 mm holes: fits NKK AS12AP (2.54 mm, 0.8 mm
-    recommended holes), NKK SS12SDP4 (2.54 mm, 0.6 x 0.4 mm pins) and E-Switch EG1218 (2.50 mm, 0.9 mm holes). Pin 2 =
-    common. Pins along y; outline = AS12AP body ~5.4 x 9.8 mm."""
+    """Slide switch, SPDT, 3 straight PC pins in line at 2.54 mm, 0.9 mm holes. NKK AS12AP (Series AS drawing, straight
+    PC, single pole): round pins 0.6 mm, recommended holes 0.8 mm, 2.54 mm pitch, body 9.8 mm along the pins; the pin row
+    is 1.0 mm off the body centre line (side not clear on the drawing) -> courtyard covers +-1.0 mm either way.
+    Also fits SS12SDP4 / EG1218. Pin 2 = common."""
     pads = [tht(n, "rect" if n == 1 else "circle", 0, -2.54 + 2.54 * (n - 1), 1.6, 1.6, 0.9, f"sw3_{n}")
             for n in (1, 2, 3)]
     g = [text("reference", "REF**", 0, -6.2, "F.SilkS", size=0.8, thick=0.12),
          text("value", "SW_Slide_SPDT", 0, 6.2, "F.Fab", size=0.6, thick=0.1),
          rect(-2.7, -4.9, 2.7, 4.9, "F.Fab", 0.1), rect(-2.85, -5.05, 2.85, 5.05, "F.SilkS", 0.12),
-         rect(-3.1, -5.3, 3.1, 5.3, "F.CrtYd", 0.05)]
+         rect(-4.1, -5.3, 4.1, 5.3, "F.CrtYd", 0.05)]   # body may sit 1.0 mm to either side of the pin row
     return footprint("SW_Slide_SPDT_3pin_P2.54mm_Vertical", "Slide switch SPDT, 3 in-line PC pins 2.54 mm, 0.9 mm holes "
                      "(NKK AS12AP / SS12SDP4, E-Switch EG1218)", "switch slide SPDT THT", "through_hole", g, pads)
 

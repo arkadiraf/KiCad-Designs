@@ -1,6 +1,6 @@
 
 import adsk.core, adsk.fusion, json
-DATA = json.loads('{"step": "C:/WorkSpace_Projects/KiCad-Designs/PicoBalancer/build/PicoBalancer.step", "colors": {"pico": [0, 135, 75], "metal": [185, 185, 190], "conn": [235, 228, 210], "switch": [40, 40, 40], "white": [245, 245, 245]}, "extras": [["J5", 0.0, -93.0, 8.94, 3.16, 6.5, "conn", 0], ["U1 Pico W", 0.0, 58.5, 21.0, 51.0, 1.0, "pico", 8.5], ["U1 micro-USB", 0.0, 34.3, 7.5, 5.5, 2.7, "metal", 9.5], ["SW1", 20.25, 34.3, 5.4, 9.8, 9.1, "switch", 0], ["SW1 actuator", 20.25, 34.3, 2.4, 2.4, 2.5, "white", 9.1]]}')
+DATA = json.loads('{"step": "C:/WorkSpace_Projects/KiCad-Designs/PicoBalancer/build/PicoBalancer.step", "colors": {"pico": [0, 135, 75], "metal": [185, 185, 190], "conn": [235, 228, 210], "switch": [40, 40, 40], "white": [245, 245, 245]}, "extras": [["J5", 0.0, -93.0, 8.94, 3.16, 6.5, "conn", 0], ["U1 Pico W", 0.0, 52.5, 21.0, 51.0, 1.0, "pico", 8.5], ["U1 micro-USB", 0.0, 28.3, 7.5, 5.5, 2.7, "metal", 9.5], ["SW1", 20.25, 28.3, 5.4, 9.8, 9.1, "switch", 0], ["SW1 actuator", 20.25, 28.3, 2.4, 2.4, 2.5, "white", 9.1]]}')
 TOP = -0.39            # PCB top face, cm
 def run(context):
     app = adsk.core.Application.get()

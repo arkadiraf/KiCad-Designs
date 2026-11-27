@@ -57,11 +57,12 @@ MPN = {
     "D1": ("Lite-On", "LTST-C171KRKT", "ok", "red 0805 (stock)"),
     "R20": (YAGEO, "RC0603FR-072K2L", "ok", ""),
     "U7": (TI, "TPS22810DBVT", "ok", "ordered as DBVT (small reel), same part as DBVR"),
-    "SW1": ("NKK Switches", "AS12AP", "ok", "non-shorting; alternative SS12SDP4 (shorting, needs R34) also ordered"),
+    "SW1": ("NKK Switches", "AS12AP", "ok", "non-shorting, the only switch ordered (user 2026-11-27); pins 0.6 mm round in 0.9 mm holes"),
     "R34": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "C28 C29": ("Samsung", "CL10B105KA8NNNC", "ok", "1 uF 0603 (stock)"),
-    "R21": (YAGEO, "RC0603FR-070RL", "ok", "0R default (internal UVLO); RC0603FR-07156KL for the 2.70 V option"),
-    "R22 R23": (YAGEO, "RC0603FR-07100KL / -071M27L", "DNP", "fit with R21 = 156k for 3.30 / 2.70 V"),
+    "R21": (YAGEO, "RC0603FR-07156KL", "ok", "UVLO 3.30 / 2.70 V default (user 2026-11-27); 0R = internal 2.54 / 2.41 V"),
+    "R22": (YAGEO, "RC0603FR-07100KL", "ok", "UVLO divider bottom"),
+    "R23": (YAGEO, "RC0603FR-071M27L", "ok", "UVLO hysteresis"),
     "D2": ("onsemi", "MBR120VLSFT1G", "verify", "same diode family as on the Pico; SOD-123FL"),
     "R24": (YAGEO, "RC0603FR-070RL", "DNP", "D2 bypass"),
     "D3": ("Lite-On", "LTST-C171KGKT", "ok", "green 0805 (stock)"),
@@ -80,6 +81,7 @@ MPN = {
     "R35": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "R36": (YAGEO, "RC0603FR-0710KL", "ok", "CHG_STAT series"),
     "TP1": ("-", "pad only", "ok", "copper pad"),
+    "TP2": ("-", "pad only", "ok", "copper pad, GND"),
 }
 
 # Items without a design.BOM line: refs/use, qty, description, (mfr, MPN, status, note)

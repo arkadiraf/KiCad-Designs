@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal client for the local Fusion 360 MCP server (http://127.0.0.1:27182/mcp).
+"""Minimal client for the local Fusion 360 MCP server (default http://127.0.0.1:60594/mcp; override with FUSION_MCP_URL).
 
     python fusion_mcp.py <script.py> [--write]
 
@@ -8,10 +8,11 @@ readOnly=True unless --write is given; Fusion enforces read-only. Write access t
 granted by the user on 2026-11-27 for the placement-review component only.
 """
 import json
+import os
 import sys
 import urllib.request
 
-URL = "http://127.0.0.1:27182/mcp"
+URL = os.environ.get("FUSION_MCP_URL", "http://127.0.0.1:60594/mcp")   # the port changes when Fusion restarts
 
 
 def post(body, sid=None):

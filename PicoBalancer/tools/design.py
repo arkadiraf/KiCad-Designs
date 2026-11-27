@@ -220,21 +220,21 @@ BOM = [
     ("R36", "10k", "Device:R", _R, "STAT -> CHG_STAT (GP4) series resistor"),
     ("R20", "2.2k", "Device:R", _R, "STAT LED series"),
     # --- Pico switch: TPS22810 + slide switch + back-feed Schottky ---
-    ("U7", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, input BAT (user 2026-11-27), UVLO 2.54 / 2.41 V"),
+    ("U7", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, input BAT (user 2026-11-27), UVLO 3.30 / 2.70 V (divider R21-R23)"),
     # Slide switch (user order 2026-11-27): NKK AS12AP (non-shorting, 3 pins 2.54 mm, body ~9.8 x 5.4 x 9.1 mm + 2.5 mm
     # actuator) or NKK SS12SDP4 (SHORTING make-before-break, 3 pins 2.54 mm, body 6.54 x 4.0 x 4.5 mm). One footprint:
     # 3 pins at 2.54 mm, 0.9 mm holes - also fits the earlier EG1218 (2.50 mm). Common = middle pin -> EN/UVLO (via R21);
     # throws -> BAT through R34 and GND. R34 limits the SS12S make-before-break short of BAT to GND to ~4 mA.
-    ("SW1", "SPDT slide (NKK AS12AP; alt. SS12SDP4)", "Switch:SW_SPDT",
+    ("SW1", "SPDT slide (NKK AS12AP)", "Switch:SW_SPDT",
      "KD_Switches:SW_Slide_SPDT_3pin_P2.54mm_Vertical", "power switch on EN/UVLO"),
-    ("R34", "1k", "Device:R", _R, "slide switch BAT leg: limits the make-before-break short (SS12SDP4) to ~4 mA"),
+    ("R34", "1k", "Device:R", _R, "slide switch BAT leg (AS12AP is non-shorting; R34 kept so a shorting switch also works)"),
     ("C28 C29", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
     # UVLO by population (user 2026-11-27, both options on the board). Slide switch common -> R21 -> EN/UVLO:
-    #   default  R21 = 0R, R22 / R23 not fitted: internal UVLO 2.54 V on / 2.41 V off.
-    #   option   R21 = 156k (switch -> EN), R22 = 100k (EN -> GND), R23 = 1.27M (VOUT -> EN, hysteresis):
+    #   DEFAULT (user 2026-11-27) R21 = 156k (switch -> EN), R22 = 100k (EN -> GND), R23 = 1.27M (VOUT -> EN, hysteresis):
     #            3.30 V on / 2.70 V off (checked on Drone_1S_Pico2W against SLVSDH0C). Switch off = EN to GND either way.
-    ("R21", "0R (or 156k for the 2.70 V option)", "Device:R", _R, "slide switch -> EN; 156k = divider top for 3.30 / 2.70 V"),
-    ("R22 R23", "100k / 1.27M (DNP option)", "Device:R", _R, "EN -> GND / VOUT -> EN, fitted only for the 2.70 V option"),
+    ("R21", "156k", "Device:R", _R, "UVLO divider top, slide switch -> EN (3.30 / 2.70 V; 0R = internal 2.54 / 2.41 V)"),
+    ("R22", "100k", "Device:R", _R, "UVLO divider bottom, EN -> GND"),
+    ("R23", "1.27M", "Device:R", _R, "UVLO hysteresis, VOUT -> EN"),
     # Pico datasheet "Powering Pico": external supply into VSYS through a Schottky, so the Pico's own USB
     # (VBUS -> its Schottky -> VSYS) cannot back-feed the TPS22810 and the cells.
     ("D2", "Schottky 20V 1A (MBR120VLSFT1G)", "Device:D_Schottky", "Diode_SMD:D_SOD-123F",
@@ -242,7 +242,7 @@ BOM = [
     ("R24", "0R (DNP)", "Device:R", _R, "D2 bypass option"),
     ("D3", "LED green 0805", "Device:LED", _LED, "power on (VSYS)"),
     ("R25", "1k", "Device:R", _R, "power LED series"),
-    ("R26 R27", "100k", "Device:R", _R, "VBAT_SENSE divider BAT / 2 -> GP28"),
+    ("R26 R27", "100k", "Device:R", _R, "VBAT_SENSE divider VSW / 2 -> GP28 (switched rail: no drain when off)"),
     ("C30", "100nF 16V", "Device:C", _C, "VBAT_SENSE filter"),
     # --- cells, connectors, mechanics ---
     # Default Keystone 1042 (not polarized, for the stock plain cells; user 2026-11-27), alternative 1042P (polarized):
@@ -283,6 +283,9 @@ BOM = [
     ("D4", "LED blue 0805", "Device:LED", _LED, "USER_LED (GP19)"),
     ("R35", "1k", "Device:R", _R, "user LED series"),
     ("TP1", "test pad", "Connector:TestPoint", "TestPoint:TestPoint_Pad_D1.5mm", "BNO086 BOOTN"),
+    # user 2026-11-27: no bring-up test pads; only a GND pad 2.5 mm from TP1, to short BOOTN low with tweezers
+    # during reset (BNO086 bootloader for a firmware update)
+    ("TP2", "test pad", "Connector:TestPoint", "TestPoint:TestPoint_Pad_D1.5mm", "GND next to TP1 (tweezers)"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -319,8 +322,8 @@ REVIEW_PARTS = [
     ("F2", 12.0, -5.0, 4.5, 3.2, 0.9, "prot", 0), ("Q2", 12.0, 2.0, 3.3, 3.3, 0.8, "ic", 0),
     ("Q4", 6.5, 2.0, 2.9, 1.3, 1.1, "ic", 0),
     # Pico W on 2 x 1x20 sockets (8.5 mm), micro-USB end up (toward -y), antenna end down
-    ("J1", -8.89, 58.5, 2.54, 50.8, 8.5, "socket", 0), ("J2", 8.89, 58.5, 2.54, 50.8, 8.5, "socket", 0),
-    ("U1 Pico W", 0.0, 58.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 34.3, 7.5, 5.5, 2.7, "metal", 9.5),
+    ("J1", -8.89, 52.5, 2.54, 50.8, 8.5, "socket", 0), ("J2", 8.89, 52.5, 2.54, 50.8, 8.5, "socket", 0),
+    ("U1 Pico W", 0.0, 52.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 28.3, 7.5, 5.5, 2.7, "metal", 9.5),
     # IMU at the centre bottom, nearest the wheel axle
     ("U2 BNO086", 0.0, 89.0, 3.8, 5.2, 1.1, "ic", 0), ("Y1", 5.0, 89.0, 3.2, 1.5, 0.9, "metal", 0),
     # motor drivers up and out to the sides beside the Pico's lower end (user); vertical connectors at the bottom
@@ -335,10 +338,10 @@ REVIEW_PARTS = [
     ("C18", -26.5, 58.0, 3.2, 1.6, 1.6, "cap", 0),
     ("C14", -14.5, 52.0, 2.0, 1.25, 1.25, "cap", 0), ("C15", -14.5, 56.0, 2.0, 1.25, 1.25, "cap", 0),
     # slide switch centred between the Pico edge and the board edge; Pico power path (U7, D2, D3) below it
-    ("U7", 20.25, 45.5, 2.9, 2.8, 1.1, "ic", 0), ("D2", 20.25, 50.5, 3.7, 1.6, 1.1, "ic", 0),
-    ("SW1", 20.25, 34.3, 5.4, 9.8, 9.1, "switch", 0), ("SW1 actuator", 20.25, 34.3, 2.4, 2.4, 2.5, "white", 9.1),
-    ("D3", 20.25, 55.5, 2.0, 1.25, 0.8, "led_green", 0),
-    ("D4", 20.25, 62.0, 2.0, 1.25, 0.8, "led_blue", 0),
+    ("U7", 20.25, 39.5, 2.9, 2.8, 1.1, "ic", 0), ("D2", 20.25, 44.5, 3.7, 1.6, 1.1, "ic", 0),
+    ("SW1", 20.25, 28.3, 5.4, 9.8, 9.1, "switch", 0), ("SW1 actuator", 20.25, 28.3, 2.4, 2.4, 2.5, "white", 9.1),
+    ("D3", 20.25, 49.5, 2.0, 1.25, 0.8, "led_green", 0),
+    ("D4", 20.25, 56, 2.0, 1.25, 0.8, "led_blue", 0),
 ]
 
 # ---------------------------------------------------------------------------
@@ -350,8 +353,8 @@ REVIEW_PARTS = [
 PICO_GP_PIN = {0: 1, 1: 2, 2: 4, 3: 5, 4: 6, 5: 7, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14, 11: 15, 12: 16, 13: 17, 14: 19,
                15: 20, 16: 21, 17: 22, 18: 24, 19: 25, 20: 26, 21: 27, 22: 29, 26: 31, 27: 32, 28: 34}
 PICO_GND = (3, 8, 13, 18, 23, 28, 33, 38)          # 33 = AGND
-DNP = {"TH1", "R22", "R23", "R24"}
-VALUES = {"R22": "100k", "R23": "1.27M", "R21": "0R", "Q1": "DMP2008UFG", "Q2": "DMP2008UFG",
+DNP = {"TH1", "R24"}
+VALUES = {"Q1": "DMP2008UFG", "Q2": "DMP2008UFG",
           "Q3": "DMG2302U", "Q4": "DMG2302U", "J5": "USB4235-03-C", "U1": "Pico W / Pico 2 W", "SW1": "AS12AP",
           "BT1": "Keystone 1042", "BT2": "Keystone 1042", "F1": "1812L260TH", "F2": "1812L260TH",
           "L1": "1uH 74438357010", "L2": "1uH 74438357010", "Y1": "32.768kHz",
@@ -405,6 +408,7 @@ def build_nets():
                    ("R6", "IMU_ENV_SCL"), ("R7", "IMU_PS1")):
         add("3V3", r, 1), add(net, r, 2)
     add("IMU_BOOTN", "TP1", 1)
+    add("GND", "TP2", 1)
     # --- motor drivers: U3 = motor 1 (left, J7), U4 = motor 2 (right, J8) ---
     for k, (u, cvin, cvcc, c33, riset, cvis, jw) in enumerate(
             (("U3", "C6", "C8", "C10", "R8", "C12", "J7"), ("U4", "C7", "C9", "C11", "R9", "C13", "J8")), 1):
@@ -483,7 +487,9 @@ def build_nets():
     add("VSW", "R24", 1), add("VSYS", "R24", 2)
     add("VSYS", "R25", 1), add("PWR_LED", "R25", 2)
     add("PWR_LED", "D3", 2), add("GND", "D3", 1)
-    add("BAT", "R26", 1), add("VBAT_SENSE", "R26", 2)
+    # VBAT divider from the switched rail VSW (= BAT - ~8 mV through the TPS22810 when on): no drain and no back-feed
+    # into the unpowered Pico ADC with the slide switch off (user 2026-11-27; was BAT: ~21 uA always + ~30 uA back-feed)
+    add("VSW", "R26", 1), add("VBAT_SENSE", "R26", 2)
     add("VBAT_SENSE", "R27", 1), add("GND", "R27", 2)
     add("VBAT_SENSE", "C30", 1), add("GND", "C30", 2)
     # --- cells: holder -> PPTC -> P-FET (drain) -> BAT (source); N-FET enables the gate from its own cell ---
@@ -525,19 +531,19 @@ _P = {
     "R28": (-9.5, 2.0, 0), "R30": (-9.5, 10.0, 0), "R32": (-13.5, 10.5, 0),
     "F2": (14.0, -1.5, 90), "Q2": (14.0, 6.0, 0), "Q4": (9.0, 6.0, 0),
     "R29": (9.5, 2.0, 0), "R31": (9.5, 10.0, 0), "R33": (13.5, 10.5, 0),
-    # Pico on its sockets, micro-USB end up
-    "U1": (0.0, 58.5, 0),
+    # Pico on its sockets, micro-USB end up; 6 mm higher than the review (user): antenna end 8 mm from the IMU
+    "U1": (0.0, 52.5, 0),
     # left column: UART header, MOTOR_EN pull-down, boost
     "R10": (-14.5, 45.0, 0),
     "U5": (-20.0, 56.0, 0), "L2": (-20.0, 64.0, 0), "C16": (-26.5, 50.0, 0), "C17": (-26.5, 54.0, 0),
     "C18": (-26.5, 58.0, 0), "C14": (-14.5, 52.0, 0), "C15": (-14.5, 56.0, 0), "R11": (-14.5, 59.5, 0),
     "R12": (-20.0, 52.0, 0), "C19": (-20.0, 50.0, 0),
     # right column: slide switch at the micro-USB height, TPS22810 path, VBAT sense, LEDs
-    "SW1": (20.25, 34.3, 0), "R34": (15.5, 33.0, 90), "R21": (15.5, 37.5, 90), "R22": (25.5, 33.0, 90),
-    "R23": (25.5, 37.5, 90), "U7": (20.25, 45.5, 0), "C28": (15.5, 45.5, 90), "C29": (25.0, 45.5, 90),
-    "D2": (20.25, 50.5, 0), "R24": (20.25, 53.0, 0), "R26": (15.5, 56.5, 90), "R27": (15.5, 60.5, 90),
-    "C30": (18.5, 60.5, 90), "D3": (24.5, 56.0, 90), "R25": (24.5, 60.0, 90), "D4": (20.25, 68.5, 0),
-    "R35": (16.0, 68.5, 0),
+    "SW1": (20.25, 28.3, 0), "R34": (15.2, 27, 90), "R21": (15.2, 31.5, 90), "R22": (25.5, 27, 90),
+    "R23": (25.5, 31.5, 90), "U7": (20.25, 39.5, 0), "C28": (15.5, 39.5, 90), "C29": (25.0, 39.5, 90),
+    "D2": (20.25, 44.5, 0), "R24": (20.25, 47, 0), "R26": (15.5, 50.5, 90), "R27": (15.5, 54.5, 90),
+    "C30": (18.5, 54.5, 90), "D3": (24.5, 50, 90), "R25": (24.5, 54, 90), "D4": (20.25, 62.5, 0),
+    "R35": (16.0, 62.5, 0),
     # motor drivers beside the Pico's lower end, wire pads and vertical connectors at the bottom edge
     "U3": (-20.0, 76.0, 0), "C6": (-24.0, 76.0, 90), "C8": (-26.5, 76.0, 90), "C10": (-16.0, 76.0, 90),
     "R8": (-20.0, 80.0, 0), "C12": (-20.0, 72.3, 0),
@@ -549,7 +555,12 @@ _P = {
     # IMU at the centre bottom
     "U2": (0.0, 89.0, 0), "Y1": (5.0, 89.0, 90), "C1": (3.0, 93.6, 90), "C2": (6.0, 93.6, 90),
     "C3": (-3.0, 93.6, 90), "C4": (-6.0, 93.6, 90), "C5": (0.0, 93.6, 90),
-    "R1": (-6.0, 80.0, 90), "R2": (-4.0, 80.0, 90), "R3": (-2.0, 80.0, 90), "R4": (0.0, 80.0, 90), "R7": (2.0, 80.0, 90),
-    "R5": (4.0, 80.0, 90), "R6": (6.0, 80.0, 90), "TP1": (-6.5, 87.0, 0),
+    "R1": (-6.0, 82.0, 90), "R2": (-4.0, 82.0, 90), "R3": (-2.0, 82.0, 90), "R4": (0.0, 82.0, 90), "R7": (2.0, 82.0, 90),
+    "R5": (4.0, 82.0, 90), "R6": (6.0, 82.0, 90), "TP1": (-6.5, 87.0, 0), "TP2": (-10.5, 87.0, 0),
 }
 PLACEMENT = _P
+
+# Pico W antenna keep-out (Pico W datasheet: no copper near the antenna): the module's last ~9 mm (antenna end, away
+# from the USB), x +-7 mm, plus 1 mm past the module end. Rule area on both copper layers: no tracks, vias, pads, pour.
+_ux, _uy, _ = PLACEMENT["U1"]
+ANTENNA_KEEPOUT = (_ux - 7.0, _uy + 16.5, _ux + 7.0, _uy + 26.5)     # x0, y0, x1, y1 (board)
