@@ -65,7 +65,8 @@ BOLT_KEEPOUT_R = 3.75                    # 7.5 mm diameter mark (user 2026-11-27
 HOLDER_TOP_OFFSET = 11.5
 _hx = BOARD_W / 2 - HOLDER["body"][0] / 2                                  # 19.675
 _hy = -BOARD_H / 2 + HOLDER_TOP_OFFSET + HOLDER["body"][1] / 2             # -49.975 with the default
-BT_POS = {"BT1": (-_hx, _hy), "BT2": (_hx, _hy)}   # centre; + contact toward the board centre (+y)
+BT_POS = {"BT1": (-_hx, _hy), "BT2": (_hx, _hy)}   # centre; + contact at the TOP end (-y, USB side), - spring at the
+# board-centre end: moulded +/- on the Fusion 1042P holder (user screenshot 2026-11-27). Footprint rotated 180 deg.
 
 # Pololu 4761 side-entry encoder connectors on the motors (Fusion): x +-6.95..10.70, y_f -4.8..9.4
 ENCODER_ZONE = ((6.95, 10.70), (121 - 9.4, 121 + 4.8))     # |x| range, y range (below the board edge at +100)
@@ -300,9 +301,10 @@ BOM = [
 # Keystone 1042 drawing rev H mounting pad layout (same as KiCad's stock footprint): two 3.45 mm peg holes on the
 # 55.20 x 16.00 diagonal and a 2.39 mm hole for the small peg 8.51 mm beyond one 3.45 hole, on the other side, at the
 # spring (-) end (KiCad stock model / footprint; TO CHECK on a real holder).
-# Offsets from the holder centre (+ end at +y): (+8, +27.62) 3.45, (-8, -27.62) 3.45, (+8, -36.13) 2.39.
+# Offsets from the holder centre on the board (+ end at -y, holder footprint rotated 180): (-8, -27.62) 3.45,
+# (+8, +27.62) 3.45, (-8, +36.13) 2.39 (small peg at the - spring end, toward the board centre).
 HOLDER_HOLES = [(sx + dx, _hy + dy, d) for sx in (-_hx, _hx)
-                for dx, dy, d in ((8.0, 27.62, 3.45), (-8.0, -27.62, 3.45), (8.0, -36.13, 2.39))]
+                for dx, dy, d in ((-8.0, -27.62, 3.45), (8.0, 27.62, 3.45), (-8.0, 36.13, 2.39))]
 
 REVIEW_PARTS = [
     # top channel between the holders: USB-C + charger
@@ -514,8 +516,9 @@ def build_nets():
 # serve. Rotation 90 = 2-pin parts vertical. Courtyard overlaps are checked by gen_pcb.py (DRC).
 # ---------------------------------------------------------------------------
 _P = {
-    # cells: holders flush with the long edges, + pad at the board-centre end
-    "BT1": (BT_POS["BT1"][0], BT_POS["BT1"][1], 0), "BT2": (BT_POS["BT2"][0], BT_POS["BT2"][1], 0),
+    # cells: holders flush with the long edges, rotated 180: + pad (1) at the top end, - spring pad (2) at the centre end.
+    # CELLx runs from the top pad down to its fuse (F1 / F2) under the holder (wide trace, both layers at routing).
+    "BT1": (BT_POS["BT1"][0], BT_POS["BT1"][1], 180), "BT2": (BT_POS["BT2"][0], BT_POS["BT2"][1], 180),
     # USB-C at the top edge, CC resistors and VBUS cap beside it (channel x +-8.9 between the holder courtyards)
     "J5": (0.0, -93.0, 0), "C20": (-7.5, -93.0, 90), "R13": (7.1, -95.0, 90), "R14": (7.1, -91.4, 90),
     # charger below the cover pillar (y > -56)

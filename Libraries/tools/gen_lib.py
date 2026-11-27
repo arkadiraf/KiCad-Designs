@@ -577,7 +577,7 @@ def fp_keystone_1042():
     diagonal 55.20 along x 16.00 across, and one 2.39 mm hole for the small 1.57 mm peg, 8.51 mm beyond one 3.45 hole
     and on the other side. That small peg is at the SPRING end: KiCad's stock footprint and 3D model put the 2.39 hole
     and the coil spring at the same end (the stock silk calls that end "+", but the spring is the - contact, as in the
-    Fusion 1042P model). Pad 1 = + (flat contact, board-centre end, +y), pad 2 = - (spring, -y): this footprint is the
+    Fusion 1042P model). Pad 1 = + (flat contact, +y), pad 2 = - (spring, -y): this footprint is the
     stock one rotated -90 deg. TO CHECK on a real 1042: small peg at the spring end. Body 77.05 x 20.65 x 14.86 mm."""
     pads = [smd(1, "rect", 0, 39.65, 6.5, 7.5, "k1042p1"), smd(2, "rect", 0, -39.65, 6.5, 7.5, "k1042p2"),
             npth(8.0, 27.62, 3.45, "k1042h1"), npth(-8.0, -27.62, 3.45, "k1042h2"), npth(8.0, -36.13, 2.39, "k1042h3")]
