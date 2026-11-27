@@ -584,10 +584,18 @@ def fp_keystone_1042():
     g = [text("reference", "REF**", 0, 0, "F.SilkS", size=1.2, thick=0.18, ang=90),
          text("value", "Keystone_1042", 0, 0, "F.Fab", size=1.0, thick=0.15, ang=90),
          rect(-10.325, -38.525, 10.325, 38.525, "F.Fab", 0.12),
-         line(-10.45, -35.5, -10.45, 35.5, "F.SilkS", 0.15), line(10.45, -35.5, 10.45, 35.5, "F.SilkS", 0.15),
-         text("user", "+", -6.0, 34.5, "F.SilkS", size=2.0, thick=0.3),
-         text("user", "-", -6.0, -34.5, "F.SilkS", size=2.0, thick=0.3),
+         line(-10.05, -38.65, -10.05, 38.65, "F.SilkS", 0.15), line(10.05, -38.65, 10.05, 38.65, "F.SilkS", 0.15),   # inside the body (holder flush with the board edge)
          rect(-10.7, -43.7, 10.7, 43.7, "F.CrtYd", 0.05)]
+    # cell polarity marks, visible with the holder fitted: between the body ends (y +-38.5) and the pad ends (+-43.4),
+    # both sides of each contact. + = flat contact (pad 1, +y); - = spring (pad 2, -y). Drawn as 0.4 mm strokes.
+    for sx in (-1, 1):
+        x, yp, ym, a = sx * 6.6, 41.1, -41.1, 1.2
+        g += [line(x - a, yp, x + a, yp, "F.SilkS", 0.4), line(x, yp - a, x, yp + a, "F.SilkS", 0.4),
+              line(x - a, ym, x + a, ym, "F.SilkS", 0.4)]
+    # body end lines (holder placement guide), outside the pads
+    for sy in (-1, 1):
+        g += [line(-10.05, sy * 38.65, -3.9, sy * 38.65, "F.SilkS", 0.15),
+              line(3.9, sy * 38.65, 10.05, sy * 38.65, "F.SilkS", 0.15)]
     return footprint("Keystone_1042_1x18650_SMD", "Keystone 1042 / 1042P SMT holder for one 18650 cell, pads and "
                      "locating holes from the Keystone drawings (1042 rev H, 1042P rev C)", "battery holder 18650 "
                      "Keystone 1042", "smd", g, pads,

@@ -46,8 +46,9 @@ def text(board, s, x, y, layer, size=1.5):
     t.SetPosition(pt(x, y))
     t.SetLayer(layer)
     t.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size)))
-    t.SetTextThickness(MM(0.15))
+    t.SetTextThickness(MM(max(0.15, size * 0.15)))
     board.Add(t)
+    return t
 
 
 LIB_MECH = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), SHARED_LIBS, "KD_Mechanical.pretty"))
@@ -352,7 +353,7 @@ def main():
     for sx in (-1, 1):
         rect(board, sx * ex0, ey0, sx * ex1, ey1, pcbnew.Dwgs_User, 0.05)
     text(board, "encoder connectors (on motors)", 0, 108, pcbnew.Dwgs_User, 1.2)
-    text(board, f"{PROJECT} rev {REVISION}", 0, 22.0, pcbnew.F_SilkS, 1.2)
+    t_title = text(board, f"{PROJECT} V01", 0, 21.0, pcbnew.F_SilkS, 3.0)        # board name (user: enlarged)
     n_parts = place_parts(board)
     n_lab, n_marks, silk_failed = silk_pass(board)
     print(f"silk: {n_lab} labels, {n_marks} polarity / pin-1 marks; not placed cleanly: {silk_failed or 'none'}")
