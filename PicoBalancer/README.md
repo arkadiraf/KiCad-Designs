@@ -2,7 +2,7 @@
 
 One 60 × 200 × 1.6 mm PCB for a two-wheel balancing robot:
 * **MCU:** Raspberry Pi Pico W (RP2040) on 2 × 20 female sockets, upgradable to a Pico 2 W (RP2350) with no board change.
-* **Cells:** plain 2 × 18650 (no protection PCB) in parallel (1S2P) in Keystone 1042P holders, or the non-polarized 1042 on the same footprint. Each cell has its own reverse-polarity FET.
+* **Cells:** plain 2 × 18650 (no protection PCB) in parallel (1S2P) in Keystone 1042 holders (not polarized, Digi-Key 36-1042-ND), or the polarized 1042P on the same footprint. Each cell has its own reverse-polarity FET.
 * **IMU:** BNO086 on SPI0.
 * **Motors:** 2 × MP6550 H-bridges for Pololu #3072 micro metal gearmotors (30:1 HPCB 6V, extended shaft), each with a Pololu 4761 magnetic encoder on one JST-SH 6-pin connector. ISET 4.3 k caps each motor at 1.16 A.
 * **Power:** the blocks are reused from [Drone_1S_Pico2W](../Drone_1S_Pico2W/): BQ25606 USB-C charger (vertical GCT USB4235), TPS22810 Pico switch with UVLO, TPS61235P 5.1 V boost.
@@ -41,7 +41,7 @@ Fusion: `y_kicad = 121 - y_fusion`.
 |---|---|
 | Outline | 60 × 200 |
 | Holes | 6 × Ø2.65 NPTH at x ±26, y −96 / 0 / +96, each with an 8 × 8 keep-out (`KD_Mechanical:MountingHole_2.65mm_NPTH`) |
-| BT1 / BT2 (1042P) | centres (±19.0, −50.2), + contact toward the board centre |
+| BT1 / BT2 (1042, alt. 1042P) | centres (±19.0, −50.2), + contact toward the board centre; pads ≥ 7.46 × 6.47 mm, ≥ 86.80 mm overall, holes Ø3.45 / Ø2.39 mm |
 | Channel between holders | x ±8.65, y −93.5…−6.9: vertical USB-C at the top, BQ25606 charger below, two battery-clamp holes in the middle (positions to come from Fusion) |
 | Pico | centred, x ±10.5, y 14…65, micro-USB up, antenna down |
 | IMU | centre bottom, about (0, 89): nearest the wheel axle |

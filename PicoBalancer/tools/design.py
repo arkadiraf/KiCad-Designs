@@ -50,7 +50,11 @@ HOLE_KEEPOUT = 8.0                       # DXF 8 x 8 squares centred on each hol
 
 # Keystone 1042P, positions from the Fusion model (base body x[-29.33,-8.67] y_f[132.67,209.73];
 # polarized (+) contact y_f 127.92..136.24, spring (-) contact y_f 203.19..214.48). Mirror for BT2.
-HOLDER = dict(body=(20.7, 77.1), pad_span_min=86.0, pad_min=(6.4, 7.3), height=18.3)
+# Keystone drawings 1042 rev H (8.12.26) and 1042P rev C (9.28.26): identical mounting pad layout - pads >= 6.47 x 7.46 mm,
+# >= 86.80 mm overall (was 86.00 before rev B), locating holes 3.45 and 2.39 mm on a diagonal, 55.20 mm along x 16.00 mm
+# across; body 77.05 x 20.65 x 14.86 mm. 1042 bay 64.0 mm (plain cells), 1042P bay 68.9 mm (protected cells).
+HOLDER = dict(body=(20.65, 77.05), pad_span_min=86.80, pad_min=(6.47, 7.46), height=14.86,
+              holes=((3.45, 2.39), 55.20, 16.00))
 BT_POS = {"BT1": (-19.0, -50.2), "BT2": (19.0, -50.2)}   # centre; + contact toward the board centre (+y)
 
 # Pololu 4761 side-entry encoder connectors on the motors (Fusion): x +-6.95..10.70, y_f -4.8..9.4
@@ -209,9 +213,10 @@ BOM = [
     ("R26 R27", "100k", "Device:R", _R, "VBAT_SENSE divider BAT / 2 -> GP28"),
     ("C30", "100nF 16V", "Device:C", _C, "VBAT_SENSE filter"),
     # --- cells, connectors, mechanics ---
-    # Keystone 1042P (polarized) or 1042 (plain leaf springs, NOT polarized): same SMT pad layout on the catalog page,
-    # so one footprint takes either. With the 1042 a cell can go in backwards -> per-cell protection below.
-    ("BT1 BT2", "18650 holder Keystone 1042P (alt. 1042)", "Device:Battery_Cell",
+    # Default Keystone 1042 (not polarized, for the stock plain cells; user 2026-11-27), alternative 1042P (polarized):
+    # identical pad layout in both drawings, so one footprint takes either. With the 1042 a cell can go in backwards
+    # -> per-cell protection below.
+    ("BT1 BT2", "18650 holder Keystone 1042 (alt. 1042P)", "Device:Battery_Cell",
      "KD_Power:Keystone_1042_1x18650_SMD (TO CREATE)", "one cell each, in parallel"),
     # --- per-cell reverse-polarity protection (one channel per holder, x = 1 for BT1, 2 for BT2) ---
     # Cells are in parallel, so one shared FET cannot protect them: a reversed cell next to a good one would see
@@ -230,7 +235,10 @@ BOM = [
     # Fx also limits the equalizing surge when a mismatched cell goes in. Littelfuse 1812L260TH: Ihold 2.60 A (2.15 A
     # at 50 C), Itrip 5.20 A, 8 V, Imax 100 A, R 15-47 mOhm (R1max after trip). Per-cell load: ~1 A running,
     # 2.2 A worst case (boost at its 2.49 A limit from 3.0 V), 1.5 A charging. Qn senses CELLx at the holder (BTx+).
-    ("F1 F2", "PPTC 2.6A hold / 5.2A trip 8V (Littelfuse 1812L260TH)", "Device:Polyfuse", "Fuse:Fuse_1812_4532Metric",
+    # Land pattern per the Littelfuse 1812L datasheet (p.6): two 1.78 x 3.15 mm pads, 3.45 mm gap (7.01 mm overall),
+    # larger than KiCad's generic Fuse_1812_4532Metric (1.125 x 3.4, 3.15 gap) - PPTC trip depends on pad heat sinking.
+    ("F1 F2", "PPTC 2.6A hold / 5.2A trip 8V (Littelfuse 1812L260TH)", "Device:Polyfuse",
+     "KD_Power:Fuse_Littelfuse_1812L (TO CREATE)",
      "per-cell resettable fuse, BTx+ -> Qp drain"),
     ("Q1 Q2", "DMP2008UFG P-MOSFET 20V 9.8mOhm@-2.5V", "Device:Q_PMOS", "Package_SON:Diodes_PowerDI3333-8",
      "per-cell reverse-polarity switch, BTx+ (drain) -> BAT (source)"),

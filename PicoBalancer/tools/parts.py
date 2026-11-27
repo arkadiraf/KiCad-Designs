@@ -13,7 +13,7 @@ YAGEO, MURATA, TI = "Yageo", "Murata", "Texas Instruments"
 
 # key = refs string of a design.BOM line -> (manufacturer, MPN, status, note)
 MPN = {
-    "U1": ("Raspberry Pi", "SC0919", "verify", "Pico WH (headers fitted) for the sockets; Pico 2 WH later"),
+    "U1": ("Raspberry Pi", "SC0919", "ok", "Pico WH (headers fitted) for the sockets; SC0918 = Pico W without headers; Pico 2 WH later"),
     "J1 J2": ("Sullins", "PPPC201LFBN-RC", "verify", "1x20 female 2.54 mm, 8.5 mm"),
     "U2": ("CEVA", "BNO086", "verify", "LGA-28; check Digi-Key / Mouser stock"),
     "Y1": ("Epson", "Q13FC1350000400", "verify", "FC-135 32.768 kHz 12.5 pF 20 ppm"),
@@ -38,7 +38,7 @@ MPN = {
     "R11": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R12": (YAGEO, "RC0603FR-0749K9L", "ok", "E24 fallback 51k = 2.44 A"),
     "C19": ("Samsung", "CL10B103KB8NNNC", "ok", "10 nF 50 V X7R 0603 (stock); replaces GRM188R71H103KA01D (EOL)"),
-    "J5": ("GCT", "USB4235-03-C", "verify", "vertical SMT, 6.5 mm; footprint from the GCT drawing; fallback USB4120-03-C"),
+    "J5": ("GCT", "USB4235-03-C", "ok", "vertical SMT, 6.5 mm; land pattern from GCT drawing sheet 2; fallback USB4120-03-C"),
     "U6": (TI, "BQ25606RGER", "ok", ""),
     "L1": ("Wurth Elektronik", "74438357010", "ok", ""),
     "R13 R14": (YAGEO, "RC0603FR-075K1L", "ok", ""),
@@ -67,10 +67,10 @@ MPN = {
     "R25": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "R26 R27": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "C30": ("Samsung", "CL10B104KB8NNNC", "ok", "100 nF 50 V X7R 0603 (stock)"),
-    "BT1 BT2": ("Keystone", "1042P", "verify", "SMT polarized 18650 holder; alternative 1042 (non-polarized, same pads) - "
-                "needs Q1-Q4 reverse protection, which is fitted either way; peg holes from the full drawing"),
+    "BT1 BT2": ("Keystone", "1042", "ok", "SMT 18650 holder, not polarized, 64 mm bay for the stock plain cells (user 2026-11-27); "
+                "Q1-Q4 reverse protection fitted; alternative 1042P on the same footprint"),
     "F1 F2": ("Littelfuse", "1812L260THDR", "verify", "1812, Ihold 2.6 A, Itrip 5.2 A, 8 V; tape-and-reel suffix to confirm at Digi-Key / Mouser"),
-    "Q1 Q2": ("Diodes Inc.", "DMP2008UFG-7", "ok", "PowerDI3333-8, 9.8 mOhm max at -2.5 V, VGSS +-8 V"),
+    "Q1 Q2": ("Diodes Inc.", "DMP2008UFG-7", "ok", "PowerDI3333-8, 9.8 mOhm max at -2.5 V, VGSS +-8 V; symbol pins 1-3 S, 4 G, 5 D"),
     "Q3 Q4": ("Diodes Inc.", "DMG2302U-7", "ok", "SOT-23, VGS(th) 0.4-1.0 V, VGSS +-8 V"),
     "R28 R29": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R30 R31": (YAGEO, "RC0603FR-0710KL", "ok", ""),
@@ -81,10 +81,12 @@ MPN = {
 
 # Items without a design.BOM line: refs/use, qty, description, (mfr, MPN, status, note)
 EXTRA = [
-    ("BT1 BT2 alt.", 0, "18650 holder, SMT, NOT polarized (alternative to 1042P, same footprint)",
-     ("Keystone", "1042", "verify", "order instead of 1042P if wanted; qty 0 = alternative")),
-    ("Cables", 2, "JST SH 6-pin F-F twisted cable, Pololu encoder cable",
-     ("Pololu", "JST SH 6-pin F-F (length TBD)", "TBD", "check pin-1-to-pin-1 mapping")),
+    ("BT1 BT2 alt.", 0, "18650 holder, SMT, polarized, 68.9 mm bay for protected cells (alternative, same footprint)",
+     ("Keystone", "1042P", "ok", "qty 0 = alternative to the 1042")),
+    ("Cables", 2, "JST SH 6-pin F-F twisted cable, 10 cm, encoder color code",
+     ("Pololu", "4765", "ok", "straight through: same color on the same pin at both ends (pin 1 green ... 6 red) -> J3/J4 pin n = encoder pin n")),
+    ("Cables alt.", 0, "JST SH 6-pin single-ended cable, 12 cm + SHR-06V-S-B housing + 6 x SSH-003T-P0.2-H contacts",
+     ("Pololu / JST", "4762 + SHR-06V-S-B", "ok", "alternative: crimp the free end in the same color order (pin 1 green ... 6 red)")),
     ("Cells", 2, "18650 Li-ion cell, plain (no protection PCB), flat or button top", ("any", "18650 plain", "ok",
      "user 2026-11-27; insert matched cells (within ~0.1 V); board protection: per-cell reverse FETs, BQ25606 4.208 V "
      "charge limit, TPS22810 UVLO (2.70 V option recommended), no cell temperature sensing (TS fixed); F1/F2 resettable fuses per cell")),
@@ -105,6 +107,8 @@ DIGIKEY = {
     "CL31B226KPHNFNE": ("1276-3145-1-ND", ""),
     "103AT-2": ("4316-103AT-2-ND", "bulk"),
     "PRPC040SAAN-RC": ("S1011EC-40-ND", "bulk"),
+    "SC0919": ("2648-SC0919-ND", "Active (Digi-Key listing)"),
+    "1042": ("36-1042-ND", "user, Nov 2026"),
 }
 
 # Datasheet log: MPN -> [(file in Materials/bom_datasheets/ or ../ path, what it confirmed / OPEN)]
@@ -126,7 +130,8 @@ DATASHEETS = {
          "BOOT 4, S_SDA 16, S_SCL 15; SPI = PS0 = PS1 = 1 (table); copied into design.BNO086_PINS"),
         ("../extracted/sparkfun_bno086/SparkFun_VR_IMU_Breakout_BNO086_QWIIC.sch",
          "reference circuit (SparkFun, CC BY-SA 4.0): 100 nF VDD/VDDIO/CAP, 10 k NRST/BOOTN, PS0/PS1 jumpers to 3V3 for SPI, 4.7 k S_SDA/S_SCL, "
-         "22 pF + 32.768 kHz, CLKSEL0 to GND")],
+         "22 pF + 32.768 kHz, CLKSEL0 to GND"),
+        ("BNO086_CEVA_datasheet.pdf", "crystal: 50 ppm, 12.5 pF load, fig. 1-7 shows 22 pF each side -> C1/C2 22 pF kept")],
     "TPS61235PRWLT": [("TPS61235PRWLT_TI_datasheet_SLVSCK4A.pdf", "CONFIRMED on Drone_1S_Pico2W (pinout, land pattern, values)")],
     "BQ25606RGER": [("BQ25606RGER_TI_datasheet.pdf", "CONFIRMED on Drone_1S_Pico2W (pinout, land pattern, values)")],
     "TPS22810DBVR": [("TPS22810DBVR_TI_datasheet.pdf", "CONFIRMED on Drone_1S_Pico2W (pinout, UVLO, divider option)")],
@@ -143,22 +148,29 @@ DATASHEETS = {
         "JST_SH_SM06B-SRSS-TB")],
     "USB4235-03-C": [("USB4235-03-C_GCT_drawing.pdf",
         "CONFIRMED (drawing rev A, 21 Aug 2024): USB 2.0 Type-C receptacle, vertical, SMT, 16 pin, 6.50 mm above the "
-        "board, VBUS 5 A total, GND 6.25 A, 48 V. OPEN: land pattern into the KD footprint.")],
+        "board, VBUS 5 A total, GND 6.25 A, 48 V. Sheet 2 land pattern: 16 pads 0.30 x 0.87 mm at 0.50 mm pitch in two "
+        "staggered rows, 2 x 0.60 mm peg holes 7.50 mm apart, shell tabs 10.00 mm apart; pins A4/A9/B4/B9 VBUS, A5/B5 CC, "
+        "A6/B6 D+, A7/B7 D-, A1/A12/B1/B12 + shell GND. Drawn for a 1.0 mm PCB: on 1.6 mm the 1.05 mm pegs do not protrude "
+        "(all contacts SMT) - fine.")],
     "USB4120-03-C": [("USB4120-03-C_GCT_drawing.pdf", "fallback vertical USB-C 2.0, 16 contacts")],
-    "1042P": [("1042P_Keystone_18650_holders_catalog.pdf",
-        "PARTLY (catalog p.29): 1042 / 1042P SMT single 18650, body 77.1 x 20.7 mm, pads >= 86.0 mm overall, "
-        "pad >= 7.3 x 6.4 mm, holes 3.5 and 2.4 mm. OPEN: the 1042P product drawing for exact peg positions.")],
-    "1042": [("1042P_Keystone_18650_holders_catalog.pdf",
-        "PARTLY (catalog p.29): 1042 leaf springs (not polarized) shares the 1042 / 1042P / 1130 SMT drawing and pad "
-        "layout. OPEN: product drawing.")],
+    "1042P": [("1042P_Keystone_product_drawing.pdf",
+        "CONFIRMED (drawing 1042P rev C, 9.28.26): polarized, 68.88 mm bay (protected cells), same mounting pad layout as the "
+        "1042 (pads >= 7.46 x 6.47, >= 86.80 overall, holes 3.45 / 2.39 at 55.20 x 16.00)"),
+        ("1042P_Keystone_18650_holders_catalog.pdf", "catalog p.29 (older pad span 86.00 min)")],
+    "1042": [("1042_Keystone_product_drawing.pdf",
+        "CONFIRMED (drawing 1042 rev H, 8.12.26): not polarized, 64.00 mm bay, body 77.05 x 20.65 x 14.86 mm; mounting pad layout "
+        "pads >= 7.46 x 6.47 mm, >= 86.80 mm overall, holes 3.45 / 2.39 mm diagonal at 55.20 x 16.00 mm; for cells <= 67 mm "
+        "with protection")],
     "1812L260THDR": [("1812L260_Littelfuse_datasheet.pdf",
         "CONFIRMED (Littelfuse 1812L series datasheet): 1812L260TH Ihold 2.60 A, Itrip 5.20 A, Vmax 8 V, Imax 100 A, Pd 0.8 W, "
         "time to trip 2.5 s at 8 A, R min 0.015 / R1max 0.047 Ohm; hold current derates to 2.15 A at 50 C, 1.63 A at 85 C. "
-        "OPEN: exact ordering suffix (DR = tape and reel) and land pattern vs KiCad Fuse_1812_4532Metric.")],
+        "Pad layout (p.6): 1.78 x 3.15 mm pads, 3.45 mm gap -> KD_Power:Fuse_Littelfuse_1812L (KiCad's generic 1812 is smaller). "
+        "OPEN: ordering suffix (DR = tape and reel) at the distributor.")],
     "DMP2008UFG-7": [("DMP2008UFG_Diodes_datasheet.pdf",
         "CONFIRMED: P-ch, BVDSS -20 V, VGSS +-8 V, RDS(on) max 8 mOhm @ -4.5 V, 9.8 @ -2.5 V, 13 @ -1.8 V; VGS(th) "
         "-0.4..-1.0 V; ID -11 A steady (TA 25 C); PowerDI3333-8. At 2.3 A per cell: "
-        "23 mV, 0.05 W. OPEN: pinout figure and land pattern vs KiCad Package_SON:Diodes_PowerDI3333-8.")],
+        "23 mV, 0.05 W. Pinout (p.1): pins 1-3 S, 4 G, 5-8 + pad D. Suggested pad layout (p.5: C 0.65, X2 0.42, Y3 0.70, "
+        "Y 3.70, X 2.37, Y1 2.25) = KiCad Package_SON:Diodes_PowerDI3333-8 (pads 1-3 S, 4 G, 5 = drain incl. fingers).")],
     "DMG2302U-7": [("DMG2302U_Diodes_datasheet.pdf",
         "CONFIRMED: N-ch SOT-23, BVDSS 20 V, VGSS +-8 V, VGS(th) 0.4-1.0 V (50 uA), RDS(on) 90 mOhm @ 4.5 V / 120 @ "
         "2.5 V - only switches a 100 k gate pull-up; reversed cell gives VGS -4.2 V, within rating.")],
