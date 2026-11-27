@@ -82,7 +82,7 @@ COVER_PILLAR = (-5.0, -86.0, 5.0, -56.0)          # x0, y0, x1, y1 (board)
 
 # Bottom-half layout (user, 2026-11-27). Guide rectangles (x0, y0, x1, y1), refined at placement.
 ZONES = {
-    "Pico W, USB end up": (-10.5, 14.0, 10.5, 65.0),     # centred, micro-USB toward the cells, antenna end down
+    "Pico W, USB end up": (-10.5, 33.0, 10.5, 84.0),     # centred, micro-USB toward the cells, antenna end down (moved down, user)
     "IMU": (-4.0, 84.0, 4.0, 94.0),                      # centre bottom, closest to the wheel axle (least tilt noise)
     "J3 motor L": (-18.5, 93.0, -9.5, 99.6),            # motor connectors at the bottom edge, left / right
     "J4 motor R": (9.5, 93.0, 18.5, 99.6),
@@ -295,8 +295,8 @@ REVIEW_PARTS = [
     ("F2", 12.0, -5.0, 4.5, 3.2, 0.9, "prot", 0), ("Q2", 12.0, 2.0, 3.3, 3.3, 0.8, "ic", 0),
     ("Q4", 6.5, 2.0, 2.9, 1.3, 1.1, "ic", 0),
     # Pico W on 2 x 1x20 sockets (8.5 mm), micro-USB end up (toward -y), antenna end down
-    ("J1", -8.89, 39.5, 2.54, 50.8, 8.5, "socket", 0), ("J2", 8.89, 39.5, 2.54, 50.8, 8.5, "socket", 0),
-    ("U1 Pico W", 0.0, 39.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 15.3, 7.5, 5.5, 2.7, "metal", 9.5),
+    ("J1", -8.89, 58.5, 2.54, 50.8, 8.5, "socket", 0), ("J2", 8.89, 58.5, 2.54, 50.8, 8.5, "socket", 0),
+    ("U1 Pico W", 0.0, 58.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 34.3, 7.5, 5.5, 2.7, "metal", 9.5),
     # IMU at the centre bottom, nearest the wheel axle
     ("U2 BNO086", 0.0, 89.0, 3.8, 5.2, 1.1, "ic", 0), ("Y1", 5.0, 89.0, 3.2, 1.5, 0.9, "metal", 0),
     # motor drivers above their connectors, connectors at the bottom edge (opening toward +y), x +-14 (closer to the
