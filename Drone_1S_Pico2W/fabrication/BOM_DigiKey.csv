@@ -8,7 +8,7 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,APEM,MA12RTR,563-1102-1-ND,Frame SW1,SPDT slide (APEM MA12R/TR) (SW_SPDT_PCM12); power switch on EN/UVLO (signal only),ok,"replaces PCM12SMTR (last-time buy); same PCM12 land pattern; active (user, Nov 2026)"
 4,Texas Instruments,TPS22997RYZR,296-TPS22997RYZRCT-ND,Frame U3 U4 U5 U6,"TPS22997 (Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm); per-ESC high-side switch, ~7.5 A",ok,
 1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",ok,also sold as the larger reel TPS61235PRWLR
-3,Murata,GRM31CR61A226KE19L,,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,verify,22 uF 10 V X5R 1206; count from the datasheet; not found at Digi-Key under this MPN - pick an active 22 uF 1206
+3,Samsung,CL31B226KPHNFNE,1276-3145-1-ND,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,ok,"22 uF 10 V X7R 1206 (user pick, Digi-Key 1276-3145-1-ND); active (user, Nov 2026)"
 1,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,Frame J1 J2 J3 J4,"2.54 mm male header strip 1x40 (ESC seats: 28 pins, 4 + 3 per ESC)",ok,"1x40 break-away strip, cut to 4 + 3; bulk"
 2,Samtec,SMM-110-02-S-S,,Frame J5 J6,"B2B socket 1x10 2.00 mm, frame bottom",TBD,"SMT socket, needs 6 mm standoffs; current design = Bitcraze socket from Bitcraze (5 mm); not listed (Digi-Key stocks the -LC clip version); Samtec direct / Mouser"
 1,JST,SM04B-SRSS-TB(LF)(SN),455-SM04B-SRSS-TBCT-ND,Frame J7,"JST-SH 4, Pi USB",ok,
@@ -19,4 +19,4 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 2,Samtec,TMM-110-04-L-S-SM,,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),verify,-04: 1.91 mm post into the Flow deck's 2.1 mm Bitcraze sockets; check availability; Samtec direct / Mouser; -04 is a non-standard length at Samtec - confirm
 2,Samtec,TMM-110-01-L-S,,FC J1 J2,2.00 mm male 1x10 THT (to the frame),ok,"-01: 3.20 mm post, 1.8 mm into the Bitcraze socket on 5 mm standoffs (-02 for SMM on 6 mm); not listed in this variant; Samtec direct / Mouser, or a listed variant"
 0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
-1,Omron,B3U-1000P,SW1020CT-ND,FC SW1,BOOTSEL tactile switch,ok,"top-actuated, 3.0 x 2.5 mm"
+1,Aratas (formerly Omron),B3U-1000P,SW1020CT-ND,FC SW1,BOOTSEL tactile switch,ok,"top-actuated, 3.0 x 2.5 x 1.6 mm"

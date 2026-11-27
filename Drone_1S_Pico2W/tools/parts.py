@@ -48,7 +48,7 @@ FRAME_MPN = {
     "U7": (TI, "TPS61235PRWLT", "ok", "also sold as the larger reel TPS61235PRWLR"),
     "L2": ("Wurth Elektronik", "74438357010", "ok", "same part as L1; TPS61235P wants 0.7-1.3 uH effective"),
     "C18 C19": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
-    "C20 C21 C22": (MURATA, "GRM31CR61A226KE19L", "verify", "22 uF 10 V X5R 1206; count from the datasheet"),
+    "C20 C21 C22": ("Samsung", "CL31B226KPHNFNE", "ok", "22 uF 10 V X7R 1206 (user pick, Digi-Key 1276-3145-1-ND)"),
     "R19": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R20": (YAGEO, "RC0603FR-0749K9L", "ok", "CC 2.49 A (E24 fallback 51k = 2.44 A)"),
     "C24": (MURATA, "GRM188R71H103KA01D", "ok", "10 nF 0603, stock book"),
@@ -75,7 +75,7 @@ FC_PARTS = [
     ("J1 J2", 2, "2.00 mm male 1x10 THT (to the frame)",
      ("Samtec", "TMM-110-01-L-S", "ok", "-01: 3.20 mm post, 1.8 mm into the Bitcraze socket on 5 mm standoffs (-02 for SMM on 6 mm)")),
     ("J9", 1, "JST-SH 3 horizontal, SWD", ("JST", "SM03B-SRSS-TB(LF)(SN)", "DNP", "fit when SWD is needed")),
-    ("SW1", 1, "BOOTSEL tactile switch", ("Omron", "B3U-1000P", "ok", "top-actuated, 3.0 x 2.5 mm")),
+    ("SW1", 1, "BOOTSEL tactile switch", ("Aratas (formerly Omron)", "B3U-1000P", "ok", "top-actuated, 3.0 x 2.5 x 1.6 mm")),
 ]
 
 # Mechanical stack (FC on the 4 cover holes) - generic hardware, any vendor
@@ -119,7 +119,8 @@ DIGIKEY = {
     "GRM188R71H103KA01D": ("", "end of life at distributors - replaced by 3.3 nF 50 V (stock)"),
     "RC0603FR-0747KL": ("311-47.0KHRCT-ND", ""),
     "TPS61235PRWLT": ("296-44628-1-ND", ""),
-    "GRM31CR61A226KE19L": ("", "not found at Digi-Key under this MPN - pick an active 22 uF 1206"),
+    "GRM31CR61A226KE19L": ("", "not found at Digi-Key - replaced by Samsung CL31B226KPHNFNE"),
+    "CL31B226KPHNFNE": ("1276-3145-1-ND", "active (user, Nov 2026)"),
     "PRPC040SAAN-RC": ("S1011EC-40-ND", "bulk"),
     "SMM-110-02-S-S": ("", "not listed (Digi-Key stocks the -LC clip version); Samtec direct / Mouser"),
     "SM04B-SRSS-TB(LF)(SN)": ("455-SM04B-SRSS-TBCT-ND", ""),
@@ -141,6 +142,35 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "B3U-1000P": [
+        ("B3U-1000P_Omron-Aratas_datasheet.pdf",
+         "CONFIRMED: top-actuated, 3.0 x 2.5 mm body 1.2 mm high, plunger to 1.6 mm, 1.5 N, 1-50 mA / 3-12 VDC, "
+         "-25..+70 C. PCB pads 0.8 x 1.7 mm at +-1.7 mm (2.6 inner / 4.2 outer) = KiCad SW_SPST_B3U-1000P centres "
+         "(KiCad pads 0.9 mm wide). BOOTSEL current is below the 1 mA rating minimum - normal for a logic button."),
+    ],
+    "SM04B-SRSS-TB(LF)(SN)": [
+        ("JST_SH_series_catalog.pdf",
+         "CONFIRMED: SH 1.0 mm, 1.0 A, 50 V, -25..+85 C; side-entry PCB layout: signal pads 0.6 x 1.55 at 1.0 mm, MP pads "
+         "1.2 x 1.8 with the inner edge 0.7 from the last pin centre, 3.875 mm signal-to-MP = KiCad "
+         "JST_SH_SM04B-SRSS-TB (MP at +-2.8). Height 2.95 mm, depth 6.25 mm."),
+    ],
+    "SM03B-SRSS-TB(LF)(SN)": [
+        ("JST_SH_series_catalog.pdf", "CONFIRMED: same layout rules as SM04B; = KiCad JST_SH_SM03B-SRSS-TB (MP at +-2.3)."),
+    ],
+    "B2B-PH-K-S(LF)(SN)": [
+        ("JST_PH_series_catalog.pdf",
+         "CONFIRMED: PH 2.0 mm, 2 A, 100 V, -40..+105 C; through-hole top entry: holes 0.7 +0.1/-0 mm at 2.0 mm = KiCad "
+         "JST_PH_B2B-PH-K (0.75 mm drill) and the frame's DXF holes (0.75 mm); JST suggests the larger end (0.8) for FR4."),
+    ],
+    "GRM21BR61C106KE15L": [
+        ("GRM21BR61C106KE15L_Murata_catalog_page.pdf",
+         "CONFIRMED (Murata MLCC catalog 2021, p.109): 10 uF +-10 %, 16 Vdc, X5R, 2.0 x 1.25 mm (0805)."),
+    ],
+    "CL31B226KPHNFNE": [
+        ("(no Samsung datasheet in the repo yet)",
+         "OPEN: Digi-Key description 22 uF 10 V X7R 1206 (CL31 = 1206, B = X7R, 226 = 22 uF, K = 10 %, P = 10 V). "
+         "Need the DC-bias curve: 3 x 22 uF must stay >= 20 uF effective at 5.1 V for the TPS61235P."),
+    ],
     "TMM-110-01-L-S": [
         ("TMM-1xx-01_Samtec_TH_drawing.pdf",
          "CONFIRMED (F-226): 2.00 mm pitch, 0.5 mm posts, plastic 1.50 mm, 1.97 mm wide; lead style -01: post 3.20, tail "
