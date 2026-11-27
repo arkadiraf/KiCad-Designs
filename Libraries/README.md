@@ -50,7 +50,7 @@ are listed in [sources/SOURCES.md](sources/SOURCES.md).
 |---|---|---|---|
 | BQ25606 | **TI datasheet SLUSCK6C (rev C)**, plus381-robotics, Y2K-x/psxpress, oliver-nederal/OpenRide-PCB, Decktrix-Lab | KiCad stock RGE0024H = TI land pattern RGE0024H (pad pitch and positions; KiCad pads longer outward) | **confirmed** against the datasheet |
 | TPS22997 | girishji/tmr-keyboard, emaneric/EN_Designs, teehee567/Aevia (3/3) | teehee567 (cites TI MPQF651A) = girishji: same pad centres | **TO CHECK** against TI MPQF651A. Fine pitch for hand assembly (doc open item) |
-| TPS22810DBV | official KiCad 9 `Power_Management:TPS22810DBV` (KiCad 7 has only the DRV/WSON variant) | stock SOT-23-6 | **TO CHECK** against the datasheet |
+| TPS22810DBV | **TI datasheet SLVSDH0C (rev C)**, official KiCad 9 `Power_Management:TPS22810DBV` | stock SOT-23-6 = TI DBV0006A land pattern (pitch, pin order) | **confirmed** against the datasheet |
 | TPS61235P | Redherring32/Xbox-Portable, k5utd/Cobalt-Cowboy, unsurv/unsurv-offline (3/3) | asukiaaa (cites the TPS61235P datasheet) = Redherring32/TinyTendo = unsurv: same pad centres. Sizes from asukiaaa (the others make the power pads 0.14 mm wider) | **TO CHECK** against the datasheet |
 | BMI088 | **Bitcraze Crazyflie Bolt 1.1 schematic (rev H)**, murexrobotics, bit-bots, ArduPilot NxtPX4v2 (ground names 4 GND_IO / 6 GND as the Bolt) | ArduPilot NxtPX4v2 = bit-bots = KiCad generator (BST-BMI088-DS000-19) | pin numbers confirmed; pad-1 corner **TO CHECK** (Bosch drawing) |
 | BMP388 | Bitcraze Bolt 1.1 schematic, leelili444, Caped-Crussader/VENDETTAFC, fdiwth/tvc-drone, ArduPilot NxtPX4v2 (5/5) | OpenAXES = KiCad generator (BST-BMP388-DS001) | good |

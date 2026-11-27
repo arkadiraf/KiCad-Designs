@@ -342,8 +342,11 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 ## Design summary (from the design doc)
 
 * **Power:** a 1S 18650 cell (30 A peak) feeds two paths.
-  * **A, logic:** TPS22810 load switch to Pico VSYS (0.5 A). UVLO at about 2.54 V on / 2.41 V off.
-    An SPDT slide switch drives EN/UVLO and only carries the signal.
+  * **A, logic:** TPS22810 load switch to Pico VSYS (0.5 A). UVLO at about 2.54 V on / 2.41 V off
+    (datasheet: 2.00–2.62 V rising, 125 mV hysteresis). An SPDT slide switch ties EN/UVLO to VIN (on) or GND
+    (off, < 1 µA shutdown) and only carries the signal. QOD tied to VOUT, CT left open. Option: the
+    R8/R9/R10 divider moves the thresholds to 3.30 V on / 2.70 V off (checked); the switch then feeds the
+    divider top instead of EN.
   * **B, motors:** one TPS22997 per ESC, high side, about 7.5 A each.
     * ON comes from a Pico GPIO, with a 100 k pull-down: Pico off means motors off.
     * PG is open-drain with a 47 k pull-up to 3V3, read by the Pico.

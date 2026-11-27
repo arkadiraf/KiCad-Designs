@@ -137,6 +137,17 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "TPS22810DBVR": [
+        ("TPS22810DBVR_TI_datasheet.pdf",
+         "CONFIRMED (SLVSDH0C rev C): DBV pinout 1 VIN, 2 GND, 3 EN/UVLO, 4 CT, 5 QOD, 6 VOUT = KD_Power:TPS22810DBV; "
+         "DBV0006A land pattern (1.1 x 0.6 mm pads, 0.95 mm pitch, rows 2.6 mm) fits KiCad SOT-23-6 (same pitch/order, "
+         "pads 1.325 mm reaching further in). 2.7-18 V, 2 A (DBV), RON 83 mOhm typ / 125 max at 3.3 V (0.06 V at 0.5 A). "
+         "Internal VIN UVLO 2.54 V rising (2.00-2.62), 125 mV hysteresis -> off ~2.41 V. EN 1.23 V on (1.13-1.30), 1.13 V "
+         "off, < 0.75 V shutdown (< 1 uA): SPDT EN/UVLO to VIN (on) / GND (off) is allowed (EN up to 18 V, must not float). "
+         "Divider option R8 156 k / R9 100 k / R10 1.27 M (VOUT -> EN): on 3.30 V, off 2.70 V - confirmed, needs QOD "
+         "active and the SPDT switching the divider top, not EN directly. QOD tied to VOUT: RPD 250-400 Ohm. CT may float "
+         "(no part fitted)."),
+    ],
     "103AT-2": [
         ("103AT-2_Semitec_AT_thermistor.pdf",
          "CONFIRMED: R25 10.0 k +-1 %, B25/85 3435 K +-1 % (the NTC TI recommends for the BQ25606 TS pin), "
