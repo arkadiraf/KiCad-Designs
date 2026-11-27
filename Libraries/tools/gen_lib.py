@@ -603,13 +603,14 @@ def fp_keystone_1042():
 
 def fp_usb4235():
     """GCT USB4235 USB 2.0 Type-C receptacle, vertical, SMT, 16 pin (drawing rev A 21-08-2024, sheet 2 recommended PCB
-    layout): 16 pads 0.30 x 0.87 mm in two rows 0.60 mm apart (edge to edge, centres +-0.735), row A on top (A1, A4-A9,
-    A12 left->right), row B below (B12, B9-B4, B1 left->right); outer pads 5.50 mm apart, inner six at 0.50 mm pitch;
-    2 x 0.60 mm peg holes 7.50 mm apart; 2 shell tabs in plated slots 0.60 x 0.85 mm (pads 1.10 x 1.35 mm) 10.00 mm
-    apart. Drawn for a 1.0 mm PCB (pegs do not protrude on 1.6 mm). TO CHECK: 1:1 print against the part."""
+    layout): 16 pads 0.30 x 0.87 mm in two rows, centres y +-0.865 (0.86 mm edge gap, measured to scale on the drawing;
+    = SnapMagic GCT_USB4235-03-C_REVA; the drawing's "0.60" is the peg hole diameter, not the row gap). Row A on top
+    (A1, A4-A9, A12 left->right), row B below (B12, B9-B4, B1 left->right); outer pads 5.50 mm apart, inner six at
+    0.50 mm pitch; 2 x 0.60 mm peg holes 7.50 mm apart; 2 shell tabs in plated slots 0.60 x 0.85 mm (pads 1.10 x 1.35 mm)
+    10.00 mm apart. Drawn for a 1.0 mm PCB: on 1.6 mm the tabs do not protrude, solder the slots from the top."""
     xs = [-2.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 2.75]
-    rows = {-0.735: ["A1", "A4", "A5", "A6", "A7", "A8", "A9", "A12"],
-            0.735: ["B12", "B9", "B8", "B7", "B6", "B5", "B4", "B1"]}
+    rows = {-0.865: ["A1", "A4", "A5", "A6", "A7", "A8", "A9", "A12"],
+            0.865: ["B12", "B9", "B8", "B7", "B6", "B5", "B4", "B1"]}
     pads = []
     for y, names in rows.items():
         for x, n in zip(xs, names):

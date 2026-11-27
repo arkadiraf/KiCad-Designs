@@ -142,6 +142,10 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   * The small peg is at the **+ end**, which is now the top end. SnapMagic's BAT_1042 (pads P / N) and KiCad's stock footprint agree. Hole spacing follows the Keystone drawing (8.51 mm). SnapMagic uses 8.22 mm, which still fits the 0.8 mm play around the peg.
   * Routing consequence: CELLx comes out at the top pad, so it runs about 80 mm under the holder to F1/F2. Route it wide, on both layers.
   * The Fusion review holes are not rebuilt yet.
+* **USB-C J5 (GCT USB4235-03-C) footprint, checked against the GCT drawing (rev A, sheet 2):**
+  * The pad rows were too close together, with centres at ±0.735 mm. They are now at **±0.865 mm**. I had misread the drawing's "0.60" (the peg hole diameter) as the gap between the rows.
+  * All 16 pads now match SnapMagic's GCT_USB4235-03-C_REVA exactly. Pin order, pegs and shell slots were already right.
+  * The drawing assumes a 1.0 mm board. On our 1.6 mm board the shell tabs don't come through the slots, so solder the slots from the top.
 * **3D models:** KiCad stock models on the holders, Pico sockets, BNO086 (LGA-28) and MP6550 (UQFN-12, which looks the same). The Pico module, USB4235 and slide switch have no model.
 
 ## Regenerate
