@@ -4,7 +4,8 @@ status: "ok"      value fixed, datasheet checked (or a part already verified on 
         "verify"  MPN / variant / distributor stock still to confirm on Digi-Key or Mouser
         "TBD"     waits for a decision (see the design doc "Open decisions")
         "DNP"     footprint only
-Supply chain: Digi-Key or Mouser, whichever has stock. Stock items (0603 R / C from the sample book,
+Supply chain: Digi-Key or Mouser, whichever has stock. Lifecycle (active / NRND / obsolete) is verified by the user at the end of component selection (Digi-Key BOM
+Manager); TI's product pages list BQ25606, TPS22810, TPS61235P as ACTIVE (checked 2026-11-27). Stock items (0603 R / C from the sample book,
 0805 LEDs) are left out of the distributor CSV and listed in fabrication/BOM_stock.md.
 """
 
@@ -17,7 +18,7 @@ MPN = {
     "U2": ("CEVA", "BNO086", "verify", "LGA-28; check Digi-Key / Mouser stock"),
     "Y1": ("Epson", "Q13FC1350000400", "verify", "FC-135 32.768 kHz 12.5 pF 20 ppm"),
     "C1 C2": (MURATA, "GRM1885C1H220JA01D", "ok", "22 pF C0G 0603 (stock)"),
-    "C3 C4 C5": (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 0603 (stock)"),
+    "C3 C4 C5": ("Samsung", "CL10B104KB8NNNC", "ok", "100 nF 50 V X7R 0603 (stock); replaces GRM188R71H104KA93D (EOL at distributors)"),
     "R1 R2": (YAGEO, "RC0603FR-0710KL", "ok", ""),
     "R3 R4": (YAGEO, "RC0603FR-0710KL", "ok", ""),
     "R5 R6": (YAGEO, "RC0603FR-074K7L", "ok", ""),
@@ -36,7 +37,7 @@ MPN = {
     "C16 C17 C18": ("Samsung", "CL31B226KPHNFNE", "ok", "22 uF 10 V X7R 1206"),
     "R11": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R12": (YAGEO, "RC0603FR-0749K9L", "ok", "E24 fallback 51k = 2.44 A"),
-    "C19": (MURATA, "GRM188R71H103KA01D", "ok", "10 nF 0603 (stock)"),
+    "C19": ("Samsung", "CL10B103KB8NNNC", "ok", "10 nF 50 V X7R 0603 (stock); replaces GRM188R71H103KA01D (EOL)"),
     "J5": ("GCT", "USB4235-03-C", "verify", "vertical SMT, 6.5 mm; footprint from the GCT drawing; fallback USB4120-03-C"),
     "U6": (TI, "BQ25606RGER", "ok", ""),
     "L1": ("Wurth Elektronik", "74438357010", "ok", ""),
@@ -51,8 +52,8 @@ MPN = {
     "C21 C22": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
     "C23 C24": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
     "C25": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
-    "C26": (MURATA, "GRM188R61A475KE15D", "ok", "4.7 uF 0603 (stock)"),
-    "C27": (MURATA, "GRM188R71H473KA61D", "ok", "47 nF 0603 (stock)"),
+    "C26": (MURATA, "GRM188R61A475KAAJD", "ok", "4.7 uF 10 V X5R 0603 (stock); Digi-Key upgrade of the obsolete GRM188R61A475KE15D"),
+    "C27": ("Samsung", "CL10B473KB8NNNC", "ok", "47 nF 50 V X7R 0603 (stock); replaces GRM188R71H473KA61D (not found at Digi-Key)"),
     "D1": ("Lite-On", "LTST-C171KRKT", "ok", "red 0805 (stock)"),
     "R20": (YAGEO, "RC0603FR-072K2L", "ok", ""),
     "U7": (TI, "TPS22810DBVR", "ok", ""),
@@ -65,9 +66,10 @@ MPN = {
     "D3": ("Lite-On", "LTST-C171KGKT", "ok", "green 0805 (stock)"),
     "R25": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "R26 R27": (YAGEO, "RC0603FR-07100KL", "ok", ""),
-    "C30": (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 0603 (stock)"),
+    "C30": ("Samsung", "CL10B104KB8NNNC", "ok", "100 nF 50 V X7R 0603 (stock)"),
     "BT1 BT2": ("Keystone", "1042P", "verify", "SMT polarized 18650 holder; alternative 1042 (non-polarized, same pads) - "
                 "needs Q1-Q4 reverse protection, which is fitted either way; peg holes from the full drawing"),
+    "F1 F2": ("Littelfuse", "1812L260THDR", "verify", "1812, Ihold 2.6 A, Itrip 5.2 A, 8 V; tape-and-reel suffix to confirm at Digi-Key / Mouser"),
     "Q1 Q2": ("Diodes Inc.", "DMP2008UFG-7", "ok", "PowerDI3333-8, 9.8 mOhm max at -2.5 V, VGSS +-8 V"),
     "Q3 Q4": ("Diodes Inc.", "DMG2302U-7", "ok", "SOT-23, VGS(th) 0.4-1.0 V, VGSS +-8 V"),
     "R28 R29": (YAGEO, "RC0603FR-07100KL", "ok", ""),
@@ -85,7 +87,7 @@ EXTRA = [
      ("Pololu", "JST SH 6-pin F-F (length TBD)", "TBD", "check pin-1-to-pin-1 mapping")),
     ("Cells", 2, "18650 Li-ion cell, plain (no protection PCB), flat or button top", ("any", "18650 plain", "ok",
      "user 2026-11-27; insert matched cells (within ~0.1 V); board protection: per-cell reverse FETs, BQ25606 4.208 V "
-     "charge limit, TPS22810 UVLO (2.70 V option recommended), no cell temperature sensing (TS fixed), no short-circuit fuse yet")),
+     "charge limit, TPS22810 UVLO (2.70 V option recommended), no cell temperature sensing (TS fixed); F1/F2 resettable fuses per cell")),
     ("M1 M2", 2, "30:1 Micro Metal Gearmotor HPCB 6V, extended motor shaft",
      ("Pololu", "3072", "ok", "6 V, 1100 rpm, 1.5 A stall (at 6 V); order from Pololu")),
     ("Encoders", 1, "Magnetic encoder pair kit, side-entry JST SH 6-pin, 12 CPR (2 encoders)",
@@ -149,6 +151,10 @@ DATASHEETS = {
     "1042": [("1042P_Keystone_18650_holders_catalog.pdf",
         "PARTLY (catalog p.29): 1042 leaf springs (not polarized) shares the 1042 / 1042P / 1130 SMT drawing and pad "
         "layout. OPEN: product drawing.")],
+    "1812L260THDR": [("1812L260_Littelfuse_datasheet.pdf",
+        "CONFIRMED (Littelfuse 1812L series datasheet): 1812L260TH Ihold 2.60 A, Itrip 5.20 A, Vmax 8 V, Imax 100 A, Pd 0.8 W, "
+        "time to trip 2.5 s at 8 A, R min 0.015 / R1max 0.047 Ohm; hold current derates to 2.15 A at 50 C, 1.63 A at 85 C. "
+        "OPEN: exact ordering suffix (DR = tape and reel) and land pattern vs KiCad Fuse_1812_4532Metric.")],
     "DMP2008UFG-7": [("DMP2008UFG_Diodes_datasheet.pdf",
         "CONFIRMED: P-ch, BVDSS -20 V, VGSS +-8 V, RDS(on) max 8 mOhm @ -4.5 V, 9.8 @ -2.5 V, 13 @ -1.8 V; VGS(th) "
         "-0.4..-1.0 V; ID -11 A steady (TA 25 C); PowerDI3333-8. At 2.3 A per cell: "

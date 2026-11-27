@@ -58,6 +58,7 @@ Fusion findings, reported but not changed:
   * A DMG2302U turns that P-FET on only when its own cell is the right way round.
   * A reversed cell is blocked, an empty holder's contacts are dead, and charging still works through the P-FET channel.
   * This makes the non-polarized Keystone 1042 safe to use.
+* **Resettable fuse per cell** (F1/F2, Littelfuse 1812L260TH: 2.6 A hold, 5.2 A trip, 8 V) between each holder's + and its P-FET. A short on BAT trips both, and they cap the equalizing current when cells don't match.
 
 * **Back-feed Schottky D2** between the TPS22810 output and Pico VSYS. The Pico's own micro-USB stays usable for
   programming and cannot push current into the cells.

@@ -217,7 +217,7 @@ BOM = [
     # Cells are in parallel, so one shared FET cannot protect them: a reversed cell next to a good one would see
     # 2 x Vcell through the shared node. Each holder gets its own high-side P-FET, and its gate is enabled only by
     # that cell's OWN voltage:
-    #   BTx- -> GND.  BTx+ (CELLx) -> Qp drain;  Qp source -> BAT (common).  Rgs 100k Qp gate -> source (off).
+    #   BTx- -> GND.  BTx+ (CELLx) -> Fx (PPTC) -> Qp drain;  Qp source -> BAT (common).  Rgs 100k Qp gate -> source (off).
     #   Qn (DMG2302U) drain -> Qp gate, source -> GND, gate <- CELLx through 10k.  1M CELLx -> GND.
     # Good cell: CELLx > ~1 V -> Qn on -> Qp gate at GND -> Qp on (Vgs = -Vcell, 9.8 mOhm max at -2.5 V);
     #   current both ways, so the charger still charges it.
@@ -225,7 +225,13 @@ BOM = [
     #   reverse biased: blocks up to 2 x 4.2 V (BVDSS 20 V).
     # Empty holder: 1M holds CELLx at 0 -> Qp off, so the contacts are dead and a cell inserted backwards meets an
     #   FET that is already off. Leakage per good cell: ~4 uA (1M) + 0 (Qn gate).
-    # Not covered: two good cells at very different voltages still equalize through both FETs (insert matched cells).
+    # Two good cells at very different voltages still equalize through both FETs; Fx limits that current (trip 5.2 A).
+    # Resettable fuse per cell (user 2026-11-27, plain cells): BTx+ -> Fx -> Qp drain. A short on BAT trips both, and
+    # Fx also limits the equalizing surge when a mismatched cell goes in. Littelfuse 1812L260TH: Ihold 2.60 A (2.15 A
+    # at 50 C), Itrip 5.20 A, 8 V, Imax 100 A, R 15-47 mOhm (R1max after trip). Per-cell load: ~1 A running,
+    # 2.2 A worst case (boost at its 2.49 A limit from 3.0 V), 1.5 A charging. Qn senses CELLx at the holder (BTx+).
+    ("F1 F2", "PPTC 2.6A hold / 5.2A trip 8V (Littelfuse 1812L260TH)", "Device:Polyfuse", "Fuse:Fuse_1812_4532Metric",
+     "per-cell resettable fuse, BTx+ -> Qp drain"),
     ("Q1 Q2", "DMP2008UFG P-MOSFET 20V 9.8mOhm@-2.5V", "Device:Q_PMOS", "Package_SON:Diodes_PowerDI3333-8",
      "per-cell reverse-polarity switch, BTx+ (drain) -> BAT (source)"),
     ("Q3 Q4", "DMG2302U N-MOSFET 20V Vth<=1V", "Device:Q_NMOS", "Package_TO_SOT_SMD:SOT-23",

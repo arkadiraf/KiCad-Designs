@@ -15,6 +15,7 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,E-Switch,EG1218,EG1903-ND,SW1,SPDT slide (E-Switch EG1218),ok,"user pick (Digi-Key EG1903-ND); footprint from drawing P040040; user, Nov 2026"
 1,onsemi,MBR120VLSFT1G,,D2,Schottky 20V 1A (MBR120VLSFT1G),verify,same diode family as on the Pico; SOD-123FL
 2,Keystone,1042P,,BT1 BT2,18650 holder Keystone 1042P (alt. 1042),verify,"SMT polarized 18650 holder; alternative 1042 (non-polarized, same pads) - needs Q1-Q4 reverse protection, which is fitted either way; peg holes from the full drawing"
+2,Littelfuse,1812L260THDR,,F1 F2,PPTC 2.6A hold / 5.2A trip 8V (Littelfuse 1812L260TH),verify,"1812, Ihold 2.6 A, Itrip 5.2 A, 8 V; tape-and-reel suffix to confirm at Digi-Key / Mouser"
 2,Diodes Inc.,DMP2008UFG-7,,Q1 Q2,DMP2008UFG P-MOSFET 20V 9.8mOhm@-2.5V,ok,"PowerDI3333-8, 9.8 mOhm max at -2.5 V, VGSS +-8 V"
 2,Diodes Inc.,DMG2302U-7,,Q3 Q4,DMG2302U N-MOSFET 20V Vth<=1V,ok,"SOT-23, VGS(th) 0.4-1.0 V, VGSS +-8 V"
 0,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,J6,1x4 2.54 mm header (DNP),DNP,cut 4 pins from a 1x40 strip; bulk
