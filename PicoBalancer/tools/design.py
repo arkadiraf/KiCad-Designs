@@ -86,11 +86,11 @@ ZONES = {
     "IMU": (-4.0, 84.0, 4.0, 94.0),                      # centre bottom, closest to the wheel axle (least tilt noise)
     "J3 motor L": (-18.5, 93.0, -9.5, 99.6),            # motor connectors at the bottom edge, left / right
     "J4 motor R": (9.5, 93.0, 18.5, 99.6),
-    "U3 driver L": (-20.0, 80.0, -9.0, 91.0),           # drivers right above their connectors
-    "U4 driver R": (9.0, 80.0, 20.0, 91.0),
+    "U3 driver L": (-27.0, 71.0, -16.0, 79.0),   # up and out to the side (user)           # drivers right above their connectors
+    "U4 driver R": (16.0, 71.0, 27.0, 79.0),
     # user 2026-11-27: boost in the bottom part beside the Pico, next to the drivers (left side);
     # slide switch on the other side at the board edge (EG1218 body 11.6 x 4.0, long side along the edge)
-    "U5 boost": (-29.0, 50.0, -12.0, 78.0),
+    "U5 boost": (-29.0, 44.0, -12.0, 68.0),   # 6 mm higher (user)
     "SW1": (17.55, 29.4, 22.95, 39.2),   # centred between the Pico edge (x 10.5) and the board edge, at the micro-USB height (user)
     "U7 + D2": (17.2, 43.0, 23.3, 58.0),    # below the slide switch (user)
 }
@@ -306,19 +306,19 @@ REVIEW_PARTS = [
     ("U1 Pico W", 0.0, 58.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 34.3, 7.5, 5.5, 2.7, "metal", 9.5),
     # IMU at the centre bottom, nearest the wheel axle
     ("U2 BNO086", 0.0, 89.0, 3.8, 5.2, 1.1, "ic", 0), ("Y1", 5.0, 89.0, 3.2, 1.5, 0.9, "metal", 0),
-    # motor drivers above their connectors, vertical connectors at the bottom edge, x +-14 (closer to the
-    # encoders; clear of the bolt keep-outs)
-    ("U3", -14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C6", -18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
+    # motor drivers up and out to the sides beside the Pico's lower end (user); vertical connectors at the bottom
+    # edge, x +-14 (closer to the encoders; clear of the bolt keep-outs)
+    ("U3", -20.0, 75.0, 2.0, 2.0, 0.8, "ic", 0), ("C6", -24.5, 75.0, 2.0, 1.25, 1.25, "cap", 0),
     ("J3", -14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
-    ("U4", 14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
+    ("U4", 20.0, 75.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 24.5, 75.0, 2.0, 1.25, 1.25, "cap", 0),
     ("J4", 14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
-    # direct-wire solder pad rows (6 x 2.0 mm pitch), between each driver and its connector
-    ("J3W", -14.0, 91.5, 11.5, 1.5, 0.05, "metal", 0), ("J4W", 14.0, 91.5, 11.5, 1.5, 0.05, "metal", 0),
+    # direct-wire solder pad rows (6 pads, 2.0 mm pitch, 3.0 mm long = twice the first draft), above each connector
+    ("J3W", -14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0), ("J4W", 14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0),
     # boost on the left beside the Pico, above the left driver
-    ("U5", -20.0, 62.0, 2.5, 2.5, 1.0, "ic", 0), ("L2", -20.0, 70.0, 4.1, 4.1, 3.1, "ind", 0),
-    ("C16", -26.5, 56.0, 3.2, 1.6, 1.6, "cap", 0), ("C17", -26.5, 60.0, 3.2, 1.6, 1.6, "cap", 0),
-    ("C18", -26.5, 64.0, 3.2, 1.6, 1.6, "cap", 0),
-    ("C14", -14.5, 58.0, 2.0, 1.25, 1.25, "cap", 0), ("C15", -14.5, 62.0, 2.0, 1.25, 1.25, "cap", 0),
+    ("U5", -20.0, 56.0, 2.5, 2.5, 1.0, "ic", 0), ("L2", -20.0, 64.0, 4.1, 4.1, 3.1, "ind", 0),
+    ("C16", -26.5, 50.0, 3.2, 1.6, 1.6, "cap", 0), ("C17", -26.5, 54.0, 3.2, 1.6, 1.6, "cap", 0),
+    ("C18", -26.5, 58.0, 3.2, 1.6, 1.6, "cap", 0),
+    ("C14", -14.5, 52.0, 2.0, 1.25, 1.25, "cap", 0), ("C15", -14.5, 56.0, 2.0, 1.25, 1.25, "cap", 0),
     # slide switch centred between the Pico edge and the board edge; Pico power path (U7, D2, D3) below it
     ("U7", 20.25, 45.5, 2.9, 2.8, 1.1, "ic", 0), ("D2", 20.25, 50.5, 3.7, 1.6, 1.1, "ic", 0),
     ("SW1", 20.25, 34.3, 5.4, 9.8, 9.1, "switch", 0), ("SW1 actuator", 20.25, 34.3, 2.4, 2.4, 2.5, "white", 9.1),

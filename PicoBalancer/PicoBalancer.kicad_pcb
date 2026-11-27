@@ -95,306 +95,14 @@
 	)
 	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
 		(layer "F.Cu")
-		(uuid "0a007061-dbe2-4757-8c85-866eacf781ee")
-		(at 124 9)
-		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
-		(property "Reference" "H1"
-			(at 0 -2.5 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "0d843090-89a2-4ca1-a6a0-73ea8d06e2bb")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "MountingHole_2.65mm_NPTH"
-			(at 0 2.5 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "94b0b398-c1cd-4063-a0a1-af92928a897b")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "2dc52523-3753-4a7c-ab6a-b9427b65e583")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "b094d36a-6497-4eb6-a85e-d7d6b0fb1a5c")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(duplicate_pad_numbers_are_jumpers no)
-		(fp_circle
-			(center 0 0)
-			(end 1.575 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "5eb7541d-1f3b-45c2-b305-017856e16610")
-		)
-		(pad "" np_thru_hole circle
-			(at 0 0)
-			(size 2.65 2.65)
-			(drill 2.65)
-			(layers "*.Cu" "*.Mask")
-			(uuid "8fafe585-9439-486e-9597-b97189de7f9c")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
-		(layer "F.Cu")
-		(uuid "4d248eb0-d139-430f-802d-9621081cc2ec")
-		(at 176 105)
-		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
-		(property "Reference" "H4"
-			(at 0 -2.5 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "7ec918ed-2cca-4748-8dd7-2e2a79b0a5b7")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "MountingHole_2.65mm_NPTH"
-			(at 0 2.5 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "e6638a11-4271-4f2f-b5e7-84c3e210864c")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "a4a5d3b9-8e19-4995-827b-881ee4671003")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "7ecde41c-e096-4972-87b4-e7a0b6898a4f")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(duplicate_pad_numbers_are_jumpers no)
-		(fp_circle
-			(center 0 0)
-			(end 1.575 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "d597f6b9-aa4b-44da-b58a-7990e9f7a64f")
-		)
-		(pad "" np_thru_hole circle
-			(at 0 0)
-			(size 2.65 2.65)
-			(drill 2.65)
-			(layers "*.Cu" "*.Mask")
-			(uuid "8e916280-e8be-4731-b9fc-e7c2f24ea1f4")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
-		(layer "F.Cu")
-		(uuid "a39369ed-86d3-46b6-bb26-994c5b6cba16")
-		(at 176 9)
-		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
-		(property "Reference" "H2"
-			(at 0 -2.5 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "2323690f-4507-45b5-8b27-267016e99770")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "MountingHole_2.65mm_NPTH"
-			(at 0 2.5 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "8165b8ae-46e4-43f6-bf5f-f98d832f8f7e")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "e7f57c5f-f791-474d-bc33-ffd0ebce63a6")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "488c40cd-32dd-469e-aa4e-b741a66ced38")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(duplicate_pad_numbers_are_jumpers no)
-		(fp_circle
-			(center 0 0)
-			(end 1.575 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "7e5439a0-d49a-4e32-95d6-7209bfc77f1e")
-		)
-		(pad "" np_thru_hole circle
-			(at 0 0)
-			(size 2.65 2.65)
-			(drill 2.65)
-			(layers "*.Cu" "*.Mask")
-			(uuid "4bc63eee-4408-4a52-bc64-47e6ab233de9")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
-		(layer "F.Cu")
-		(uuid "cc866381-fadd-4204-9296-a100e659678e")
-		(at 176 201)
-		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
-		(property "Reference" "H6"
-			(at 0 -2.5 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "313df6d6-77c2-4b92-885e-defa1961f107")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "MountingHole_2.65mm_NPTH"
-			(at 0 2.5 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "4a17f3b7-9cd1-46e1-beba-628b5d78c6a7")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "80414586-3b73-4ae1-8f5e-d7a5a05cb92d")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "8877b96e-fd2a-4b1f-b688-83c93d622ae5")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(duplicate_pad_numbers_are_jumpers no)
-		(fp_circle
-			(center 0 0)
-			(end 1.575 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "55229417-e7ec-4e05-b981-9ef123ce84d0")
-		)
-		(pad "" np_thru_hole circle
-			(at 0 0)
-			(size 2.65 2.65)
-			(drill 2.65)
-			(layers "*.Cu" "*.Mask")
-			(uuid "63f3f6e8-1073-4394-957b-a0e0e055d19b")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
-		(layer "F.Cu")
-		(uuid "da5f8dcf-c61f-4d56-bf98-4c58fcf62cc1")
+		(uuid "13276726-8405-42f1-90dc-f8efccf37b8c")
 		(at 124 201)
 		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
 		(property "Reference" "H5"
 			(at 0 -2.5 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "83583a78-fe72-4ad7-948b-c6f6f723d6f7")
+			(uuid "4b6efd85-0ff8-4fbd-af18-480999bce315")
 			(effects
 				(font
 					(size 1 1)
@@ -406,7 +114,7 @@
 			(at 0 2.5 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "8e0e8c8a-ccea-4781-9b88-ded92a6483f7")
+			(uuid "15304777-7f87-4a6e-842d-a95904a67a3c")
 			(effects
 				(font
 					(size 1 1)
@@ -418,7 +126,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "19746b3e-97da-4453-a96f-32ee8527ed5b")
+			(uuid "6f8fde54-1cee-45d3-818d-8af89cceae4a")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -429,7 +137,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "efeaae23-3e0e-4903-a4a2-ec0389b08af3")
+			(uuid "b02264d7-66c5-4e61-a3e7-b1cf78b23f7b")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -447,173 +155,27 @@
 			)
 			(fill no)
 			(layer "F.CrtYd")
-			(uuid "7ef1454f-c6db-45ba-8baf-4756b2a2d4f5")
+			(uuid "fa21d146-a26c-4f8a-ba5f-189598ddfa9b")
 		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 2.65 2.65)
 			(drill 2.65)
 			(layers "*.Cu" "*.Mask")
-			(uuid "3d204d39-aeca-46ca-9ef3-ea36e01820a8")
+			(uuid "915ca237-9efd-4fae-bb67-167fc6eb4abc")
 		)
 		(embedded_fonts no)
 	)
 	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
 		(layer "F.Cu")
-		(uuid "deb3dd43-202c-4917-b04a-5c3d9cbd2a98")
-		(at 124 105)
-		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
-		(property "Reference" "H3"
-			(at 0 -2.5 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "e8528923-38c7-47b7-9338-4b8a3f8d7ff7")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "MountingHole_2.65mm_NPTH"
-			(at 0 2.5 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "24e4ec88-4f90-471c-ad45-500f490d91eb")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "cc3b1abc-da2b-45ab-8703-55cd99f7422d")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "f809153f-5ca4-4872-be95-9dc65cc505bb")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(duplicate_pad_numbers_are_jumpers no)
-		(fp_circle
-			(center 0 0)
-			(end 1.575 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "896cc9a7-015c-419f-a81d-9e2886d90f9f")
-		)
-		(pad "" np_thru_hole circle
-			(at 0 0)
-			(size 2.65 2.65)
-			(drill 2.65)
-			(layers "*.Cu" "*.Mask")
-			(uuid "f29d342e-bffc-4d8e-a011-6dfa93815538")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
-		(layer "F.Cu")
-		(uuid "e3774f70-7082-46cd-bb65-816173d3bd33")
-		(at 150 44)
-		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
-		(property "Reference" "H7"
-			(at 0 -2.5 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "7a7c744b-9a40-44b5-a543-52aefddc3205")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "MountingHole_2.65mm_NPTH"
-			(at 0 2.5 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "5f8fab78-77e0-41a3-a70f-3208de40d0d3")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "2f388fb9-c288-4ea5-b449-c5f7123bc93d")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "b39665e2-eefd-48a1-ac51-79c3cb4abc9c")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(duplicate_pad_numbers_are_jumpers no)
-		(fp_circle
-			(center 0 0)
-			(end 1.575 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "f974830f-de63-4580-84b0-7dfaaffa7288")
-		)
-		(pad "" np_thru_hole circle
-			(at 0 0)
-			(size 2.65 2.65)
-			(drill 2.65)
-			(layers "*.Cu" "*.Mask")
-			(uuid "16652c93-7120-4aee-8f99-198804f70115")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
-		(layer "F.Cu")
-		(uuid "e56b3d9b-6174-42b8-aeab-1b8f5195f6e2")
+		(uuid "2408b63d-eab2-4d97-a150-8b38a030552c")
 		(at 150 24)
 		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
 		(property "Reference" "H8"
 			(at 0 -2.5 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "664b42f7-25db-4ffa-ad5a-b2100a4036f2")
+			(uuid "dcaa5059-9525-477e-b6d7-d5773002f68f")
 			(effects
 				(font
 					(size 1 1)
@@ -625,7 +187,7 @@
 			(at 0 2.5 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "73063ecb-7589-4bbd-89b3-edef903e6b16")
+			(uuid "36aaf195-ae24-4c3e-bbef-113a8280fb51")
 			(effects
 				(font
 					(size 1 1)
@@ -637,7 +199,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "09ad1153-859b-432b-9d5f-3f88c0a0f488")
+			(uuid "6ac8f99d-0c54-4c5e-99aa-a772641f5911")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -648,7 +210,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e396d5c7-77b6-4e5e-9914-def34fc155a1")
+			(uuid "fc1ef848-00a3-4fbf-ac2a-4d3fc47078f9")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -666,14 +228,452 @@
 			)
 			(fill no)
 			(layer "F.CrtYd")
-			(uuid "4241861f-71d7-425f-b3f2-893672fd8695")
+			(uuid "aa981192-2f8e-4304-bd1d-5657ad8d0025")
 		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 2.65 2.65)
 			(drill 2.65)
 			(layers "*.Cu" "*.Mask")
-			(uuid "3459d77f-3911-4454-883b-33dc11306fd9")
+			(uuid "fda70413-656f-4e78-8a28-8080e001ed34")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
+		(layer "F.Cu")
+		(uuid "2adfb444-4040-46d9-bf94-a7b66dab73c6")
+		(at 176 201)
+		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
+		(property "Reference" "H6"
+			(at 0 -2.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "727c5c0a-29ca-40dc-82e9-43182114fe6d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole_2.65mm_NPTH"
+			(at 0 2.5 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "fed91bc0-f612-41e2-aa47-9c1d08e6fbc4")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1b44911e-e766-4760-8c2b-754b7ac3e193")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "83e87486-9ae2-475b-b1e2-9dc79951151c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_circle
+			(center 0 0)
+			(end 1.575 0)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "ccd4c1dc-e6ba-4d17-b531-4ac1c51db31f")
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.65 2.65)
+			(drill 2.65)
+			(layers "*.Cu" "*.Mask")
+			(uuid "1461deca-35e3-4253-bb1a-d31bda034fcd")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
+		(layer "F.Cu")
+		(uuid "319db42a-2ec1-47c2-b2b9-529793e81885")
+		(at 150 44)
+		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
+		(property "Reference" "H7"
+			(at 0 -2.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "4385fc1b-9e39-4110-92b8-375f18c9f4b7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole_2.65mm_NPTH"
+			(at 0 2.5 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c27a2674-0ab3-4522-ab83-dbcfb38206d7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "047f429d-4c80-4bfc-b67f-dfcc34d3b71d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "15867f60-4ff3-4e45-ad83-140e6836cb7f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_circle
+			(center 0 0)
+			(end 1.575 0)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "d5e44460-fa25-406b-b537-48aa0af69c5a")
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.65 2.65)
+			(drill 2.65)
+			(layers "*.Cu" "*.Mask")
+			(uuid "5c85b10f-9a73-429a-952a-9f9319f591d8")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
+		(layer "F.Cu")
+		(uuid "55b8fe5e-f49f-449c-9b56-cded85de04a4")
+		(at 176 9)
+		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
+		(property "Reference" "H2"
+			(at 0 -2.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "f20eaac2-851a-4718-8d83-2aa6c2c3be1f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole_2.65mm_NPTH"
+			(at 0 2.5 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2c71e652-f96f-4a47-811d-0b85dbf51702")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "70007f1d-72da-40be-bd3d-f2fb902aff96")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "bf814dc1-0522-420f-b26a-c6b6b7fd590d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_circle
+			(center 0 0)
+			(end 1.575 0)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "3cd2fae1-ad1e-48c2-9006-6b15ffc2f1b7")
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.65 2.65)
+			(drill 2.65)
+			(layers "*.Cu" "*.Mask")
+			(uuid "7738b7dc-0260-4ee9-80d7-c24e37cdcd3c")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
+		(layer "F.Cu")
+		(uuid "5d13e6bf-8bc3-482a-9d0d-de8b93242edf")
+		(at 124 105)
+		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
+		(property "Reference" "H3"
+			(at 0 -2.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "521e9272-96b6-4608-b140-d309bd5a9b03")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole_2.65mm_NPTH"
+			(at 0 2.5 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a28fca25-4c7b-4494-8aca-6d2deaee42f0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a77c9835-90a3-4903-85fa-14d165f0cbc4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f9381cb2-3805-4ec3-abb1-318c9a9445dc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_circle
+			(center 0 0)
+			(end 1.575 0)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "e033bff8-16f7-47c4-a4f0-2da62818b8f9")
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.65 2.65)
+			(drill 2.65)
+			(layers "*.Cu" "*.Mask")
+			(uuid "085e0c57-82cb-4b15-ab06-371cb179d1cb")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
+		(layer "F.Cu")
+		(uuid "607b2940-4dda-45ba-9c2f-89d5db8323f6")
+		(at 176 105)
+		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
+		(property "Reference" "H4"
+			(at 0 -2.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "177e0ccc-0c48-4379-923d-ff2b735b4e10")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole_2.65mm_NPTH"
+			(at 0 2.5 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "48490338-0f09-4a91-a8e4-436393d7b1d3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b0bc9524-3af4-4209-86b3-ae527d98bd52")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "95f1ccfa-072d-42ae-ab27-b8fff3b1f79f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_circle
+			(center 0 0)
+			(end 1.575 0)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "97f21e43-7555-4e1b-a836-04965a7c087b")
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.65 2.65)
+			(drill 2.65)
+			(layers "*.Cu" "*.Mask")
+			(uuid "d43a34a5-9a13-491b-acbe-bdd135a17c8f")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "KD_Mechanical:MountingHole_2.65mm_NPTH"
+		(layer "F.Cu")
+		(uuid "eaca62fa-2313-4f5a-8925-04b3a73e221f")
+		(at 124 9)
+		(descr "NPTH 2.65 mm (M2.5 clearance), from the PicoBalancer DXF")
+		(property "Reference" "H1"
+			(at 0 -2.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "3399e958-04cb-445b-9764-76981f60a9b7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole_2.65mm_NPTH"
+			(at 0 2.5 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "88e10203-5fcb-43f8-9e49-fa5508e126e6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f051b92e-269e-434d-8ed9-ee113681c293")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "47496c9b-30b9-4968-bdc6-18cb4206cdb8")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_circle
+			(center 0 0)
+			(end 1.575 0)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "9e186234-5c0d-4252-9bad-82a4347da8da")
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.65 2.65)
+			(drill 2.65)
+			(layers "*.Cu" "*.Mask")
+			(uuid "cb2b96ad-118e-4a43-80f3-35b34a382c2c")
 		)
 		(embedded_fonts no)
 	)
@@ -685,7 +685,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "b1a7f711-0509-4b4e-b325-7fdc31f3ab35")
+		(uuid "47fdc34b-3e83-4b22-a3e2-a9ff0dd6db5f")
 	)
 	(gr_line
 		(start 120 93.55)
@@ -695,27 +695,27 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "5a9e63ec-5ed0-45c6-b97b-47c178e75683")
+		(uuid "0ecc51fc-d72d-42f4-9333-c8890f2d2303")
 	)
 	(gr_line
-		(start 121 155)
-		(end 138 155)
+		(start 121 149)
+		(end 138 149)
 		(stroke
 			(width 0.05)
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "25ef3aa9-2afc-460a-9339-9c647f68cdae")
+		(uuid "e1cd8f32-9753-4c46-a5e7-9562538bdc95")
 	)
 	(gr_line
-		(start 121 183)
-		(end 121 155)
+		(start 121 173)
+		(end 121 149)
 		(stroke
 			(width 0.05)
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "7fa27277-cb66-4b4b-ab50-22879f43b387")
+		(uuid "454db0b0-6775-4c58-b2b6-ba5294bab188")
 	)
 	(gr_circle
 		(center 122.325 27.424999)
@@ -726,7 +726,27 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "889dbccb-da9f-4603-9cb6-948ebd9c4fa8")
+		(uuid "6e9ce02f-6eef-462c-863e-c98c741ef4fe")
+	)
+	(gr_line
+		(start 123 176)
+		(end 134 176)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "9864cc9b-896b-4d3b-b879-5290f6595203")
+	)
+	(gr_line
+		(start 123 184)
+		(end 123 176)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "545a3cae-ca20-4334-90b2-18501ad92e59")
 	)
 	(gr_circle
 		(center 124 9)
@@ -737,7 +757,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "66834057-0970-49d9-8bd4-7a7c67e5ca88")
+		(uuid "d7db369a-2d19-44fc-b936-69a34ca96d13")
 	)
 	(gr_circle
 		(center 124 105)
@@ -748,7 +768,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "5ef2a39e-85c0-4717-a324-8f9ac6700e3c")
+		(uuid "0e42d9a7-cd02-4e8c-acdb-51db6986984a")
 	)
 	(gr_circle
 		(center 124 201)
@@ -759,7 +779,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "66e582b0-c9d1-47ad-84eb-8daa376a2ed1")
+		(uuid "4c594b6e-2d77-4c5e-bdae-166177e44a99")
 	)
 	(gr_line
 		(start 127.125 11.625)
@@ -769,7 +789,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "a462087d-2d2a-444a-8c50-8b094f353424")
+		(uuid "ba75fb07-6c39-4cdc-8ad7-e4e0d43bb963")
 	)
 	(gr_line
 		(start 127.125 18.924999)
@@ -779,7 +799,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "ba0859ac-d222-4548-bc1e-1f92b6d02e72")
+		(uuid "e0e9741c-1c7e-4daa-8600-0282bdba378d")
 	)
 	(gr_line
 		(start 127.125 91.125)
@@ -789,7 +809,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "c3d45d0a-e16d-4d5a-8e7b-db3f82586051")
+		(uuid "2e606b11-ea07-43b4-a272-42c1531992e0")
 	)
 	(gr_line
 		(start 127.125 98.425)
@@ -799,27 +819,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "a555945f-b070-4bfc-99b0-8e3305248150")
-	)
-	(gr_line
-		(start 130 185)
-		(end 141 185)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "0817eb11-cc94-4363-83c5-f159890e8064")
-	)
-	(gr_line
-		(start 130 196)
-		(end 130 185)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "d297548f-c2a2-4c97-aab3-cc8e1e6e00b6")
+		(uuid "bd46a156-a0cd-4a91-9587-103c7f415d79")
 	)
 	(gr_line
 		(start 131.5 198)
@@ -829,7 +829,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "fbf2972d-68e6-4bd6-9347-a3b71b0f4002")
+		(uuid "9551ebd7-389c-46ea-bc86-5219b8ddf06d")
 	)
 	(gr_line
 		(start 131.5 204.6)
@@ -839,7 +839,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "78b92865-deb8-42f7-a3d5-b09aeea11e7a")
+		(uuid "c4b86f4d-4a65-4d07-94f8-757feaa8728f")
 	)
 	(gr_line
 		(start 133.525 11.625)
@@ -849,7 +849,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "bfdddaa1-6db9-4ea3-aeb8-13e998a0a686")
+		(uuid "27886f72-2c79-42dd-9c34-61c91bd37603")
 	)
 	(gr_line
 		(start 133.525 18.924999)
@@ -859,7 +859,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "09d8aa91-129e-435f-9cb4-9bef8940d2e9")
+		(uuid "9b4a5b12-39c9-4713-9b66-fdd88c0f60ec")
 	)
 	(gr_line
 		(start 133.525 91.125)
@@ -869,7 +869,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "45a64573-bb06-4af2-b510-07fcf6e89297")
+		(uuid "5d07fe8e-6151-4806-a3b2-34062cc59f3d")
 	)
 	(gr_line
 		(start 133.525 98.425)
@@ -879,27 +879,47 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "c01bf6a4-571a-4554-94b6-8118c24af243")
+		(uuid "acfa3926-0202-476c-a428-a7ac272d669b")
 	)
 	(gr_line
-		(start 138 155)
-		(end 138 183)
+		(start 134 176)
+		(end 134 184)
 		(stroke
 			(width 0.05)
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "1e93998c-ae82-4666-92c5-8f11dc0a5114")
+		(uuid "40d103e5-a580-4e5f-b24a-476e6d2479db")
 	)
 	(gr_line
-		(start 138 183)
-		(end 121 183)
+		(start 134 184)
+		(end 123 184)
 		(stroke
 			(width 0.05)
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "c75dd364-a293-4cb6-80a8-1bb64303f2ed")
+		(uuid "155118ec-3aa1-46d4-aaa3-62a9f98e3c4f")
+	)
+	(gr_line
+		(start 138 149)
+		(end 138 173)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "0535e66c-3de7-4a7d-9aaa-4508643c39be")
+	)
+	(gr_line
+		(start 138 173)
+		(end 121 173)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "ded181e2-ec35-41ac-9473-f5531a6133ac")
 	)
 	(gr_circle
 		(center 138.325 82.625)
@@ -910,7 +930,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "403a0c45-904e-4b80-8698-5d43192e433c")
+		(uuid "e6974dec-6814-4209-bc43-fc58a4174c8c")
 	)
 	(gr_line
 		(start 139.3 216.6)
@@ -920,7 +940,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "57a955c5-2e22-4ab9-a7fb-54ff0dbaddf1")
+		(uuid "85bc8f4a-4d87-4e8d-86a1-02b54c9406e0")
 	)
 	(gr_line
 		(start 139.3 230.8)
@@ -930,7 +950,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "745574f4-1afc-4358-b8ad-89220aa480de")
+		(uuid "e2ba5595-5525-4e4c-8d1c-bff3a83feef5")
 	)
 	(gr_line
 		(start 139.5 138)
@@ -940,7 +960,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "76af51df-5514-4e98-8b91-4e3b3f8dd78a")
+		(uuid "8e1da015-76ca-4f63-b5fe-54b02d3ba2c9")
 	)
 	(gr_line
 		(start 139.5 189)
@@ -950,7 +970,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "e8e8526d-fe51-4b3a-b253-173eb6fb5d72")
+		(uuid "70e9dc3e-cad9-4d47-a27f-5139666dd7f0")
 	)
 	(gr_line
 		(start 140.5 198)
@@ -960,7 +980,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "8407b1b9-e22b-4406-bb2c-bfb0cfd0fddb")
+		(uuid "a00a7f8b-236a-4752-9fa9-22a60490bec0")
 	)
 	(gr_line
 		(start 140.5 204.6)
@@ -970,7 +990,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "aba3d698-e0c3-48ac-b817-4441d95b44c0")
+		(uuid "4c422060-65d7-45f2-a65c-2f88b2297663")
 	)
 	(gr_line
 		(start 140.65 11.625)
@@ -980,7 +1000,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "edc3d41a-2fdf-4504-a2c8-c209e05e142a")
+		(uuid "282a6ad1-8e5a-4996-bba3-bc5bb413a4d2")
 	)
 	(gr_line
 		(start 140.65 16.5)
@@ -990,7 +1010,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "9a7f8d9f-488b-425c-a8ad-6e292eee54b3")
+		(uuid "c4e8c4b7-46ef-460d-b970-59126df05b67")
 	)
 	(gr_line
 		(start 140.65 93.55)
@@ -1000,7 +1020,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "c522ce82-471f-4b9d-97b8-08114212e078")
+		(uuid "055096c3-d3ac-47c3-a31e-b62b849883a0")
 	)
 	(gr_line
 		(start 140.65 98.425)
@@ -1010,27 +1030,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "3c5cb65a-3f96-497f-acb8-2d8072dc3587")
-	)
-	(gr_line
-		(start 141 185)
-		(end 141 196)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "f861a9f0-7914-46de-8b2e-f18157f276e5")
-	)
-	(gr_line
-		(start 141 196)
-		(end 130 196)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "52110734-3c60-461b-bdd2-67e4874b2141")
+		(uuid "a0e1775c-4b0e-4201-b599-58bbe22cee9c")
 	)
 	(gr_line
 		(start 143.05 216.6)
@@ -1040,7 +1040,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "7862c158-10ad-457d-80f9-8cc25866c62c")
+		(uuid "8bdc1863-f1a7-42a4-80e0-84b10ae64aa4")
 	)
 	(gr_line
 		(start 143.05 230.8)
@@ -1050,7 +1050,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "ce03191b-840c-4e08-9b62-81971552cbc9")
+		(uuid "dfb7cff2-1d9c-46af-bbf5-078869cd1d57")
 	)
 	(gr_line
 		(start 145 19)
@@ -1060,7 +1060,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "b4132c6c-16ed-4845-bddd-62cd6dea1069")
+		(uuid "64caafa0-580b-4bcf-b38a-30a2ce84c2e0")
 	)
 	(gr_line
 		(start 145 49)
@@ -1070,7 +1070,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "201ead2d-8dc7-44e1-aa85-f8288b721a03")
+		(uuid "4371d7bc-9e05-4cdb-90ac-ac666345d9c5")
 	)
 	(gr_line
 		(start 146 189)
@@ -1080,7 +1080,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "68faa807-6d18-460b-b2b6-e1837af0f60b")
+		(uuid "215d4c46-ec9c-49e9-9baa-a5c0daf7584e")
 	)
 	(gr_line
 		(start 146 199)
@@ -1090,7 +1090,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "5d9a92f6-8bb7-4b8a-8aaf-0006dfcb7533")
+		(uuid "d43f1889-7c15-419a-95ab-5d16a815191a")
 	)
 	(gr_line
 		(start 154 189)
@@ -1100,7 +1100,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "093ee950-75e3-4a62-8a02-d6ec0ebdb921")
+		(uuid "c3b21cd5-d738-4aad-9955-238c79dc5da7")
 	)
 	(gr_line
 		(start 154 199)
@@ -1110,7 +1110,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "653b8820-4970-4629-93df-791ae6666e9b")
+		(uuid "3c3f9613-a302-4432-ae0d-fcae5cf92e9c")
 	)
 	(gr_line
 		(start 155 19)
@@ -1120,7 +1120,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "82bb6c9e-8920-4211-b1ca-7efee6f1ded0")
+		(uuid "cffb996a-d0a6-4c90-8a9e-75bfbf4e2153")
 	)
 	(gr_line
 		(start 155 49)
@@ -1130,7 +1130,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "b3c5366b-1f1a-4f52-b042-b7d33e15461c")
+		(uuid "dc6e635d-4f36-47f7-a185-c4d5a49b18ac")
 	)
 	(gr_line
 		(start 156.95 216.6)
@@ -1140,7 +1140,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "2feeef79-c5e7-45e2-84e2-308e01f86bde")
+		(uuid "15c03298-d777-4c70-a510-920b512bce6a")
 	)
 	(gr_line
 		(start 156.95 230.8)
@@ -1150,27 +1150,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "bcc861e7-3f09-476c-81c4-84588d295555")
-	)
-	(gr_line
-		(start 159 185)
-		(end 170 185)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "f046f57a-ea69-4004-a176-59dc4e593f6b")
-	)
-	(gr_line
-		(start 159 196)
-		(end 159 185)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "a355fa82-1516-4e16-90eb-ab0b73ff14e2")
+		(uuid "081a8af0-c3b9-4f3b-89fc-ed341c82dc6f")
 	)
 	(gr_line
 		(start 159.35 11.625)
@@ -1180,7 +1160,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "b5601016-6fb4-4b99-a5f3-23503ff2e707")
+		(uuid "2ea36e7f-1710-4882-af8d-53e1b53657fc")
 	)
 	(gr_line
 		(start 159.35 16.5)
@@ -1190,7 +1170,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "957154b4-ec71-42f9-9b19-e75c72dcfae8")
+		(uuid "42027a6c-e22f-40c6-883e-a2dfe836d045")
 	)
 	(gr_line
 		(start 159.35 93.55)
@@ -1200,7 +1180,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "557976c2-1435-4145-b5f8-3ec29aaf1571")
+		(uuid "186d66e0-06ea-488e-9536-f5da1670d3c0")
 	)
 	(gr_line
 		(start 159.35 98.425)
@@ -1210,7 +1190,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "b0acc1d0-6233-400a-8688-64bfaea3d726")
+		(uuid "9596403c-bd75-4201-a5f9-149170b497f5")
 	)
 	(gr_line
 		(start 159.5 198)
@@ -1220,7 +1200,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "b153cba5-0a7e-43f8-a2ea-26202495173e")
+		(uuid "6046ccb9-227d-4732-b69a-60a2face9cc5")
 	)
 	(gr_line
 		(start 159.5 204.6)
@@ -1230,7 +1210,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "a25c3fc9-8636-4263-860e-3cd162192285")
+		(uuid "4959d34e-3b39-44b9-8e10-93bdd70f6d94")
 	)
 	(gr_line
 		(start 160.5 138)
@@ -1240,7 +1220,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "c77318e7-68c2-4058-beba-35f6d9af2be8")
+		(uuid "56788399-a58c-4d8d-9f2d-0756682990f6")
 	)
 	(gr_line
 		(start 160.5 189)
@@ -1250,7 +1230,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "7b20d4c9-667a-4f50-9cbc-12ce0d0905b1")
+		(uuid "d826280d-cfa1-4313-bd40-e71b240c9dc7")
 	)
 	(gr_line
 		(start 160.7 216.6)
@@ -1260,7 +1240,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "ef4b1950-ea95-4918-999e-333750b6b25f")
+		(uuid "65329f6b-625d-49ff-b43a-a49e97f0e853")
 	)
 	(gr_line
 		(start 160.7 230.8)
@@ -1270,7 +1250,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "70b58abe-16e1-4e45-b4d5-f69ff2482d3b")
+		(uuid "4de0812f-89c2-47cb-8d68-5a332d79ec93")
 	)
 	(gr_circle
 		(center 161.675 27.424999)
@@ -1281,7 +1261,27 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "6779bc68-a9d1-4113-af32-d553df99fdbb")
+		(uuid "6f656b33-2fa9-4fa6-b11a-bcfbac098542")
+	)
+	(gr_line
+		(start 166 176)
+		(end 177 176)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "a6c64c18-9577-4841-bd68-9577acff8ec5")
+	)
+	(gr_line
+		(start 166 184)
+		(end 166 176)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "67676366-f0e8-4e69-8df6-df1396c38015")
 	)
 	(gr_line
 		(start 166.475 11.625)
@@ -1291,7 +1291,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "1b19ff02-8cc6-4e07-8faa-11c72bbaa91e")
+		(uuid "55129572-06ed-4e43-ab9e-4a516b1ad01e")
 	)
 	(gr_line
 		(start 166.475 18.924999)
@@ -1301,7 +1301,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "d1ec89b3-f007-4421-b131-fa00adbf5b5c")
+		(uuid "704aead3-e73a-4370-87a9-71b5acd00acd")
 	)
 	(gr_line
 		(start 166.475 91.125)
@@ -1311,7 +1311,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "5bfab659-2cd3-4195-a10a-302ffd06877c")
+		(uuid "431f4a49-c073-44c7-b47d-de4af339dcd8")
 	)
 	(gr_line
 		(start 166.475 98.425)
@@ -1321,7 +1321,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "5641c492-d9df-49f4-8260-ee3ae49f6b5c")
+		(uuid "c11fd45b-46e1-468c-bbf7-e774556802a8")
 	)
 	(gr_line
 		(start 167.2 148)
@@ -1331,7 +1331,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "04309672-decf-461c-9406-d0267a197c04")
+		(uuid "0be019af-a16e-4d75-b942-cc5c5a4da40b")
 	)
 	(gr_line
 		(start 167.2 163)
@@ -1341,7 +1341,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "defa37b4-144d-49e9-90a3-66729dc835f3")
+		(uuid "33b0f525-91e0-4ec0-9d5a-917bf23158d6")
 	)
 	(gr_line
 		(start 167.55 134.4)
@@ -1351,7 +1351,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "10d85430-e434-4f26-a484-bec31fc8d63b")
+		(uuid "7f54dc0c-6832-4ff4-b6bd-116f1753679e")
 	)
 	(gr_line
 		(start 167.55 144.2)
@@ -1361,7 +1361,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "de90e1cb-df16-4adf-82db-fc1d79b9013e")
+		(uuid "ccd7ace1-0eb5-464c-91da-ff19ac792301")
 	)
 	(gr_line
 		(start 168.5 198)
@@ -1371,7 +1371,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "a0a49d56-bb6e-453c-a12d-d069800af613")
+		(uuid "f7bbf5b2-7743-48cb-8f51-488d04b320da")
 	)
 	(gr_line
 		(start 168.5 204.6)
@@ -1381,27 +1381,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "963e63e9-f4fe-49b4-ab30-b486295a4127")
-	)
-	(gr_line
-		(start 170 185)
-		(end 170 196)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "1aaf5c6d-5a7b-4f97-ad79-8e906fffa78d")
-	)
-	(gr_line
-		(start 170 196)
-		(end 159 196)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Dwgs.User")
-		(uuid "282b87aa-f9a4-410b-90f4-68684813bd41")
+		(uuid "3c3353b5-4b69-41f1-891e-95ef82aaf503")
 	)
 	(gr_line
 		(start 172.875 11.625)
@@ -1411,7 +1391,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "1494dd4f-32a9-4676-ac45-27be53e89497")
+		(uuid "dd457c0c-aae0-4294-969e-41fe85e1c929")
 	)
 	(gr_line
 		(start 172.875 18.924999)
@@ -1421,7 +1401,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "8ac75a16-d3d0-41fb-90cf-e53dce5c9729")
+		(uuid "1e98804e-0952-4021-b72c-a6f2e0086acb")
 	)
 	(gr_line
 		(start 172.875 91.125)
@@ -1431,7 +1411,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "6aa87ec1-7ba6-4a7d-9106-0236b9783d50")
+		(uuid "3ed5d0b2-1fe9-4e95-b7d8-4a5eade15d5d")
 	)
 	(gr_line
 		(start 172.875 98.425)
@@ -1441,7 +1421,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "0c6f665b-7177-4474-8a5a-a8c6d8f70793")
+		(uuid "9d9f8c35-cf3d-4224-beaf-6ea055f2c087")
 	)
 	(gr_line
 		(start 172.95 134.4)
@@ -1451,7 +1431,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "265e13bf-77c8-4446-bb24-14322f352e77")
+		(uuid "fe1cdbd1-950f-4c09-aa96-30966868c5cd")
 	)
 	(gr_line
 		(start 172.95 144.2)
@@ -1461,7 +1441,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "784fa85d-19af-403b-8401-945ed2d01310")
+		(uuid "18f22755-3b75-4d37-8d58-f21a6905317b")
 	)
 	(gr_line
 		(start 173.3 148)
@@ -1471,7 +1451,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "b5032dd9-13dc-4d27-b7a7-f78b77c3a5e5")
+		(uuid "2dea3274-9bbb-4c45-81e8-b89ed373d6c0")
 	)
 	(gr_line
 		(start 173.3 163)
@@ -1481,7 +1461,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "78eea48c-56d9-4492-8568-4a13b6780e54")
+		(uuid "bc5858a7-2b2c-4121-947c-f1cc79186309")
 	)
 	(gr_circle
 		(center 176 9)
@@ -1492,7 +1472,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "f1289432-0868-4057-992b-996dd05ad540")
+		(uuid "820174ea-0e88-4f53-bf38-0c1a00d2a32f")
 	)
 	(gr_circle
 		(center 176 105)
@@ -1503,7 +1483,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "5fa44a7b-421c-4097-9d10-467e40171279")
+		(uuid "60f7932f-5ad3-4a61-8f2a-89685f00e48a")
 	)
 	(gr_circle
 		(center 176 201)
@@ -1514,7 +1494,27 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "966fd2f7-6f64-4910-b740-f7c1d14327fc")
+		(uuid "92ae9ecf-3c13-4af6-b3af-85b2da48faa8")
+	)
+	(gr_line
+		(start 177 176)
+		(end 177 184)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "2553bac5-482d-403e-97ff-7e08678e306e")
+	)
+	(gr_line
+		(start 177 184)
+		(end 166 184)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Dwgs.User")
+		(uuid "85737d90-3cac-4696-9f74-fea2449ea6ff")
 	)
 	(gr_circle
 		(center 177.675 82.625)
@@ -1525,7 +1525,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "8d16401b-44fb-4841-84ea-8593e4d9c2c7")
+		(uuid "80ebdc6a-d10c-49b9-bb62-71b4c1e1f7a1")
 	)
 	(gr_line
 		(start 180 16.5)
@@ -1535,7 +1535,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "32285a68-9c46-4712-bb2d-c4da7ed53a71")
+		(uuid "0aee2a0d-35ea-456c-ad3d-e929a84cbe42")
 	)
 	(gr_line
 		(start 180 93.55)
@@ -1545,7 +1545,7 @@
 			(type default)
 		)
 		(layer "Dwgs.User")
-		(uuid "1451a89e-7553-4333-b117-d5b7c04360dd")
+		(uuid "6ef18489-c1e9-4b7f-a0ce-07c2e142c4b5")
 	)
 	(gr_line
 		(start 120 5)
@@ -1555,7 +1555,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "22a52c86-dced-4a19-a67b-016e617dd3ac")
+		(uuid "d35700ce-3afd-4183-8d4d-b8b553062ab6")
 	)
 	(gr_line
 		(start 120 13)
@@ -1565,7 +1565,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "4e6dbf79-3e1f-43af-b2c2-5095754a33f7")
+		(uuid "122386cf-40b9-44e0-9a6b-c7a1b396ec91")
 	)
 	(gr_line
 		(start 120 101)
@@ -1575,7 +1575,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "eca441a2-43f7-4818-942e-c609b81f4791")
+		(uuid "ecfe2c01-408d-4264-8ce4-110d487c037a")
 	)
 	(gr_line
 		(start 120 109)
@@ -1585,7 +1585,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "07e773f6-e486-4d25-8110-1133068060e9")
+		(uuid "13097612-5789-4a02-99d0-b9c226b89428")
 	)
 	(gr_line
 		(start 120 197)
@@ -1595,7 +1595,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "eda5c57d-0d57-49b8-a044-c5301c95658f")
+		(uuid "3ff51f68-2196-4956-90f4-b70ab38cd7ff")
 	)
 	(gr_line
 		(start 120 205)
@@ -1605,7 +1605,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "42c29eb1-f4d4-479d-9c4e-fa2bc050369c")
+		(uuid "af9678ae-9638-4ea0-9903-341b61a26090")
 	)
 	(gr_line
 		(start 128 5)
@@ -1615,7 +1615,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "03454282-78bc-4a7f-bf91-5f8f6c335ce9")
+		(uuid "5713bba8-4762-421f-a77e-92aa9fe72b79")
 	)
 	(gr_line
 		(start 128 13)
@@ -1625,7 +1625,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "180ee1ce-bbcf-43dd-bece-8f480d4c7f34")
+		(uuid "cb1aa63d-8099-4e29-bf25-123d81253d5a")
 	)
 	(gr_line
 		(start 128 101)
@@ -1635,7 +1635,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "5727feda-d071-4f4a-ad5d-bfa385225ff2")
+		(uuid "7707302f-dc5b-4334-81ee-761b0d3fbbad")
 	)
 	(gr_line
 		(start 128 109)
@@ -1645,7 +1645,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "8714883c-d17d-47f2-b55f-0d1a72285328")
+		(uuid "785c815e-c442-4774-b82f-19b935ad3bc4")
 	)
 	(gr_line
 		(start 128 197)
@@ -1655,7 +1655,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "1776e0e4-2595-4c25-a783-34cb177bdc87")
+		(uuid "d863e988-afac-439d-a7fe-b2182c7639a5")
 	)
 	(gr_line
 		(start 128 205)
@@ -1665,7 +1665,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "31fcc7ae-181d-4729-b0d9-108415a3c3ea")
+		(uuid "e5f8e7ff-2c30-4217-9bd9-22dc248c093c")
 	)
 	(gr_line
 		(start 172 5)
@@ -1675,7 +1675,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "2248736e-4b6c-4be1-b72f-c6d557969307")
+		(uuid "e9a15ee5-fc24-455f-b9a4-a733cd624993")
 	)
 	(gr_line
 		(start 172 13)
@@ -1685,7 +1685,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "9eb412e9-b731-4558-a54b-8dbd6ea0553f")
+		(uuid "2e3a554b-cc25-4c2d-ac50-3eac9295ced5")
 	)
 	(gr_line
 		(start 172 101)
@@ -1695,7 +1695,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "88f4a9da-9463-425f-bcf3-e559d9428cd4")
+		(uuid "c5b47fbf-2065-48f8-a93d-5d10d3790657")
 	)
 	(gr_line
 		(start 172 109)
@@ -1705,7 +1705,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "b4e9e515-ff55-48cd-9de5-2c8af2c06a22")
+		(uuid "586fb8b2-93a8-4658-aaed-8e8a183547b7")
 	)
 	(gr_line
 		(start 172 197)
@@ -1715,7 +1715,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "d48f6d9e-00e0-4630-9978-92fc9b3fd97c")
+		(uuid "0378ab1c-367b-40c7-be4a-3bf26c4e8402")
 	)
 	(gr_line
 		(start 172 205)
@@ -1725,7 +1725,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "a90a8ee7-bfe3-4e29-bb9d-46a048c2207d")
+		(uuid "8e5245af-9e9e-452f-9df4-7f910f084f71")
 	)
 	(gr_line
 		(start 180 5)
@@ -1735,7 +1735,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "9de5a1e8-a5a8-473f-89f1-d27a2aa84a80")
+		(uuid "6f8d5f62-bcce-471a-ad95-2d695a2cb27b")
 	)
 	(gr_line
 		(start 180 13)
@@ -1745,7 +1745,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "e2d62de4-2601-4705-b180-b052decaf149")
+		(uuid "a3895eb6-a2dc-4817-b9b9-37c260b01e7f")
 	)
 	(gr_line
 		(start 180 101)
@@ -1755,7 +1755,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "07738b9e-d4e7-4e8a-8dd4-99c17971e022")
+		(uuid "2af3d734-845e-4c56-a3cb-5cfc8ae213cc")
 	)
 	(gr_line
 		(start 180 109)
@@ -1765,7 +1765,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "936fc65a-52fe-450b-9953-7c3f4dacc660")
+		(uuid "5915dd3a-e660-4aed-83cd-f5ac1ce2b377")
 	)
 	(gr_line
 		(start 180 197)
@@ -1775,7 +1775,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "64ada128-3914-44e6-ae91-2c5bb62c17c3")
+		(uuid "cc7ce949-b1b9-46fa-933d-19ff45770832")
 	)
 	(gr_line
 		(start 180 205)
@@ -1785,7 +1785,7 @@
 			(type default)
 		)
 		(layer "Cmts.User")
-		(uuid "a4388ffd-28da-4cf8-84f5-4e4a52cf2981")
+		(uuid "3f32c237-9688-406c-a833-a9f2b1e627dd")
 	)
 	(gr_line
 		(start 120 5)
@@ -1795,7 +1795,7 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "f46db431-240a-4741-af7b-cb19bbbc5ada")
+		(uuid "db03f595-d49d-424c-8787-f42039974e83")
 	)
 	(gr_line
 		(start 120 205)
@@ -1805,7 +1805,7 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "74db293f-84ba-427c-ad83-423ccb89f237")
+		(uuid "4d895b13-fc85-41c8-8547-228d1b535aa3")
 	)
 	(gr_line
 		(start 180 5)
@@ -1815,7 +1815,7 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "3e6b778f-24ad-4404-86dc-6ed6a1401718")
+		(uuid "050141b9-4fde-4c25-9342-8e4e147e9c9a")
 	)
 	(gr_line
 		(start 180 205)
@@ -1825,12 +1825,12 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "27eec64e-a34f-424b-a66d-fd0d8f03f0f2")
+		(uuid "2013d55b-42af-4e3c-b0c5-1616ff337fb0")
 	)
 	(gr_text "PicoBalancer rev 0.1"
 		(at 162 177 0)
 		(layer "F.SilkS")
-		(uuid "344bb5d3-e92c-4767-9bce-acb5fb2eb29e")
+		(uuid "57c84b53-4841-43e2-bbe9-8e8a9e0f8671")
 		(effects
 			(font
 				(size 1.2 1.2)
@@ -1841,7 +1841,7 @@
 	(gr_text "cover pillar"
 		(at 150 34 0)
 		(layer "Dwgs.User")
-		(uuid "ef7af63c-fbee-4521-8e63-27aada432c37")
+		(uuid "6132a90e-c698-4646-a23a-7aab8e539962")
 		(effects
 			(font
 				(size 0.9 0.9)
@@ -1849,10 +1849,21 @@
 			)
 		)
 	)
-	(gr_text "U5 boost"
-		(at 129.5 169 0)
+	(gr_text "U3 driver L"
+		(at 128.5 180 0)
 		(layer "Dwgs.User")
-		(uuid "5ff53fad-2401-4182-abd1-60323659f754")
+		(uuid "b3112f51-1803-492e-a13e-59a563cdffb5")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(gr_text "U5 boost"
+		(at 129.5 161 0)
+		(layer "Dwgs.User")
+		(uuid "71b06627-76a2-4fe2-a8a8-48e3c03448ce")
 		(effects
 			(font
 				(size 1 1)
@@ -1863,18 +1874,7 @@
 	(gr_text "+ end down"
 		(at 130.324999 59.025 0)
 		(layer "Dwgs.User")
-		(uuid "da959b35-da33-44b2-ac9b-84936c1cd14a")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(gr_text "U3 driver L"
-		(at 135.5 190.5 0)
-		(layer "Dwgs.User")
-		(uuid "344d11de-cfa8-40fb-95a5-3d4a5a40cda6")
+		(uuid "742e906b-e6ec-4d37-ab86-de332d97db80")
 		(effects
 			(font
 				(size 1 1)
@@ -1885,7 +1885,7 @@
 	(gr_text "J3 motor L"
 		(at 136 201.3 0)
 		(layer "Dwgs.User")
-		(uuid "d4537a26-0d06-4f89-9258-4b49f2393415")
+		(uuid "7927235d-0f75-45d2-808f-4d1bf9872043")
 		(effects
 			(font
 				(size 1 1)
@@ -1896,7 +1896,7 @@
 	(gr_text "USB-C"
 		(at 150 10.5 0)
 		(layer "Dwgs.User")
-		(uuid "e33c51da-fe1b-43cb-8a6b-3c4190af33a5")
+		(uuid "66ae2a16-3928-46b4-822f-49ff9e7cbfd0")
 		(effects
 			(font
 				(size 1 1)
@@ -1907,7 +1907,7 @@
 	(gr_text "charger"
 		(at 150 75 0)
 		(layer "Dwgs.User")
-		(uuid "e15c3007-d951-41ab-8cd4-aa51d71b687b")
+		(uuid "a02a4118-d231-4c29-bc2e-50adad8400a5")
 		(effects
 			(font
 				(size 1 1)
@@ -1918,7 +1918,7 @@
 	(gr_text "Pico W, USB end up"
 		(at 150 163.5 0)
 		(layer "Dwgs.User")
-		(uuid "b05fdc21-42ba-4f06-9a13-67f82b9d08e7")
+		(uuid "b22105f2-5a65-48dd-b937-b90f01c729b0")
 		(effects
 			(font
 				(size 1 1)
@@ -1929,7 +1929,7 @@
 	(gr_text "IMU"
 		(at 150 194 0)
 		(layer "Dwgs.User")
-		(uuid "996bfc56-ba07-48d5-a34f-d98bd90711e1")
+		(uuid "53200a93-e05c-48c5-aef2-3216eee524e8")
 		(effects
 			(font
 				(size 1 1)
@@ -1940,18 +1940,7 @@
 	(gr_text "J4 motor R"
 		(at 164 201.3 0)
 		(layer "Dwgs.User")
-		(uuid "79e522d3-c889-4d2e-8705-bc7fa805ed77")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(gr_text "U4 driver R"
-		(at 164.5 190.5 0)
-		(layer "Dwgs.User")
-		(uuid "2fc98508-ccd5-4f30-829a-d0cf53cc8fbb")
+		(uuid "a5b6df93-0e7d-4af2-a1e2-5a9654c1e4dd")
 		(effects
 			(font
 				(size 1 1)
@@ -1962,7 +1951,7 @@
 	(gr_text "+ end down"
 		(at 169.675 59.025 0)
 		(layer "Dwgs.User")
-		(uuid "65a9852e-f4be-4fd8-925f-df89ce4d4441")
+		(uuid "689afdac-eb58-4a97-85b2-2328283a3c6a")
 		(effects
 			(font
 				(size 1 1)
@@ -1973,7 +1962,7 @@
 	(gr_text "SW1"
 		(at 170.25 139.3 0)
 		(layer "Dwgs.User")
-		(uuid "d5763307-ca80-42a6-8aa3-1878acb5e0b5")
+		(uuid "0403fd72-c39d-4d53-bf6c-9e980f62b38d")
 		(effects
 			(font
 				(size 1 1)
@@ -1984,7 +1973,18 @@
 	(gr_text "U7 + D2"
 		(at 170.25 155.5 0)
 		(layer "Dwgs.User")
-		(uuid "72fb316b-aa96-432a-9c3c-7e3cffa64040")
+		(uuid "2947707d-d399-431e-8893-c7f0f940341f")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(gr_text "U4 driver R"
+		(at 171.5 180 0)
+		(layer "Dwgs.User")
+		(uuid "69ba2227-363e-4676-89e8-e9c2f50568d1")
 		(effects
 			(font
 				(size 1 1)
@@ -1995,7 +1995,7 @@
 	(gr_text "BT1 1042"
 		(at 130.324999 51.025 0)
 		(layer "Dwgs.User")
-		(uuid "5f323ed7-258e-4e08-8b9e-e66c0ef5ef63")
+		(uuid "dd30bd1a-be2b-41ee-89d3-4da0ca84e486")
 		(effects
 			(font
 				(size 1.2 1.2)
@@ -2006,7 +2006,7 @@
 	(gr_text "encoder connectors (on motors)"
 		(at 150 213 0)
 		(layer "Dwgs.User")
-		(uuid "6cdebb8e-6126-4e79-bd7e-febbcff92216")
+		(uuid "4a263174-c26c-4516-abce-3a5fb2a0593d")
 		(effects
 			(font
 				(size 1.2 1.2)
@@ -2017,7 +2017,7 @@
 	(gr_text "BT2 1042"
 		(at 169.675 51.025 0)
 		(layer "Dwgs.User")
-		(uuid "8e888cd6-9e7e-4828-987c-fe74212e59da")
+		(uuid "2fecbffb-dd5f-45a3-9608-917538048099")
 		(effects
 			(font
 				(size 1.2 1.2)
