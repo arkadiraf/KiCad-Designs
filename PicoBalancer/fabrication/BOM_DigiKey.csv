@@ -5,7 +5,7 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Epson,Q13FC1350000400,,Y1,32.768kHz 12.5pF,verify,FC-135 32.768 kHz 12.5 pF 20 ppm
 2,Monolithic Power Systems,MP6550GG-Z,,U3 U4,MP6550GG,ok,QFN-12 2 x 2 mm
 9,Murata,GRM21BR61C106KE15L,490-3886-1-ND,C6 C7 C14 C15 C21 C22 C23 C24 C25,10uF 16V,ok,10 uF 16 V X5R 0805
-2,JST,SM06B-SRSS-TB(LF)(SN),,J3 J4,JST SH 6-pin side entry,ok,mates the Pololu 4761 encoder cable
+2,JST,BM06B-SRSS-TB(LF)(SN),,J3 J4,JST SH 6-pin vertical (top entry),ok,"vertical (top entry), mates the Pololu 4761 encoder cable (SHR-06V-S-B)"
 1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,U5,TPS61235P,ok,
 2,Wurth Elektronik,74438357010,732-11197-1-ND,L2 L1,"1uH, Isat 6.2 A (Wurth 74438357010)",ok,
 3,Samsung,CL31B226KPHNFNE,1276-3145-1-ND,C16 C17 C18,22uF 10V,ok,22 uF 10 V X7R 1206

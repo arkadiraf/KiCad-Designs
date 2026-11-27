@@ -30,7 +30,7 @@ MPN = {
     "R8 R9": (YAGEO, "RC0603FR-074K3L", "ok", "ISET 1.16 A for the Pololu 3072 (30:1 HPCB 6V)"),
     "C12 C13": (MURATA, "GRM1885C1H101JA01D", "ok", "100 pF C0G 0603 (stock)"),
     "R10": (YAGEO, "RC0603FR-07100KL", "ok", ""),
-    "J3 J4": ("JST", "SM06B-SRSS-TB(LF)(SN)", "ok", "mates the Pololu 4761 encoder cable"),
+    "J3 J4": ("JST", "BM06B-SRSS-TB(LF)(SN)", "ok", "vertical (top entry), mates the Pololu 4761 encoder cable (SHR-06V-S-B)"),
     "U5": (TI, "TPS61235PRWLT", "ok", ""),
     "L2": ("Wurth Elektronik", "74438357010", "ok", ""),
     "C14 C15": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
@@ -143,9 +143,10 @@ DATASHEETS = {
         ("EG_E-Switch_series_datasheet.pdf", "EG series catalog")],
     "103AT-2": [("103AT-2_Semitec_AT_thermistor.pdf", "CONFIRMED: 10 k, B 3435 K; 5.23 k / 30.9 k -> 0-60 C window")],
     "GRM21BR61C106KE15L": [("GRM21BR61C106KE15L_Murata_catalog_page.pdf", "CONFIRMED: 10 uF 16 V X5R 0805")],
-    "SM06B-SRSS-TB(LF)(SN)": [("JST_SH_series_catalog.pdf",
-        "CONFIRMED (SH catalog): 1.0 mm pitch, 1 A per contact, side entry; same layout rules as SM04B (drone) = KiCad "
-        "JST_SH_SM06B-SRSS-TB")],
+    "BM06B-SRSS-TB(LF)(SN)": [("JST_SH_series_catalog.pdf",
+        "CONFIRMED (SH catalog p.3): top entry, 6 circuits, A 5.0 / B 8.0 mm, depth 2.9 mm + 0.7 mm tails, height 4.25 mm, "
+        "1,500 per reel; 1.0 mm pitch, 1 A per contact; KiCad JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical: pads 0.6 x 1.55 "
+        "at 1.0 mm, MP 1.2 x 1.8 at +-3.8 mm")],
     "USB4235-03-C": [("USB4235-03-C_GCT_drawing.pdf",
         "CONFIRMED (drawing rev A, 21 Aug 2024): USB 2.0 Type-C receptacle, vertical, SMT, 16 pin, 6.50 mm above the "
         "board, VBUS 5 A total, GND 6.25 A, 48 V. Sheet 2 land pattern: 16 pads 0.30 x 0.87 mm at 0.50 mm pitch in two "

@@ -169,8 +169,9 @@ BOM = [
     ("R8 R9", "4.3k", "Device:R", _R, "MP6550 ISET: current limit 1.16 A per motor (both stalled 2.33 A < boost 2.49 A)"),
     ("C12 C13", "100pF 50V", "Device:C", _C, "MP6550 VISEN filter (<= 500 pF)"),
     ("R10", "100k", "Device:R", _R, "MOTOR_EN (both nSLEEP_HB) pull-down"),
-    ("J3 J4", "JST SH 6-pin side entry", "Connector_Generic_MountingPin:Conn_01x06_MountingPin",
-     "Connector_JST:JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal",
+    # vertical (top-entry) header (user 2026-11-27): JST BM06B-SRSS-TB, body 8.0 x 2.9 x 4.25 mm (catalog p.3)
+    ("J3 J4", "JST SH 6-pin vertical (top entry)", "Connector_Generic_MountingPin:Conn_01x06_MountingPin",
+     "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
      "motor + encoder (Pololu 4761 pinout: GND, B, A, VCC=3V3, M2, M1)"),
     # --- 5.1 V boost: TPS61235P (values from Drone_1S_Pico2W, checked against SLVSCK4A) ---
     ("U5", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5V1 for the motor drivers"),
@@ -299,12 +300,12 @@ REVIEW_PARTS = [
     ("U1 Pico W", 0.0, 58.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 34.3, 7.5, 5.5, 2.7, "metal", 9.5),
     # IMU at the centre bottom, nearest the wheel axle
     ("U2 BNO086", 0.0, 89.0, 3.8, 5.2, 1.1, "ic", 0), ("Y1", 5.0, 89.0, 3.2, 1.5, 0.9, "metal", 0),
-    # motor drivers above their connectors, connectors at the bottom edge (opening toward +y), x +-14 (closer to the
+    # motor drivers above their connectors, vertical connectors at the bottom edge, x +-14 (closer to the
     # encoders; clear of the bolt keep-outs)
     ("U3", -14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C6", -18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
-    ("J3", -14.0, 96.5, 8.0, 4.25, 2.95, "conn", 0),
+    ("J3", -14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
     ("U4", 14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
-    ("J4", 14.0, 96.5, 8.0, 4.25, 2.95, "conn", 0),
+    ("J4", 14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
     # boost on the left beside the Pico, above the left driver
     ("U5", -20.0, 62.0, 2.5, 2.5, 1.0, "ic", 0), ("L2", -20.0, 70.0, 4.1, 4.1, 3.1, "ind", 0),
     ("C16", -26.5, 56.0, 3.2, 1.6, 1.6, "cap", 0), ("C17", -26.5, 60.0, 3.2, 1.6, 1.6, "cap", 0),

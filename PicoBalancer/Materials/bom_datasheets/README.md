@@ -21,7 +21,7 @@ Status: 16 verified, 3 with OPEN items, 7 without a datasheet, 25 stock parts.
 | `RC0603FR-074K3L` | Yageo | R8 R9 | — |  | — | stock part, no datasheet needed |
 | `GRM1885C1H101JA01D` | Murata | C12 C13 | — |  | — | stock part, no datasheet needed |
 | `RC0603FR-07100KL` | Yageo | R10, R11, R22 R23, R26 R27, R28 R29 | — |  | — | stock part, no datasheet needed |
-| `SM06B-SRSS-TB(LF)(SN)` | JST | J3 J4 | — |  | [JST_SH_series_catalog.pdf](JST_SH_series_catalog.pdf) | CONFIRMED (SH catalog): 1.0 mm pitch, 1 A per contact, side entry; same layout rules as SM04B (drone) = KiCad JST_SH_SM06B-SRSS-TB |
+| `BM06B-SRSS-TB(LF)(SN)` | JST | J3 J4 | — |  | [JST_SH_series_catalog.pdf](JST_SH_series_catalog.pdf) | CONFIRMED (SH catalog p.3): top entry, 6 circuits, A 5.0 / B 8.0 mm, depth 2.9 mm + 0.7 mm tails, height 4.25 mm, 1,500 per reel; 1.0 mm pitch, 1 A per contact; KiCad JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical: pads 0.6 x 1.55 at 1.0 mm, MP 1.2 x 1.8 at +-3.8 mm |
 | `TPS61235PRWLT` | Texas Instruments | U5 | `296-44628-1-ND` |  | [TPS61235PRWLT_TI_datasheet_SLVSCK4A.pdf](TPS61235PRWLT_TI_datasheet_SLVSCK4A.pdf) | CONFIRMED on Drone_1S_Pico2W (pinout, land pattern, values) |
 | `74438357010` | Wurth Elektronik | L2, L1 | `732-11197-1-ND` |  | [74438357010_Wurth_datasheet.pdf](74438357010_Wurth_datasheet.pdf) | CONFIRMED: 1 uH, Isat 6.2 A, = KiCad L_Wuerth_MAPI-4030 |
 | `CL31B226KPHNFNE` | Samsung | C16 C17 C18 | `1276-3145-1-ND` |  | — | no datasheet yet |
