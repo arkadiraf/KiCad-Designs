@@ -21,7 +21,7 @@ TI = "Texas Instruments"
 FRAME_MPN = {
     "J10": ("GCT", "USB4105-GF-A", "ok", "USB-C receptacle, USB 2.0, 16P top mount"),
     "U1": (TI, "BQ25606RGER", "ok", ""),
-    "L1": ("Coilcraft", "XAL4020-102MEC", "ok", "1.0 uH, Isat well above 3.6 A"),
+    "L1": ("Wurth Elektronik", "74438357010", "ok", "WE-MAPI 4030, 1 uH, Isat 6.2 A, 3.1 mm tall; replaces XAL4020-102MEC (in stock)"),
     "R1 R2": (YAGEO, "RC0603FR-075K1L", "ok", ""),
     "R3": (YAGEO, "RC0603FR-07226RL", "ok", ""),
     "R4": (YAGEO, "RC0603FR-07150RL", "ok", ""),
@@ -46,7 +46,7 @@ FRAME_MPN = {
     "R11 R12 R13 R14": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R15 R16 R17 R18": (YAGEO, "RC0603FR-0747KL", "TBD", "or Pico internal pull-ups (decision open)"),
     "U7": (TI, "TPS61235PRWLT", "verify", "also sold as the larger reel TPS61235PRWLR"),
-    "L2": ("Coilcraft", "XAL4020-102MEC", "TBD", "value from the TPS61235P datasheet"),
+    "L2": ("Wurth Elektronik", "74438357010", "TBD", "same part as L1 if the TPS61235P datasheet accepts 1 uH / 6.2 A"),
     "C18 C19": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
     "C20 C21 C22": (MURATA, "GRM31CR61A226KE19L", "verify", "22 uF 10 V X5R 1206; count from the datasheet"),
     "R19": (YAGEO, "RC0603FR-07100KL", "ok", ""),
@@ -92,7 +92,8 @@ MECH_PARTS = [
 DIGIKEY = {
     "USB4105-GF-A": ("2073-USB4105-GF-ACT-ND", ""),
     "BQ25606RGER": ("296-47743-1-ND", ""),
-    "XAL4020-102MEC": ("2457-XAL4020-102MEC-ND", ""),
+    "XAL4020-102MEC": ("2457-XAL4020-102MEC-ND", "replaced by Wurth 74438357010"),
+    "74438357010": ("732-11197-1-ND", "in stock (user, Nov 2026)"),
     "RC0603FR-075K1L": ("311-5.10KHRCT-ND", ""),
     "RC0603FR-075K23L": ("311-5.23KHRCT-ND", "Digi-Key PN by the Yageo 311-<value>HRCT-ND pattern - confirm"),
     "RC0603FR-0730K9L": ("311-30.9KHRCT-ND", "Digi-Key PN by the Yageo 311-<value>HRCT-ND pattern - confirm"),
@@ -136,6 +137,14 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "74438357010": [
+        ("74438357010_Wurth_datasheet.pdf",
+         "CONFIRMED (WE-MAPI, rev 003.002): 1 uH +-20 %, Isat 6.2 A @ -10 % (12.5 A @ -30 %), IRP 10.25 A (40 K), "
+         "RDC 11.6 typ / 13.5 max mOhm, 4.1 x 4.1 x 3.1 mm max, -40..+125 C, AEC-Q200. Charger needs Isat >= 3.42 A: OK. "
+         "Land pattern 1 (0.98 x 3.7 mm pads, 3.35 mm span) = KiCad Inductor_SMD:L_Wuerth_MAPI-4030. "
+         "Layout: no vias or traces under the inductor; 3.1 mm height to check at frame placement. "
+         "L2 (boost): value still from the TPS61235P datasheet."),
+    ],
     "BQ25606RGER": [
         ("BQ25606RGER_TI_datasheet.pdf",
          "CONFIRMED (SLUSCK6C rev C, Sep 2021): pinout = KD_Power:BQ25606 (all 25 pins); RGE0024H land pattern "

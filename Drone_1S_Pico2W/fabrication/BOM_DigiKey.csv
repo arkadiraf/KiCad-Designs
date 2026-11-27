@@ -1,7 +1,7 @@
 Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Reference,Description,Status,Note
 1,GCT,USB4105-GF-A,2073-USB4105-GF-ACT-ND,Frame J10,"USB-C receptacle (GCT USB4105-GF-A) (USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal); charging input, USB 2.0 D+/D- to the charger",ok,"USB-C receptacle, USB 2.0, 16P top mount"
 1,Texas Instruments,BQ25606RGER,296-47743-1-ND,Frame U1,"BQ25606 (Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias); 1S 3 A standalone charger, power path",ok,
-2,Coilcraft,XAL4020-102MEC,2457-XAL4020-102MEC-ND,"Frame L1, Frame L2","1uH, Isat >= 3.6 A (Coilcraft XAL4020-102) (L_Coilcraft_XAL4020-XXX); charger buck inductor",ok,"1.0 uH, Isat well above 3.6 A"
+2,Wurth Elektronik,74438357010,732-11197-1-ND,"Frame L1, Frame L2","1uH, Isat 6.2 A (Wurth 74438357010) (L_Wuerth_MAPI-4030); charger buck inductor",ok,"WE-MAPI 4030, 1 uH, Isat 6.2 A, 3.1 mm tall; replaces XAL4020-102MEC (in stock); in stock (user, Nov 2026)"
 2,Yageo,RC0603FR-075K1L,311-5.10KHRCT-ND,Frame R1 R2,5.1k (R_0603_1608Metric); USB-C CC1 / CC2 pull-downs (sink),ok,
 1,Yageo,RC0603FR-07226RL,311-226HRCT-ND,Frame R3,226 (R_0603_1608Metric); ICHG: 3.0 A charge current (doc),ok,
 1,Yageo,RC0603FR-07150RL,311-150HRCT-ND,Frame R4,150 (R_0603_1608Metric); ILIM: 3.2 A input limit (doc),ok,

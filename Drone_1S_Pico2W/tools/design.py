@@ -248,7 +248,9 @@ FRAME_BOM = [
      "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal", "charging input, USB 2.0 D+/D- to the charger"),
     ("U1", "BQ25606", "KD_Power:BQ25606",
      "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias", "1S 3 A standalone charger, power path"),
-    ("L1", "1uH, Isat >= 3.6 A (Coilcraft XAL4020-102)", "Device:L", "Inductor_SMD:L_Coilcraft_XAL4020-XXX", "charger buck inductor"),
+    # Wurth WE-MAPI 74438357010 (Digi-Key stock): 1 uH +-20 %, Isat 6.2 A (10 %), RDC 13.5 mOhm max,
+    # 4.1 x 4.1 x 3.1 mm max; land pattern 1 of its datasheet = KiCad L_Wuerth_MAPI-4030. No vias/traces under it.
+    ("L1", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "charger buck inductor"),
     ("R1 R2", "5.1k", "Device:R", _R, "USB-C CC1 / CC2 pull-downs (sink)"),
     ("R3", "226", "Device:R", _R, "ICHG: 3.0 A charge current (doc)"),
     ("R4", "150", "Device:R", _R, "ILIM: 3.2 A input limit (doc)"),
@@ -284,7 +286,7 @@ FRAME_BOM = [
      "PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE)"),
     # --- optional 5.1 V boost for the Pi Zero ---
     ("U7", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5.1 V boost, true disconnect"),
-    ("L2", "1uH (TO CHECK vs datasheet)", "Device:L", "Inductor_SMD:L_Coilcraft_XAL4020-XXX", "boost inductor"),
+    ("L2", "1uH (TO CHECK vs the TPS61235P datasheet)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "boost inductor"),
     ("C18 C19", "10uF 16V", "Device:C", _C08, "boost input"),
     ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C12, "boost output"),
     ("R19", "100k", "Device:R", _R, "BOOST_EN pull-down: Pico off = Pi off"),

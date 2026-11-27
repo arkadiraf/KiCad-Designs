@@ -355,7 +355,7 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
   * VSET floats (4.208 V). CE to GND (charging on). **OTG (pin 6) to GND**: it must not float. **VAC (pin 1)
     shorted to VBUS.**
   * TS: 103AT-2 NTC with RT1 5.23 kΩ (REGN → TS) and RT2 30.9 kΩ (TS → GND), for a 0–60 °C window.
-  * 1 µH inductor. Capacitors: VBUS 1 µF, PMID 2 × 10 µF, SYS 20 µF, BAT 10 µF, REGN 4.7 µF, BTST 47 nF.
+  * 1 µH inductor: Würth WE-MAPI 74438357010 (4.1 × 4.1 × 3.1 mm, Isat 6.2 A). Capacitors: VBUS 1 µF, PMID 2 × 10 µF, SYS 20 µF, BAT 10 µF, REGN 4.7 µF, BTST 47 nF.
   * **Open:** the internal loop compensation wants ≤ 20 µF on SYS. The TPS22810 input (1 µF) and the boost
     input (2 × 10 µF) also sit on SYS, about 41 µF in total.
   * SYS feeds the TPS22810 only. The motors stay on BAT. PG goes to the header.
