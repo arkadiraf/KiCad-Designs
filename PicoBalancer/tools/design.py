@@ -92,7 +92,7 @@ ZONES = {
     # slide switch on the other side at the board edge (EG1218 body 11.6 x 4.0, long side along the edge)
     "U5 boost": (-29.0, 50.0, -12.0, 78.0),
     "SW1": (18.25, 28.5, 22.25, 40.1),   # centred between the Pico edge (x 10.5) and the board edge, at the micro-USB height (user)
-    "U7 + D2": (12.2, 29.0, 16.6, 47.5),
+    "U7 + D2": (17.2, 43.0, 23.3, 58.0),    # below the slide switch (user)
 }
 
 PICO_SOCKET_PITCH = 17.78              # 2 x 1x20, 2.54 mm, Pico W / Pico 2 W
@@ -310,8 +310,8 @@ REVIEW_PARTS = [
     ("C16", -26.5, 56.0, 3.2, 1.6, 1.6, "cap", 0), ("C17", -26.5, 60.0, 3.2, 1.6, 1.6, "cap", 0),
     ("C18", -26.5, 64.0, 3.2, 1.6, 1.6, "cap", 0),
     ("C14", -14.5, 58.0, 2.0, 1.25, 1.25, "cap", 0), ("C15", -14.5, 62.0, 2.0, 1.25, 1.25, "cap", 0),
-    # Pico switch beside the Pico; slide switch centred between the Pico edge and the board edge
-    ("U7", 14.4, 32.0, 2.9, 2.8, 1.1, "ic", 0), ("D2", 14.4, 40.0, 3.7, 1.6, 1.1, "ic", 0),
+    # slide switch centred between the Pico edge and the board edge; Pico power path (U7, D2, D3) below it
+    ("U7", 20.25, 45.5, 2.9, 2.8, 1.1, "ic", 0), ("D2", 20.25, 50.5, 3.7, 1.6, 1.1, "ic", 0),
     ("SW1", 20.25, 34.3, 4.0, 11.6, 5.4, "switch", 0), ("SW1 actuator", 20.25, 34.3, 2.0, 2.0, 2.0, "white", 5.4),
-    ("D3", 14.4, 45.5, 2.0, 1.25, 0.8, "led_green", 0),
+    ("D3", 20.25, 55.5, 2.0, 1.25, 0.8, "led_green", 0),
 ]

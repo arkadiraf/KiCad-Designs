@@ -89,7 +89,7 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   both MP6550 nSLEEP_HB pins the same way.
 * **Charger temperature left out:** TS is held in its normal window by R19 10 k (TH1 not fitted), so charging never stops for temperature.
 * **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop: internal 2.54 / 2.41 V by default (R21 = 0 Ω), or 3.30 / 2.70 V by fitting R21 = 156 k, R22 and R23. Firmware sleeps well above it.
-* **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the TPS22810, D2 and the power LED between it and the Pico.
+* **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the Pico power path (TPS22810, D2, power LED) below it.
 * **BNO086 on SPI0** (GP4–GP7; pin-for-pin SPI wiring from the SparkFun breakout schematic v10, `design.BNO086_PINS`), with INT on GP8, RST on GP9 and WAKE on GP3. PS1 and PS0/WAKE have pull-ups.
 * **Slide switch:** E-Switch EG1218 (Digi-Key EG1903-ND) on the TPS22810 EN/UVLO pin, signal only.
 
