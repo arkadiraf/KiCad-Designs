@@ -25,7 +25,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 | 0 | Folder, datasheets, outline + holes from the DXF (checked against Fusion), placement guides, BOM, design doc | **done** |
 | 1 | Decisions closed (motor, cells, TS fixed, UVLO option, placement); follow-up: BAT fuse | done |
 | 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, Pico socket, 1042, USB4235, slide switch, 1812L, wire pads), schematic | **done** |
-| 3 | Placement, 3D review against the Fusion model, routing | |
+| 3 | Placement (first pass done: 97 parts, DRC clean), silkscreen for hand assembly, 3D render; routing next | in progress |
 | 4 | DRC, fab outputs | |
 
 ![stage 0 guides](docs/board_stage0.png)
@@ -121,6 +121,26 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   * BNO086: its NC pins.
 * **ERC (kicad-cli, KiCad 10.0.8): 0 errors, 2 warnings.** Both warnings are `lib_symbol_mismatch` for Q3/Q4: the flattened DMG2302U differs from the derived library symbol, and this is expected.
 * **Shared BQ25606 symbol changed:** the second SW pin and the second SYS pin are now passive, which removes the ERC power-output conflicts. The Drone_1S_Pico2W schematic picks this up when it is regenerated.
+
+## Placement (stage 3, first pass)
+
+![top render](docs/render_top.png)
+
+* **Positions:** `PLACEMENT` in `tools/design.py` follows the reviewed Fusion layout. `gen_pcb.py` loads every footprint, assigns its nets and places it.
+* **DRC (KiCad 10.0.8):** 0 violations, no courtyard overlaps. 261 unconnected items remain because nothing is routed yet.
+* **Charger:** U6 is rotated 180° so its SW, BTST, REGN and PMID pins face L1 and the PMID capacitors. The ILIM, ICHG and TS resistors and the STAT LED sit lower in the channel.
+* **IMU pull-ups R1–R7 sit under the socketed Pico.** The sockets hold the module 8.5 mm up, so the socket courtyard covers only the two socket rows. Solder R1–R7 before plugging in the Pico.
+* **Silkscreen for hand assembly** (stencil, reflow, tweezers):
+  * Every resistor and capacitor shows its value next to the part. Its reference is on F.Fab for the assembly drawing.
+  * Every other part shows its reference.
+  * Each label is placed clear of pads and other silkscreen.
+  * Diodes and LEDs get a cathode bar.
+  * Parts with 3 or more pins get a pin-1 dot, unless the footprint already has one.
+* **Keystone 1042 footprint, corrected against the drawing (rev H):**
+  * Two Ø3.45 mm peg holes on the 55.20 × 16.00 mm diagonal, plus a Ø2.39 mm hole for the small peg.
+  * Per KiCad's stock model, the small peg sits at the spring (−) end, which is the top end. The + flat contact is at the board-centre end, as in the Fusion model.
+  * **TO CHECK on a real holder:** that the small peg is at the spring end. The Fusion review holes are not rebuilt yet.
+* **3D models:** KiCad stock models on the holders, Pico sockets, BNO086 (LGA-28) and MP6550 (UQFN-12, which looks the same). The Pico module, USB4235 and slide switch have no model.
 
 ## Regenerate
 

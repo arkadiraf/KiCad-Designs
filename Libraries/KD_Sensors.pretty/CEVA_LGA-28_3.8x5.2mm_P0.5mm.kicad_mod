@@ -4,7 +4,7 @@
   (tags "CEVA BNO086 BNO085 IMU LGA")
   (attr smd)
   (fp_text reference "REF**" (at 0 -3.4 0) (layer "F.SilkS")
-    (effects (font (size 0.6 0.6) (thickness 0.1)))
+    (effects (font (size 0.8 0.8) (thickness 0.15)))
     (tstamp 74768f76-d481-5c33-9bb4-9602810290dc)
   )
   (fp_text value "BNO086" (at 0 3.4 0) (layer "F.Fab")
@@ -50,4 +50,9 @@
   (pad "26" smd rect (at 1.5625 -0.75) (size 0.675 0.25) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 1502f5fd-2201-523e-84b4-fab0f371a100))
   (pad "27" smd rect (at 1.5625 -1.25) (size 0.675 0.25) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 7e252a8c-6784-59b7-83b7-b98c47da4eaa))
   (pad "28" smd rect (at 1.5625 -1.75) (size 0.675 0.25) (layers "F.Cu" "F.Paste" "F.Mask") (tstamp 05601e02-429f-5e3e-a451-3a8935f6f74a))
+  (model "${KICAD10_3DMODEL_DIR}/Package_LGA.3dshapes/LGA-28_5.2x3.8mm_P0.5mm.step"
+    (offset (xyz 0 0 0))
+    (scale (xyz 1 1 1))
+    (rotate (xyz 0 0 90))
+  )
 )

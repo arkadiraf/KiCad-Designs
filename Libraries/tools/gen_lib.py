@@ -270,10 +270,13 @@ def smd(num, shape, x, y, w, h, key, extra="", paste=True):
             f'(layers {layers}){extra} (tstamp {uid(key)}))')
 
 
-def footprint(name, descr, tags, attr, graphics, pads):
+def footprint(name, descr, tags, attr, graphics, pads, models=()):
+    """models: (path under ${KICAD10_3DMODEL_DIR}, (dx, dy, dz) mm with y UP, (rx, ry, rz) deg)."""
+    mdl = "".join(f'\n  (model "${{KICAD10_3DMODEL_DIR}}/{m}"\n    (offset (xyz {o[0]:g} {o[1]:g} {o[2]:g}))\n'
+                  f'    (scale (xyz 1 1 1))\n    (rotate (xyz {r[0]:g} {r[1]:g} {r[2]:g}))\n  )' for m, o, r in models)
     return (f'(footprint "{name}" (version 20221018) (generator pcbnew)\n  (layer "F.Cu")\n'
             f'  (descr "{descr}")\n  (tags "{tags}")\n  (attr {attr})\n'
-            + "\n".join(graphics) + "\n" + "\n".join(pads) + "\n)\n")
+            + "\n".join(graphics) + "\n" + "\n".join(pads) + mdl + "\n)\n")
 
 
 def fab_ref(y, size=0.4):
@@ -292,7 +295,7 @@ def fp_ryz():
            (10, 0.0, -0.9125, 0.25, 0.575)]
     for n, x, y, w, h in pos:
         pads.append(smd(n, "roundrect", x, y, w, h, f"ryz{n}", " (roundrect_rratio 0.25)"))
-    g = [text("reference", "REF**", 0, -1.85, "F.SilkS", size=0.6, thick=0.1),
+    g = [text("reference", "REF**", 0, -1.85, "F.SilkS", size=0.8, thick=0.15),
          text("value", "WQFN-HR-10_2x1.5mm", 0, 1.85, "F.Fab", size=0.4, thick=0.06),
          fab_ref(0, 0.3),
          rect(-0.75, -1.0, 0.75, 1.0, "F.Fab", 0.1),
@@ -317,7 +320,7 @@ def fp_rwl():
     for n, x, y, w, h in pos:
         pads.append(smd(n, "roundrect", x, y, w, h, f"rwl{n}", " (roundrect_rratio 0.25)"))
     pads.append(smd(2, "rect", 0.0, -0.02, 0.975, 0.3, "rwl2tab"))      # SW pad tab (TI land pattern)
-    g = [text("reference", "REF**", 0, -2.0, "F.SilkS", size=0.6, thick=0.1),
+    g = [text("reference", "REF**", 0, -2.0, "F.SilkS", size=0.8, thick=0.15),
          text("value", "VQFN-HR-9_2.5x2.5mm", 0, 2.1, "F.Fab", size=0.4, thick=0.06),
          fab_ref(0, 0.4),
          rect(-1.25, -1.25, 1.25, 1.25, "F.Fab", 0.1),
@@ -412,7 +415,7 @@ def fp_bmi088():
     for n, (x, y) in enumerate(pos, 1):
         w, h = (0.675, 0.25) if n in (8, 16) else (0.25, 0.675)
         pads.append(smd(n, "rect", x, y, w, h, f"bmi{n}"))
-    g = [text("reference", "REF**", 0, -2.5, "F.SilkS", size=0.6, thick=0.1),
+    g = [text("reference", "REF**", 0, -2.5, "F.SilkS", size=0.8, thick=0.15),
          text("value", "BMI088", 0, 2.5, "F.Fab", size=0.5, thick=0.08),
          rect(-2.25, -1.5, 2.25, 1.5, "F.Fab", 0.1),
          line(-2.25, -1.0, -1.75, -1.5, "F.Fab", 0.1),
@@ -432,7 +435,7 @@ def fp_bmp388():
     for n, (x, y) in enumerate(pos, 1):
         w, h = (0.25, 0.275) if abs(y) > 0.7 else (0.275, 0.25)
         pads.append(smd(n, "rect", x, y, w, h, f"bmp{n}"))
-    g = [text("reference", "REF**", 0, -1.7, "F.SilkS", size=0.6, thick=0.1),
+    g = [text("reference", "REF**", 0, -1.7, "F.SilkS", size=0.8, thick=0.15),
          text("value", "BMP388", 0, 1.7, "F.Fab", size=0.5, thick=0.08),
          rect(-1.0, -1.0, 1.0, 1.0, "F.Fab", 0.1),
          line(0.5, -1.0, 1.0, -0.5, "F.Fab", 0.1),
@@ -535,7 +538,7 @@ def fp_bno086():
         x, y = pos[n]
         w, h = (0.25, 0.575) if n in (2, 3, 4, 5, 16, 17, 18, 19) else (0.675, 0.25)
         pads.append(smd(n, "rect", x, y, w, h, f"bno{n}"))
-    g = [text("reference", "REF**", 0, -3.4, "F.SilkS", size=0.6, thick=0.1),
+    g = [text("reference", "REF**", 0, -3.4, "F.SilkS", size=0.8, thick=0.15),
          text("value", "BNO086", 0, 3.4, "F.Fab", size=0.5, thick=0.08), fab_ref(0, 0.4),
          rect(-1.9, -2.6, 1.9, 2.6, "F.Fab", 0.1), line(1.4, -2.6, 1.9, -2.1, "F.Fab", 0.1),
          circle(2.25, -2.85, 0.1, "F.SilkS", 0.1, True),
@@ -543,7 +546,8 @@ def fp_bno086():
          line(1.6, 2.75, 2.05, 2.75, "F.SilkS", 0.12),
          rect(-2.15, -2.85, 2.15, 2.85, "F.CrtYd", 0.05)]
     return footprint("CEVA_LGA-28_3.8x5.2mm_P0.5mm", "CEVA BNO086 / BNO085 LGA-28, 3.8 x 5.2 mm, 0.5 mm pitch, landing "
-                     "pattern from the BNO08X datasheet v1.17 fig. 7-2", "CEVA BNO086 BNO085 IMU LGA", "smd", g, pads)
+                     "pattern from the BNO08X datasheet v1.17 fig. 7-2", "CEVA BNO086 BNO085 IMU LGA", "smd", g, pads,
+                     [("Package_LGA.3dshapes/LGA-28_5.2x3.8mm_P0.5mm.step", (0, 0, 0), (0, 0, 90))])
 
 
 def fp_mp6550():
@@ -557,23 +561,26 @@ def fp_mp6550():
     for n, (x, y) in pos.items():
         w, h = (0.25, 0.70) if n in (5, 6, 11, 12) else (0.70, 0.25)
         pads.append(smd(n, "roundrect", x, y, w, h, f"mp6550_{n}", " (roundrect_rratio 0.25)"))
-    g = [text("reference", "REF**", 0, -2.1, "F.SilkS", size=0.6, thick=0.1),
+    g = [text("reference", "REF**", 0, -2.1, "F.SilkS", size=0.8, thick=0.15),
          text("value", "MP6550", 0, 2.1, "F.Fab", size=0.4, thick=0.06), fab_ref(0, 0.3),
          rect(-1.0, -1.0, 1.0, 1.0, "F.Fab", 0.1), line(-1.0, -0.6, -0.6, -1.0, "F.Fab", 0.1),
          circle(-1.6, -1.25, 0.1, "F.SilkS", 0.1, True),
          rect(-1.6, -1.6, 1.6, 1.6, "F.CrtYd", 0.05)]
     return footprint("MPS_QFN-12_2x2mm_P0.5mm", "MPS QFN-12 2 x 2 mm, 0.5 mm pitch, no exposed pad (MP6550GG), land "
-                     "pattern from the MP6550 datasheet rev 1.0 p.13", "MPS QFN-12 MP6550", "smd", g, pads)
+                     "pattern from the MP6550 datasheet rev 1.0 p.13", "MPS QFN-12 MP6550", "smd", g, pads,
+                     [("Package_DFN_QFN.3dshapes/UQFN-12-1EP_2x2mm_P0.4mm_EP1.1x1.1mm.step", (0, 0, 0), (0, 0, 0))])
 
 
 def fp_keystone_1042():
-    """Keystone 1042 / 1042P SMT 18650 holder (drawings 1042 rev H, 1042P rev C - same mounting pad layout): two pads
-    >= 6.47 x 7.46 mm with >= 86.80 mm overall (pads 6.5 x 7.5 mm, outer edges at y +-43.4), two locating holes on a
-    diagonal 16.00 across x 55.20 along: 2.39 mm near pad 1 (+) and 3.45 mm near pad 2 (-), as placed in the Fusion
-    model - WHICH END TAKES WHICH HOLE IS TO VERIFY on a real holder. Pad 1 = + contact (board-centre end, +y).
-    Body 77.05 x 20.65 x 14.86 mm."""
+    """Keystone 1042 / 1042P SMT 18650 holder, drawing 1042 rev H "mounting pad layout" (1042P rev C identical): two
+    pads >= 6.47 x 7.46 mm, >= 86.80 mm overall (pads 6.5 x 7.5 mm, outer edges y +-43.4); two 3.45 mm peg holes on a
+    diagonal 55.20 along x 16.00 across, and one 2.39 mm hole for the small 1.57 mm peg, 8.51 mm beyond one 3.45 hole
+    and on the other side. That small peg is at the SPRING end: KiCad's stock footprint and 3D model put the 2.39 hole
+    and the coil spring at the same end (the stock silk calls that end "+", but the spring is the - contact, as in the
+    Fusion 1042P model). Pad 1 = + (flat contact, board-centre end, +y), pad 2 = - (spring, -y): this footprint is the
+    stock one rotated -90 deg. TO CHECK on a real 1042: small peg at the spring end. Body 77.05 x 20.65 x 14.86 mm."""
     pads = [smd(1, "rect", 0, 39.65, 6.5, 7.5, "k1042p1"), smd(2, "rect", 0, -39.65, 6.5, 7.5, "k1042p2"),
-            npth(8.0, 27.6, 2.39, "k1042h1"), npth(-8.0, -27.6, 3.45, "k1042h2")]
+            npth(8.0, 27.62, 3.45, "k1042h1"), npth(-8.0, -27.62, 3.45, "k1042h2"), npth(8.0, -36.13, 2.39, "k1042h3")]
     g = [text("reference", "REF**", 0, 0, "F.SilkS", size=1.2, thick=0.18, ang=90),
          text("value", "Keystone_1042", 0, 0, "F.Fab", size=1.0, thick=0.15, ang=90),
          rect(-10.325, -38.525, 10.325, 38.525, "F.Fab", 0.12),
@@ -583,7 +590,8 @@ def fp_keystone_1042():
          rect(-10.7, -43.7, 10.7, 43.7, "F.CrtYd", 0.05)]
     return footprint("Keystone_1042_1x18650_SMD", "Keystone 1042 / 1042P SMT holder for one 18650 cell, pads and "
                      "locating holes from the Keystone drawings (1042 rev H, 1042P rev C)", "battery holder 18650 "
-                     "Keystone 1042", "smd", g, pads)
+                     "Keystone 1042", "smd", g, pads,
+                     [("Battery.3dshapes/BatteryHolder_Keystone_1042_1x18650.step", (0, 0, 0), (0, 0, -90))])
 
 
 def fp_usb4235():
@@ -649,8 +657,8 @@ def fp_wire_pads_6():
     for k, nm in enumerate(names):
         x = -5.0 + 2.0 * k
         pads.append(smd(k + 1, "rect", x, 0, 1.5, 3.0, f"wp6_{k}", paste=False))
-        g.append(text("user", nm, x, -2.3, "F.SilkS", size=0.7, thick=0.12, ang=90 if len(nm) > 2 else 0))
-    g.append(rect(-6.0, -3.4, 6.0, 1.75, "F.CrtYd", 0.05))
+        g.append(text("user", nm, x, -3.15 if len(nm) > 2 else -2.35, "F.SilkS", size=0.8, thick=0.15, ang=90 if len(nm) > 2 else 0))
+    g.append(rect(-6.0, -4.6, 6.0, 1.75, "F.CrtYd", 0.05))
     return footprint("SolderWire_Pads_1x06_P2.00mm_Named", "6 wire solder pads 1.5 x 3.0 mm, 2.0 mm pitch, named GND B A "
                      "VCC M2 M1 (Pololu encoder order)", "solder wire pads 2.0mm", "smd", g, pads)
 
@@ -670,9 +678,12 @@ def fp_pico_socket():
          text("user", "USB", 0, -19.0, "F.Fab", size=0.8, thick=0.12),
          rect(-7.0, 16.5, 7.0, 25.5, "F.Fab", 0.1), text("user", "ANTENNA KEEP-OUT", 0, 21.0, "F.Fab", size=0.8, thick=0.12),
          rect(-10.16, -25.4, -7.62, 25.4, "F.SilkS", 0.12), rect(7.62, -25.4, 10.16, 25.4, "F.SilkS", 0.12),
-         rect(-11.0, -26.0, 11.0, 26.0, "F.CrtYd", 0.05)]
+         # courtyard = the two socket rows only: the module sits 8.5 mm up, so low parts (0603) may go between the rows
+         rect(-10.66, -26.0, -7.12, 26.0, "F.CrtYd", 0.05), rect(7.12, -26.0, 10.66, 26.0, "F.CrtYd", 0.05)]
     return footprint("RPi_Pico_Socket_2x20_P2.54mm_Vertical", "Raspberry Pi Pico W / Pico 2 W on two 1x20 2.54 mm female "
-                     "sockets, rows 17.78 mm", "raspberry pi pico socket 2x20", "through_hole", g, pads)
+                     "sockets, rows 17.78 mm", "raspberry pi pico socket 2x20", "through_hole", g, pads,
+                     [("Connector_PinSocket_2.54mm.3dshapes/PinSocket_1x20_P2.54mm_Vertical.step", (x, 24.13, 0), (0, 0, 0))
+                      for x in (-8.89, 8.89)])
 
 FOOTPRINTS = {
     "KD_Power": [("Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm", fp_ryz),

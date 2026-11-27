@@ -4,7 +4,7 @@
   (tags "Bosch BMP388 barometer LGA")
   (attr smd)
   (fp_text reference "REF**" (at 0 -1.7 0) (layer "F.SilkS")
-    (effects (font (size 0.6 0.6) (thickness 0.1)))
+    (effects (font (size 0.8 0.8) (thickness 0.15)))
     (tstamp 72588430-e5fd-5ba4-8f28-3e6ca78deb0e)
   )
   (fp_text value "BMP388" (at 0 1.7 0) (layer "F.Fab")

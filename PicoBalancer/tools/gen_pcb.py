@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage 0 board: outline, mounting holes, placement guides. Run with KiCad's Python:
+"""Board: outline, mounting holes, guides, and (stage 3) every footprint placed with its nets. Run with KiCad's Python:
 
     "C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py
 
@@ -14,7 +14,8 @@ import sys
 import pcbnew
 
 from design import (BOARD_H, BOARD_W, BT_POS, ENCODER_ZONE, HOLDER, HOLDER_CHANNEL, HOLE_D, HOLE_KEEPOUT,
-                    HOLES, PROJECT, REVISION, DATE, SHARED_LIBS, ZONES, BOLT_KEEPOUT_R, HOLDER_HOLES, CLAMP_HOLES, COVER_PILLAR, to_kicad)
+                    HOLES, PROJECT, REVISION, DATE, SHARED_LIBS, ZONES, BOLT_KEEPOUT_R, HOLDER_HOLES, CLAMP_HOLES, COVER_PILLAR, to_kicad,
+                    BOM, DNP, PLACEMENT, VALUES, build_nets)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PCB = os.path.join(ROOT, f"{PROJECT}.kicad_pcb")
@@ -94,6 +95,230 @@ def dxf_circles():
     return out
 
 
+KD_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), SHARED_LIBS))
+STOCK_FP = next(p for p in ("C:/Program Files/KiCad/10.0/share/kicad/footprints", "/usr/share/kicad/footprints")
+                if os.path.isdir(p))
+
+
+def place_parts(board):
+    """Load every BOM footprint (except bought-only lines), place it per design.PLACEMENT and assign pad nets."""
+    netmap = {}
+    for net, conns in build_nets().items():
+        for r, p in conns:
+            netmap[(r, p)] = net
+    nets = {}
+    for net in sorted(set(netmap.values())):
+        ni = pcbnew.NETINFO_ITEM(board, net)
+        board.Add(ni)
+        nets[net] = ni
+    placed, missing_pads = 0, []
+    for refs, val, sym, fpid, _role in BOM:
+        if sym == "-":
+            continue
+        lib, name = fpid.split(":")
+        path = os.path.join(KD_DIR if lib.startswith("KD_") else STOCK_FP, f"{lib}.pretty")
+        for ref in refs.split():
+            fp = pcbnew.FootprintLoad(path, name)
+            if fp is None:
+                raise SystemExit(f"{ref}: footprint {fpid} not found")
+            fp.SetFPID(pcbnew.LIB_ID(lib, name))
+            fp.SetReference(ref)
+            fp.SetValue(VALUES.get(ref, val.split(" (")[0].split(",")[0]))
+            x, y, rot = PLACEMENT[ref]
+            fp.SetPosition(pt(x, y))
+            fp.SetOrientationDegrees(rot)
+            if ref in DNP:
+                fp.SetDNP(True)
+            board.Add(fp)
+            pads = {pd.GetNumber() for pd in fp.Pads()}
+            for pd in fp.Pads():
+                n = netmap.get((ref, pd.GetNumber()))
+                if n:
+                    pd.SetNet(nets[n])
+            missing_pads += [f"{r}.{p}" for (r, p) in netmap if r == ref and p not in pads]
+            placed += 1
+    if missing_pads:
+        raise SystemExit(f"netlist pins without a pad: {missing_pads}")
+    return placed
+
+
+# ---------------------------------------------------------------------------
+# Silkscreen for hand assembly (user 2026-11-27: stencil + reflow, parts placed with tweezers):
+# * R / C: the VALUE on silk next to the part (reference moved to F.Fab for the assembly drawing);
+#   other parts: the reference. Each label goes to the first free spot (no pad, hole, edge, other label or
+#   foreign silk), 1.0 mm text, falling back to 0.8 mm.
+# * pin-1 dot outside pad 1 of every part with 3+ pads; cathode bar outside pad 1 of every diode / LED.
+# ---------------------------------------------------------------------------
+def short_value(ref, val):
+    v = val.split(" ")[0]
+    if ref.startswith("C"):
+        m = re.match(r"([\d.]+)([pnu])F", v)
+        if m:
+            num, unit = float(m.group(1)), m.group(2)
+            if unit == "u" and num < 1:
+                num, unit = num * 1000, "n"
+            return f"{num:g}{unit}"
+    return v
+
+
+def _box(x0, y0, x1, y1):
+    return (min(x0, x1), min(y0, y1), max(x0, x1), max(y0, y1))
+
+
+def _hit(a, b, m=0.0):
+    return not (a[2] + m <= b[0] or b[2] + m <= a[0] or a[3] + m <= b[1] or b[3] + m <= a[1])
+
+
+def _bb(item):
+    b = item.GetBoundingBox()
+    return _box(pcbnew.ToMM(b.GetX()), pcbnew.ToMM(b.GetY()), pcbnew.ToMM(b.GetRight()), pcbnew.ToMM(b.GetBottom()))
+
+
+def silk_pass(board):
+    ex0, ey0 = to_kicad(-BOARD_W / 2, -BOARD_H / 2)
+    ex1, ey1 = to_kicad(BOARD_W / 2, BOARD_H / 2)
+    pads, silk, marks1 = [], [], []                      # obstacles in sheet mm; marks1 = existing dots / arrows
+    for fp in board.GetFootprints():
+        for pd in fp.Pads():
+            pads.append(_bb(pd))
+        for g in fp.GraphicalItems():
+            if g.GetLayer() == pcbnew.F_SilkS and g.GetClass() != "PCB_TEXT":
+                silk.append((fp.GetReference(), _bb(g)))
+                if g.GetShape() in (pcbnew.SHAPE_T_CIRCLE, pcbnew.SHAPE_T_POLY):
+                    marks1.append((fp.GetReference(), _bb(g)))
+    labels, failed, marks, marked = [], [], 0, []
+
+    def free(box, owner):
+        if box[0] < ex0 + 0.5 or box[1] < ey0 + 0.5 or box[2] > ex1 - 0.5 or box[3] > ey1 - 0.5:
+            return False
+        if any(_hit(box, p, 0.2) for p in pads) or any(_hit(box, l, 0.25) for l in labels):
+            return False
+        return not any(o != owner and _hit(box, b, 0.15) for o, b in silk)
+
+    for fp in sorted(board.GetFootprints(), key=lambda f: f.GetReference()):
+        ref = fp.GetReference()
+        if ref.startswith("H"):
+            continue
+        passive = re.match(r"[RC]\d", ref) is not None
+        fref = fp.Reference()
+        if passive:
+            fref.SetLayer(pcbnew.F_Fab)
+            fref.SetTextSize(pcbnew.VECTOR2I(MM(0.5), MM(0.5)))
+            fref.SetTextThickness(MM(0.08))
+            fref.SetPosition(fp.GetPosition())
+            t = pcbnew.PCB_TEXT(board)
+            t.SetText(short_value(ref, fp.GetValue()))
+            t.SetLayer(pcbnew.F_SilkS)
+            board.Add(t)
+        else:
+            t = fref
+            t.SetVisible(True)
+        t.SetTextAngleDegrees(0)
+        t.SetKeepUpright(True)
+        b = fp.GetBoundingBox(False, False)
+        cx0, cy0, cx1, cy1 = (pcbnew.ToMM(b.GetX()), pcbnew.ToMM(b.GetY()), pcbnew.ToMM(b.GetRight()), pcbnew.ToMM(b.GetBottom()))
+        mx, my = (cx0 + cx1) / 2, (cy0 + cy1) / 2
+        ok = False
+        for size in (1.0, 0.8):
+            t.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size)))
+            t.SetTextThickness(MM(0.15))
+            t.SetTextAngleDegrees(0)
+            t.SetPosition(pcbnew.VECTOR2I(0, 0))
+            tb = _bb(t)
+            w, h = tb[2] - tb[0], tb[3] - tb[1]
+            vertical = round(fp.GetOrientationDegrees()) % 180 == 90
+            cands = []
+            for g in (0.35, 1.2):
+                horiz = [(0, mx, cy0 - g - h / 2), (0, mx, cy1 + g + h / 2), (0, cx0 - g - w / 2, my),
+                         (0, cx1 + g + w / 2, my), (0, cx0 - g - w / 2, cy0 - g - h / 2),
+                         (0, cx1 + g + w / 2, cy0 - g - h / 2), (0, cx0 - g - w / 2, cy1 + g + h / 2),
+                         (0, cx1 + g + w / 2, cy1 + g + h / 2)]
+                rot = [(90, mx, cy0 - g - w / 2), (90, mx, cy1 + g + w / 2), (90, cx0 - g - h / 2, my),
+                       (90, cx1 + g + h / 2, my)]
+                cands += (rot + horiz) if vertical else (horiz + rot)
+            for ang, x, y in cands:
+                t.SetTextAngleDegrees(ang)
+                t.SetPosition(pcbnew.VECTOR2I(MM(x), MM(y)))
+                box = _bb(t)
+                if free(box, ref):
+                    labels.append(box)
+                    ok = True
+                    break
+            if ok:
+                break
+        if not ok:
+            failed.append(ref)
+            t.SetTextSize(pcbnew.VECTOR2I(MM(0.8), MM(0.8)))
+            t.SetPosition(pcbnew.VECTOR2I(MM(mx), MM(cy0 - 0.9)))
+        # polarity / pin-1 marks
+        p1 = [pd for pd in fp.Pads() if pd.GetNumber() in ("1", "A1")]
+        if not p1 or len(fp.Pads()) < 2 or ref.startswith(("BT", "J7", "J8")):
+            continue
+        pd = p1[0]
+        pb = _bb(pd)
+        px, py = (pb[0] + pb[2]) / 2, (pb[1] + pb[3]) / 2
+        fx, fy = pcbnew.ToMM(fp.GetPosition().x), pcbnew.ToMM(fp.GetPosition().y)
+        dx, dy = px - fx, py - fy
+        is_diode = ref.startswith("D")
+        if is_diode:                                     # bar beyond the cathode pad, across the diode axis
+            if abs(dx) >= abs(dy):
+                xb = (pb[0] - 0.35) if dx < 0 else (pb[2] + 0.35)
+                seg = ((xb, pb[1] - 0.2), (xb, pb[3] + 0.2))
+            else:
+                yb = (pb[1] - 0.35) if dy < 0 else (pb[3] + 0.35)
+                seg = ((pb[0] - 0.2, yb), (pb[2] + 0.2, yb))
+            own = [bx for o, bx in silk if o == ref]
+            sb = _box(seg[0][0] - 0.125, seg[0][1] - 0.125, seg[1][0] + 0.125, seg[1][1] + 0.125)
+            if any(_hit(sb, bx) for bx in own):          # the footprint already marks the cathode there: move out
+                if abs(dx) >= abs(dy):
+                    off = -0.4 if dx < 0 else 0.4
+                    seg = ((seg[0][0] + off, seg[0][1]), (seg[1][0] + off, seg[1][1]))
+                else:
+                    off = -0.4 if dy < 0 else 0.4
+                    seg = ((seg[0][0], seg[0][1] + off), (seg[1][0], seg[1][1] + off))
+            sh = pcbnew.PCB_SHAPE(board)
+            sh.SetShape(pcbnew.SHAPE_T_SEGMENT)
+            sh.SetStart(pcbnew.VECTOR2I(MM(seg[0][0]), MM(seg[0][1])))
+            sh.SetEnd(pcbnew.VECTOR2I(MM(seg[1][0]), MM(seg[1][1])))
+            sh.SetWidth(MM(0.25))
+            sh.SetLayer(pcbnew.F_SilkS)
+            board.Add(sh)
+            marks += 1
+            marked.append(ref)
+            continue
+        if len(fp.Pads()) < 3:
+            continue
+        n = max((dx * dx + dy * dy) ** 0.5, 1e-6)
+        ux, uy = dx / n, dy / n
+        hw, hh = (pb[2] - pb[0]) / 2, (pb[3] - pb[1]) / 2
+        placed = False
+        for extra in (0.45, 0.7, 1.0):
+            # outward from the part centre, past the pad edge
+            k = min(hw / abs(ux) if abs(ux) > 1e-6 else 1e9, hh / abs(uy) if abs(uy) > 1e-6 else 1e9)
+            cx, cy = px + ux * (k + extra), py + uy * (k + extra)
+            dot = _box(cx - 0.3, cy - 0.3, cx + 0.3, cy + 0.3)
+            if any(_hit(dot, bx, 0.3) for o, bx in marks1 if o == ref):
+                placed = True                            # footprint already has a pin-1 mark there
+                break
+            if not any(_hit(dot, p, 0.15) for p in pads) and not any(_hit(dot, l, 0.1) for l in labels):
+                c = pcbnew.PCB_SHAPE(board)
+                c.SetShape(pcbnew.SHAPE_T_CIRCLE)
+                c.SetCenter(pcbnew.VECTOR2I(MM(cx), MM(cy)))
+                c.SetEnd(pcbnew.VECTOR2I(MM(cx + 0.15), MM(cy)))
+                c.SetWidth(MM(0.3))
+                c.SetFilled(True)
+                c.SetLayer(pcbnew.F_SilkS)
+                board.Add(c)
+                marks += 1
+                marked.append(ref)
+                placed = True
+                break
+        if not placed:
+            failed.append(ref + " pin1")
+    print("  marks added:", " ".join(marked))
+    return len(labels), marks, failed
+
+
 def main():
     write_hole_fp()
     board = pcbnew.BOARD()
@@ -102,7 +327,7 @@ def main():
     tb.SetTitle(PROJECT)
     tb.SetRevision(REVISION)
     tb.SetDate(DATE)
-    tb.SetComment(0, "Stage 0: outline, holes, placement guides (KiCad-Designs/PicoBalancer)")
+    tb.SetComment(0, "Stage 3: placement (KiCad-Designs/PicoBalancer)")
     w, h = BOARD_W / 2, BOARD_H / 2
     rect(board, -w, -h, w, h, pcbnew.Edge_Cuts, 0.1)
     for i, (x, y) in enumerate(HOLES):
@@ -116,26 +341,8 @@ def main():
         c.SetLayer(pcbnew.Dwgs_User)
         c.SetWidth(MM(0.1))
         board.Add(c)
-    for x, y, d in HOLDER_HOLES:                      # holder locating holes (guides until the holder footprint exists)
-        c = pcbnew.PCB_SHAPE(board)
-        c.SetShape(pcbnew.SHAPE_T_CIRCLE)
-        c.SetCenter(pt(x, y))
-        c.SetEnd(pt(x + d / 2, y))
-        c.SetLayer(pcbnew.Dwgs_User)
-        c.SetWidth(MM(0.05))
-        board.Add(c)
-    bw, bl = HOLDER["body"]
-    for ref, (x, y) in BT_POS.items():
-        rect(board, x - bw / 2, y - bl / 2, x + bw / 2, y + bl / 2, pcbnew.Dwgs_User)
-        s = HOLDER["pad_span_min"] / 2
-        rect(board, x - 3.2, y - s, x + 3.2, y - s + 7.3, pcbnew.Dwgs_User)       # pad zones (catalog minimum)
-        rect(board, x - 3.2, y + s - 7.3, x + 3.2, y + s, pcbnew.Dwgs_User)
-        text(board, f"{ref} 1042", x, y - 4, pcbnew.Dwgs_User, 1.2)
-        text(board, "+ end down", x, y + 4, pcbnew.Dwgs_User, 1.0)
     cx, cy = HOLDER_CHANNEL["x"], HOLDER_CHANNEL["y"]
     rect(board, cx[0], cy[0], cx[1], cy[1], pcbnew.Dwgs_User, 0.05)
-    text(board, "USB-C", 0, -97.0, pcbnew.Dwgs_User, 1.0)
-    text(board, "charger", 0, -30, pcbnew.Dwgs_User, 1.0)
     for i, (x, y, d) in enumerate(CLAMP_HOLES):           # battery-clamp bolts (Fusion PCB body, user)
         hole(board, f"H{len(HOLES) + i + 1}", x, y)
     px0, py0, px1, py1 = COVER_PILLAR
@@ -145,10 +352,10 @@ def main():
     for sx in (-1, 1):
         rect(board, sx * ex0, ey0, sx * ex1, ey1, pcbnew.Dwgs_User, 0.05)
     text(board, "encoder connectors (on motors)", 0, 108, pcbnew.Dwgs_User, 1.2)
-    for name, (x0, y0, x1, y1) in ZONES.items():
-        rect(board, x0, y0, x1, y1, pcbnew.Dwgs_User, 0.05)
-        text(board, name, (x0 + x1) / 2, (y0 + y1) / 2, pcbnew.Dwgs_User, 1.0)
-    text(board, f"{PROJECT} rev {REVISION}", 12, 72, pcbnew.F_SilkS, 1.2)
+    text(board, f"{PROJECT} rev {REVISION}", 0, 22.0, pcbnew.F_SilkS, 1.2)
+    n_parts = place_parts(board)
+    n_lab, n_marks, silk_failed = silk_pass(board)
+    print(f"silk: {n_lab} labels, {n_marks} polarity / pin-1 marks; not placed cleanly: {silk_failed or 'none'}")
     board.Save(PCB)
     def table(name, libs, ext):
         rows = [f'  (lib (name "{n}")(type "KiCad")(uri "${{KIPRJMOD}}/../Libraries/{n}{ext}")(options "")(descr ""))'
@@ -165,7 +372,7 @@ def main():
     dx = dxf_circles()
     bad = [h_ for h_ in HOLES if not any(abs(h_[0] - x) < 0.01 and abs(h_[1] - y) < 0.01 and abs(d - HOLE_D) < 0.01
                                           for x, y, d in dx)]
-    print(f"{len(HOLES)} holes, {len(dx)} DXF circles, outline {BOARD_W} x {BOARD_H}: "
+    print(f"{n_parts} parts placed; {len(HOLES)} holes, {len(dx)} DXF circles, outline {BOARD_W} x {BOARD_H}: "
           + ("IMPORT OK" if not bad and len(dx) == len(HOLES) else f"IMPORT FAIL {bad}"))
     return 0 if not bad else 1
 

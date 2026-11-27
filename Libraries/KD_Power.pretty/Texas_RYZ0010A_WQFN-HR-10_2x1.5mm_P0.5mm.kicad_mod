@@ -4,7 +4,7 @@
   (tags "WQFN-HR TPS22997 RYZ")
   (attr smd)
   (fp_text reference "REF**" (at 0 -1.85 0) (layer "F.SilkS")
-    (effects (font (size 0.6 0.6) (thickness 0.1)))
+    (effects (font (size 0.8 0.8) (thickness 0.15)))
     (tstamp 31b67c67-4eae-51b9-8c33-117dbc757f78)
   )
   (fp_text value "WQFN-HR-10_2x1.5mm" (at 0 1.85 0) (layer "F.Fab")

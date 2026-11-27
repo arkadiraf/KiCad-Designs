@@ -4,7 +4,7 @@
   (tags "MPS QFN-12 MP6550")
   (attr smd)
   (fp_text reference "REF**" (at 0 -2.1 0) (layer "F.SilkS")
-    (effects (font (size 0.6 0.6) (thickness 0.1)))
+    (effects (font (size 0.8 0.8) (thickness 0.15)))
     (tstamp f4227b09-4eea-59da-b15a-26a9d639c813)
   )
   (fp_text value "MP6550" (at 0 2.1 0) (layer "F.Fab")
@@ -31,4 +31,9 @@
   (pad "10" smd roundrect (at 1 -0.75) (size 0.7 0.25) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25) (tstamp b19c4fb3-f392-571c-8749-fe7d906f3110))
   (pad "11" smd roundrect (at 0.25 -1) (size 0.25 0.7) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25) (tstamp 87437f50-f95b-5e8b-9ba2-9bc42b231c82))
   (pad "12" smd roundrect (at -0.25 -1) (size 0.25 0.7) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25) (tstamp f5a1be7f-67a2-5c61-a37b-bcbd8b55ea28))
+  (model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/UQFN-12-1EP_2x2mm_P0.4mm_EP1.1x1.1mm.step"
+    (offset (xyz 0 0 0))
+    (scale (xyz 1 1 1))
+    (rotate (xyz 0 0 0))
+  )
 )

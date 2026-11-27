@@ -4,7 +4,7 @@
   (tags "VQFN-HR TPS61235P RWL boost")
   (attr smd)
   (fp_text reference "REF**" (at 0 -2 0) (layer "F.SilkS")
-    (effects (font (size 0.6 0.6) (thickness 0.1)))
+    (effects (font (size 0.8 0.8) (thickness 0.15)))
     (tstamp 1eb3478b-719d-5d6e-ab22-fedad954fe5d)
   )
   (fp_text value "VQFN-HR-9_2.5x2.5mm" (at 0 2.1 0) (layer "F.Fab")

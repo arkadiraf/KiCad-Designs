@@ -194,7 +194,7 @@ BOM = [
     ("J5", "USB-C receptacle vertical (GCT USB4235-03-C)", "Connector:USB_C_Receptacle_USB2.0_16P",
      "KD_Connectors:USB_C_Receptacle_GCT_USB4235_Vertical", "charge input, D+/D- to the charger"),
     ("U6", "BQ25606", "KD_Power:BQ25606",
-     "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias", "1S 3 A charger, power path"),
+     "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm", "1S 3 A charger, power path (thermal vias 0.3 mm added at routing: the stock _ThermalVias variant uses 0.2 mm drills)"),
     ("L1", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "charger buck inductor"),
     ("R13 R14", "5.1k", "Device:R", _R, "USB-C CC1 / CC2 pull-downs"),
     ("R15", "226", "Device:R", _R, "ICHG 3.0 A (1.5 A per cell)"),
@@ -297,8 +297,12 @@ BOM = [
 # the 3.45 mm hole and which the 2.39 mm hole is TO VERIFY on the part. BT2 holes are for a real holder in the same
 # orientation as BT1 (+ end toward the board centre); the Fusion right holder is a mirrored copy, not a buildable part.
 # offsets from the holder centre (model bosses): + end (+8 toward the board centre line, +27.6 in y), - end (-8, -27.6)
-HOLDER_HOLES = [(-_hx + 8.0, _hy + 27.6, 2.39), (-_hx - 8.0, _hy - 27.6, 3.45),
-                (_hx + 8.0, _hy + 27.6, 2.39), (_hx - 8.0, _hy - 27.6, 3.45)]   # BT2 = BT1 translated (real part)
+# Keystone 1042 drawing rev H mounting pad layout (same as KiCad's stock footprint): two 3.45 mm peg holes on the
+# 55.20 x 16.00 diagonal and a 2.39 mm hole for the small peg 8.51 mm beyond one 3.45 hole, on the other side, at the
+# spring (-) end (KiCad stock model / footprint; TO CHECK on a real holder).
+# Offsets from the holder centre (+ end at +y): (+8, +27.62) 3.45, (-8, -27.62) 3.45, (+8, -36.13) 2.39.
+HOLDER_HOLES = [(sx + dx, _hy + dy, d) for sx in (-_hx, _hx)
+                for dx, dy, d in ((8.0, 27.62, 3.45), (-8.0, -27.62, 3.45), (8.0, -36.13, 2.39))]
 
 REVIEW_PARTS = [
     # top channel between the holders: USB-C + charger
@@ -503,3 +507,52 @@ def build_nets():
     add("USER_LED_A", "D4", 2), add("GND", "D4", 1)
     add("GND", "J6", 1), add("UART0_TX", "J6", 2), add("UART0_RX", "J6", 3), add("3V3", "J6", 4)
     return nets
+
+# ---------------------------------------------------------------------------
+# Placement (stage 3, first pass): ref -> (x, y, rotation deg), board coordinates (centre origin, y down, top view),
+# all parts on top. Groups follow the reviewed Fusion placement (REVIEW_PARTS); small parts sit next to the pin they
+# serve. Rotation 90 = 2-pin parts vertical. Courtyard overlaps are checked by gen_pcb.py (DRC).
+# ---------------------------------------------------------------------------
+_P = {
+    # cells: holders flush with the long edges, + pad at the board-centre end
+    "BT1": (BT_POS["BT1"][0], BT_POS["BT1"][1], 0), "BT2": (BT_POS["BT2"][0], BT_POS["BT2"][1], 0),
+    # USB-C at the top edge, CC resistors and VBUS cap beside it (channel x +-8.9 between the holder courtyards)
+    "J5": (0.0, -93.0, 0), "C20": (-7.5, -93.0, 90), "R13": (7.1, -95.0, 90), "R14": (7.1, -91.4, 90),
+    # charger below the cover pillar (y > -56)
+    "R15": (-6.0, -29.0, 90), "R16": (-3.0, -29.0, 90), "R17": (0.0, -29.0, 90), "R18": (3.0, -29.0, 90),
+    "R19": (6.0, -29.0, 90),
+    "U6": (0.0, -47.0, 180), "C21": (4.7, -41.4, 90), "C22": (7.3, -41.4, 90), "C26": (2.8, -41.4, 90),
+    "C25": (-6.6, -44.0, 90), "C23": (-4.0, -48.0, 90), "C24": (-6.6, -48.0, 90),
+    "L1": (-3.5, -38.5, 0), "C27": (1.0, -41.4, 90), "R36": (0.0, -20.0, 90),
+    "D1": (-6.0, -20.0, 90), "R20": (-3.0, -20.0, 90), "TH1": (5.0, -21.3, 0),
+    # per-cell fuse + reverse-polarity FETs, below the holder + ends
+    "F1": (-14.0, -1.5, 90), "Q1": (-14.0, 6.0, 0), "Q3": (-9.0, 6.0, 0),
+    "R28": (-9.5, 2.0, 0), "R30": (-9.5, 10.0, 0), "R32": (-13.5, 10.5, 0),
+    "F2": (14.0, -1.5, 90), "Q2": (14.0, 6.0, 0), "Q4": (9.0, 6.0, 0),
+    "R29": (9.5, 2.0, 0), "R31": (9.5, 10.0, 0), "R33": (13.5, 10.5, 0),
+    # Pico on its sockets, micro-USB end up
+    "U1": (0.0, 58.5, 0),
+    # left column: UART header, MOTOR_EN pull-down, boost
+    "J6": (-22.0, 38.0, 0), "R10": (-14.5, 45.0, 0),
+    "U5": (-20.0, 56.0, 0), "L2": (-20.0, 64.0, 0), "C16": (-26.5, 50.0, 0), "C17": (-26.5, 54.0, 0),
+    "C18": (-26.5, 58.0, 0), "C14": (-14.5, 52.0, 0), "C15": (-14.5, 56.0, 0), "R11": (-14.5, 59.5, 0),
+    "R12": (-20.0, 52.0, 0), "C19": (-20.0, 50.0, 0),
+    # right column: slide switch at the micro-USB height, TPS22810 path, VBAT sense, LEDs
+    "SW1": (20.25, 34.3, 0), "R34": (15.5, 33.0, 90), "R21": (15.5, 37.5, 90), "R22": (25.5, 33.0, 90),
+    "R23": (25.5, 37.5, 90), "U7": (20.25, 45.5, 0), "C28": (15.5, 45.5, 90), "C29": (25.0, 45.5, 90),
+    "D2": (20.25, 50.5, 0), "R24": (20.25, 53.0, 0), "R26": (15.5, 56.5, 90), "R27": (15.5, 60.5, 90),
+    "C30": (18.5, 60.5, 90), "D3": (24.5, 56.0, 90), "R25": (24.5, 60.0, 90), "D4": (20.25, 68.5, 0),
+    "R35": (16.0, 68.5, 0),
+    # motor drivers beside the Pico's lower end, wire pads and vertical connectors at the bottom edge
+    "U3": (-20.0, 76.0, 0), "C6": (-24.0, 76.0, 90), "C8": (-26.5, 76.0, 90), "C10": (-16.0, 76.0, 90),
+    "R8": (-20.0, 80.0, 0), "C12": (-20.0, 72.3, 0),
+    "U4": (20.0, 76.0, 0), "C7": (24.0, 76.0, 90), "C9": (26.5, 76.0, 90), "C11": (16.0, 76.0, 90),
+    "R9": (20.0, 80.0, 0), "C13": (20.0, 72.3, 0),
+    "J7": (-14.0, 91.5, 0), "J8": (14.0, 91.5, 0), "J3": (-14.0, 96.8, 0), "J4": (14.0, 96.8, 0),
+    # IMU at the centre bottom
+    "U2": (0.0, 89.0, 0), "Y1": (5.0, 89.0, 90), "C1": (3.0, 93.6, 90), "C2": (6.0, 93.6, 90),
+    "C3": (-3.0, 93.6, 90), "C4": (-6.0, 93.6, 90), "C5": (0.0, 93.6, 90),
+    "R1": (-6.0, 80.0, 90), "R2": (-4.0, 80.0, 90), "R3": (-2.0, 80.0, 90), "R4": (0.0, 80.0, 90), "R7": (2.0, 80.0, 90),
+    "R5": (4.0, 80.0, 90), "R6": (6.0, 80.0, 90), "TP1": (-6.5, 87.0, 0),
+}
+PLACEMENT = _P
