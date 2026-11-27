@@ -65,13 +65,21 @@ MPN = {
     "R25": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "R26 R27": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "C30": (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 0603 (stock)"),
-    "BT1 BT2": ("Keystone", "1042P", "verify", "SMT polarized 18650 holder; peg holes from the full drawing"),
+    "BT1 BT2": ("Keystone", "1042P", "verify", "SMT polarized 18650 holder; alternative 1042 (non-polarized, same pads) - "
+                "needs Q1-Q4 reverse protection, which is fitted either way; peg holes from the full drawing"),
+    "Q1 Q2": ("Diodes Inc.", "DMP2008UFG-7", "ok", "PowerDI3333-8, 9.8 mOhm max at -2.5 V, VGSS +-8 V"),
+    "Q3 Q4": ("Diodes Inc.", "DMG2302U-7", "ok", "SOT-23, VGS(th) 0.4-1.0 V, VGSS +-8 V"),
+    "R28 R29": (YAGEO, "RC0603FR-07100KL", "ok", ""),
+    "R30 R31": (YAGEO, "RC0603FR-0710KL", "ok", ""),
+    "R32 R33": (YAGEO, "RC0603FR-071ML", "ok", ""),
     "J6": ("Sullins", "PRPC040SAAN-RC", "DNP", "cut 4 pins from a 1x40 strip"),
     "TP1": ("-", "pad only", "ok", "copper pad"),
 }
 
 # Items without a design.BOM line: refs/use, qty, description, (mfr, MPN, status, note)
 EXTRA = [
+    ("BT1 BT2 alt.", 0, "18650 holder, SMT, NOT polarized (alternative to 1042P, same footprint)",
+     ("Keystone", "1042", "verify", "order instead of 1042P if wanted; qty 0 = alternative")),
     ("Cables", 2, "JST SH 6-pin F-F twisted cable, Pololu encoder cable",
      ("Pololu", "JST SH 6-pin F-F (length TBD)", "TBD", "check pin-1-to-pin-1 mapping")),
     ("Cells", 2, "18650 Li-ion cell", ("any", "18650 (protected or not)", "TBD", "decision open")),
@@ -127,6 +135,16 @@ DATASHEETS = {
     "1042P": [("1042P_Keystone_18650_holders_catalog.pdf",
         "PARTLY (catalog p.29): 1042 / 1042P SMT single 18650, body 77.1 x 20.7 mm, pads >= 86.0 mm overall, "
         "pad >= 7.3 x 6.4 mm, holes 3.5 and 2.4 mm. OPEN: the 1042P product drawing for exact peg positions.")],
+    "1042": [("1042P_Keystone_18650_holders_catalog.pdf",
+        "PARTLY (catalog p.29): 1042 leaf springs (not polarized) shares the 1042 / 1042P / 1130 SMT drawing and pad "
+        "layout. OPEN: product drawing.")],
+    "DMP2008UFG-7": [("DMP2008UFG_Diodes_datasheet.pdf",
+        "CONFIRMED: P-ch, BVDSS -20 V, VGSS +-8 V, RDS(on) max 8 mOhm @ -4.5 V, 9.8 @ -2.5 V, 13 @ -1.8 V; VGS(th) "
+        "-0.4..-1.0 V; ID -11 A steady (TA 25 C); PowerDI3333-8. At 2.3 A per cell: "
+        "23 mV, 0.05 W. OPEN: pinout figure and land pattern vs KiCad Package_SON:Diodes_PowerDI3333-8.")],
+    "DMG2302U-7": [("DMG2302U_Diodes_datasheet.pdf",
+        "CONFIRMED: N-ch SOT-23, BVDSS 20 V, VGSS +-8 V, VGS(th) 0.4-1.0 V (50 uA), RDS(on) 90 mOhm @ 4.5 V / 120 @ "
+        "2.5 V - only switches a 100 k gate pull-up; reversed cell gives VGS -4.2 V, within rating.")],
     "SC0919": [("../RPi_Pico_W_datasheet.pdf", "CONFIRMED: 51 x 21 mm, 2 x 20 pins at 2.54 mm, rows 17.78 mm"),
                ("../RPi_Pico_2_W_datasheet.pdf", "CONFIRMED: same outline and pinout (Pico 2 W upgrade)")],
 }

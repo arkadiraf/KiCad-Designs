@@ -2,7 +2,7 @@
 
 One 60 × 200 × 1.6 mm PCB for a two-wheel balancing robot:
 * **MCU:** Raspberry Pi Pico W (RP2040) on 2 × 20 female sockets, upgradable to a Pico 2 W (RP2350) with no board change.
-* **Cells:** 2 × 18650 in parallel (1S2P) in Keystone 1042P holders.
+* **Cells:** 2 × 18650 in parallel (1S2P) in Keystone 1042P holders, or the non-polarized 1042 on the same footprint. Each cell has its own reverse-polarity FET.
 * **IMU:** BNO086 on SPI0.
 * **Motors:** 2 × MP6550 H-bridges for Pololu micro metal gearmotors, each with a magnetic encoder on one JST-SH 6-pin connector.
 * **Power:** the blocks are reused from [Drone_1S_Pico2W](../Drone_1S_Pico2W/): BQ25606 USB-C charger (vertical GCT USB4235), TPS22810 Pico switch with UVLO, TPS61235P 5.1 V boost.
@@ -52,6 +52,12 @@ Fusion findings, reported but not changed:
 * The PCB body has no holes for those pegs.
 
 ## Key electrical choices (details in the design doc)
+
+* **Reverse-polarity protection, one channel per cell** (Q1–Q4, R28–R33). A shared FET cannot protect parallel cells.
+  * Each holder's + contact goes to BAT through its own P-FET (DMP2008UFG, 9.8 mΩ max at −2.5 V).
+  * A DMG2302U turns that P-FET on only when its own cell is the right way round.
+  * A reversed cell is blocked, an empty holder's contacts are dead, and charging still works through the P-FET channel.
+  * This makes the non-polarized Keystone 1042 safe to use.
 
 * **Back-feed Schottky D2** between the TPS22810 output and Pico VSYS. The Pico's own micro-USB stays usable for
   programming and cannot push current into the cells.

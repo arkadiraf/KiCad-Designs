@@ -175,8 +175,30 @@ BOM = [
     ("R26 R27", "100k", "Device:R", _R, "VBAT_SENSE divider BAT / 2 -> GP28"),
     ("C30", "100nF 16V", "Device:C", _C, "VBAT_SENSE filter"),
     # --- cells, connectors, mechanics ---
-    ("BT1 BT2", "18650 holder Keystone 1042P", "Device:Battery_Cell", "KD_Power:Keystone_1042P_1x18650 (TO CREATE)",
-     "one cell each, in parallel"),
+    # Keystone 1042P (polarized) or 1042 (plain leaf springs, NOT polarized): same SMT pad layout on the catalog page,
+    # so one footprint takes either. With the 1042 a cell can go in backwards -> per-cell protection below.
+    ("BT1 BT2", "18650 holder Keystone 1042P (alt. 1042)", "Device:Battery_Cell",
+     "KD_Power:Keystone_1042_1x18650_SMD (TO CREATE)", "one cell each, in parallel"),
+    # --- per-cell reverse-polarity protection (one channel per holder, x = 1 for BT1, 2 for BT2) ---
+    # Cells are in parallel, so one shared FET cannot protect them: a reversed cell next to a good one would see
+    # 2 x Vcell through the shared node. Each holder gets its own high-side P-FET, and its gate is enabled only by
+    # that cell's OWN voltage:
+    #   BTx- -> GND.  BTx+ (CELLx) -> Qp drain;  Qp source -> BAT (common).  Rgs 100k Qp gate -> source (off).
+    #   Qn (DMG2302U) drain -> Qp gate, source -> GND, gate <- CELLx through 10k.  1M CELLx -> GND.
+    # Good cell: CELLx > ~1 V -> Qn on -> Qp gate at GND -> Qp on (Vgs = -Vcell, 9.8 mOhm max at -2.5 V);
+    #   current both ways, so the charger still charges it.
+    # Reversed cell: CELLx = -Vcell -> Qn off (Vgs -4.2 V, within +-8 V) -> Qp Vgs = 0, body diode (drain -> source)
+    #   reverse biased: blocks up to 2 x 4.2 V (BVDSS 20 V).
+    # Empty holder: 1M holds CELLx at 0 -> Qp off, so the contacts are dead and a cell inserted backwards meets an
+    #   FET that is already off. Leakage per good cell: ~4 uA (1M) + 0 (Qn gate).
+    # Not covered: two good cells at very different voltages still equalize through both FETs (insert matched cells).
+    ("Q1 Q2", "DMP2008UFG P-MOSFET 20V 9.8mOhm@-2.5V", "Device:Q_PMOS", "Package_SON:Diodes_PowerDI3333-8",
+     "per-cell reverse-polarity switch, BTx+ (drain) -> BAT (source)"),
+    ("Q3 Q4", "DMG2302U N-MOSFET 20V Vth<=1V", "Device:Q_NMOS", "Package_TO_SOT_SMD:SOT-23",
+     "turns Qp on only when its own cell is the right way round"),
+    ("R28 R29", "100k", "Device:R", _R, "Qp gate -> source (default off)"),
+    ("R30 R31", "10k", "Device:R", _R, "Qn gate series from CELLx"),
+    ("R32 R33", "1M", "Device:R", _R, "CELLx pull-down: empty holder = Qp off"),
     ("J6", "1x4 2.54 mm header (DNP)", "Connector_Generic:Conn_01x04",
      "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical", "UART0 debug: GND, TX, RX, 3V3"),
     ("TP1", "test pad", "Connector:TestPoint", "TestPoint:TestPoint_Pad_D1.5mm", "BNO086 BOOTN"),
