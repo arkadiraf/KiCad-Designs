@@ -65,7 +65,7 @@ Fusion findings, reported but not changed:
 * **BAT feeds both paths:** the TPS22810 (Pico VSYS) and the TPS61235P boost take their input from BAT, after the per-cell FETs. The BQ25606 SYS pin carries only its own capacitors.
 * **Boost EN** comes only from the Pico (GP20, 100 k pull-down), so motor power is off by default. MOTOR_EN (GP2) gates
   both MP6550 nSLEEP_HB pins the same way.
-* **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop (the 2.70 V divider is recommended).
+* **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 internal UVLO (2.54 V on / 2.41 V off, user decision) is the last backstop; firmware sleeps well above it.
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch on the right edge, with the TPS22810 and D2 beside it.
 * **BNO086 on SPI0** (GP4–GP7), with INT on GP8, RST on GP9 and WAKE on GP3. PS1 and PS0/WAKE have pull-ups.
 * **Slide switch:** E-Switch EG1218 (Digi-Key EG1903-ND) on the TPS22810 EN/UVLO pin, signal only.

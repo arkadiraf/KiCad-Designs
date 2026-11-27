@@ -178,7 +178,8 @@ BOM = [
     ("SW1", "SPDT slide (E-Switch EG1218)", "Switch:SW_SPDT",
      "KD_Switches:SW_E-Switch_EG1218_SPDT_Vertical (TO CREATE)", "power switch on EN/UVLO"),
     ("C28 C29", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
-    ("R21 R22 R23", "156k / 100k / 1.27M (DNP option)", "Device:R", _R, "3.30 / 2.70 V UVLO divider option"),
+    ("R21 R22 R23", "156k / 100k / 1.27M (DNP option)", "Device:R", _R,
+     "3.30 / 2.70 V UVLO divider option; not fitted: internal 2.54 / 2.41 V kept (user 2026-11-27)"),
     # Pico datasheet "Powering Pico": external supply into VSYS through a Schottky, so the Pico's own USB
     # (VBUS -> its Schottky -> VSYS) cannot back-feed the TPS22810 and the cells.
     ("D2", "Schottky 20V 1A (MBR120VLSFT1G)", "Device:D_Schottky", "Diode_SMD:D_SOD-123F",
