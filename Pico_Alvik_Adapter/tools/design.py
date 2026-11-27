@@ -160,7 +160,7 @@ COMPONENTS = {
     # ref: (lib_id, value, footprint, extra properties)
     "U1": (f"{LIB}:RPi_Pico_W", "Raspberry Pi Pico W",
            f"{LIB}:RPi_Pico_W_SMD_Castellated", {}),
-    "J1": (f"{LIB}:Arduino_Nano_Headers", "Nano footprint headers (2x 1x15 SMD male)",
+    "J1": (f"{LIB}:Arduino_Nano_Headers", "2x TE 6-146132-3 (1x15 SMD male)",
            f"{LIB}:Arduino_Nano_SMD_Headers_Bottom", {}),
     "D1": ("Device:D_Schottky", "PMEG6020ER (opt. 1206 0R)",
            "Diode_SMD:Nexperia_CFP3_SOD-123W", {}),

@@ -2,6 +2,18 @@
 # Export fabrication + documentation outputs with kicad-cli (KiCad 7+).
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# Portable tools: kicad-cli / python / zip from PATH, else the Windows defaults
+KCLI="${KICAD_CLI:-$(command -v kicad-cli || echo "/c/Program Files/KiCad/10.0/bin/kicad-cli.exe")}"
+kicad-cli() { "$KCLI" "$@"; }
+PY="${PYTHON:-python3}"
+"$PY" -c 'import numpy' 2>/dev/null || PY=python
+command -v zip >/dev/null || zip() {    # zip -q out.zip files...
+  shift; local out="$1"; shift
+  "$PY" -c 'import sys, zipfile
+with zipfile.ZipFile(sys.argv[1], "w", zipfile.ZIP_DEFLATED) as z:
+    for f in sys.argv[2:]:
+        z.write(f, f[2:] if f.startswith("./") else f)' "$out" "$@"; }
+SVGMODE=""; [ "$(kicad-cli version | cut -d. -f1)" -ge 9 ] && SVGMODE="--mode-single"
 P=Pico_Alvik_Adapter
 F=fabrication
 rm -rf "$F"; mkdir -p "$F/docs"
@@ -66,7 +78,7 @@ done
 kicad-cli pcb export pos --side both --format csv --units mm \
     -o "$F/${P}_positions.csv" "$P.kicad_pcb"
 kicad-cli sch export python-bom -o "$F/docs/${P}_bom.xml" "$P.kicad_sch" >/dev/null
-python3 tools/make_bom.py "$F/docs/${P}_bom.xml" "$F/${P}_BOM.csv"
+"$PY" tools/make_bom.py "$F/docs/${P}_bom.xml" "$F/${P}_BOM.csv"
 rm -f "$F/docs/${P}_bom.xml"
 
 kicad-cli sch export pdf -o "$F/docs/${P}_schematic.pdf" "$P.kicad_sch"
@@ -78,11 +90,11 @@ kicad-cli pcb export pdf --layers "B.Cu,B.Silkscreen,B.Mask,Edge.Cuts" --mirror 
 # PNG previews (SVG -> PNG)
 for side in top bottom; do
   if [ $side = top ]; then L="F.Cu,F.Silkscreen,F.Mask,Edge.Cuts,F.Fab"; M=""; else L="B.Cu,B.Silkscreen,B.Mask,Edge.Cuts,B.Fab"; M="--mirror"; fi
-  kicad-cli pcb export svg --layers "$L" $M --exclude-drawing-sheet --page-size-mode 2 \
+  kicad-cli pcb export svg --layers "$L" $M --exclude-drawing-sheet --page-size-mode 2 $SVGMODE \
       -o "$F/docs/${P}_$side.svg" "$P.kicad_pcb" >/dev/null
-  python3 -c "import cairosvg,sys; cairosvg.svg2png(url=sys.argv[1], write_to=sys.argv[2], output_width=900, background_color='white')" \
+  "$PY" -c "import sys; sys.path.insert(0, 'tools'); from render_board import svg_to_png; open(sys.argv[2], 'wb').write(svg_to_png(sys.argv[1], 900))" \
       "$F/docs/${P}_$side.svg" "$F/docs/${P}_$side.png"
 done
-python3 tools/render_board.py >/dev/null
+"$PY" tools/render_board.py >/dev/null
 cp tools/fabrication_README.md "$F/README.md"
 echo "outputs in $F/"

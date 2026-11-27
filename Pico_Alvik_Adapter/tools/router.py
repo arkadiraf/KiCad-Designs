@@ -29,6 +29,8 @@ CLR = 0.2          # copper clearance, mm
 EDGE = 0.4         # copper to board edge, mm (OSH Park min 15 mil = 0.381)
 VIA_COST = 2.0     # mm-equivalent cost of a via
 TURN_COST = 0.2    # per 45 degree direction change
+DIAG = 0.05        # extra track margin: a 45-degree segment between grid points can pass
+                   # a pad corner closer than its grid vertices (DRC hit 0.179 mm, v1.7)
 WIDTH = {"signal": 0.25, "power": 0.5, "GND": 0.4}
 VIA = {"signal": (0.6, 0.3), "power": (0.8, 0.4), "GND": (0.6, 0.3)}
 LAYERS = ("F", "B")
@@ -72,6 +74,7 @@ class Board:
 
     def reset(self):
         self.own = {l: np.zeros((self.ny, self.nx), np.int32) for l in LAYERS}
+        self.failed_pins = []
         self.groups = {}
         self.padmask_all = np.zeros((self.ny, self.nx), bool)
         self.pad_cells = {}
@@ -110,7 +113,7 @@ class Board:
                 if n in s:
                     foreign &= (o != g)
             dist[l] = ndimage.distance_transform_edt(~foreign) * G
-        free = {l: (dist[l] >= w / 2 + CLR + G / 2) & (self.dist_edge >= w / 2 + EDGE + G)
+        free = {l: (dist[l] >= w / 2 + CLR + G / 2 + DIAG) & (self.dist_edge >= w / 2 + EDGE + G)
                 for l in LAYERS}
         via_ok = ((dist["F"] >= d / 2 + CLR + G / 2) & (dist["B"] >= d / 2 + CLR + G / 2) &
                   (self.dist_edge >= d / 2 + EDGE + G) &
@@ -260,11 +263,16 @@ class Board:
             path = self.astar(free, via_ok, tree, tgt)
             if path is None:
                 print(f"   FAILED {net} -> {pin}")
+                self.failed_pins.append((net, pin))
                 ok = False
                 continue
             self.commit(net, kind, path, tree)
             tree[l] |= m
         return ok
+
+
+from design import SIGNALS                  # noqa: E402
+REQUIRED = {s[0] for s in SIGNALS[:8]} | {"VSYS", "VBUS", "+3V3", "VIN", "3V3_NANO"}
 
 
 def net_order(geom, board):
@@ -276,11 +284,11 @@ def net_order(geom, board):
             jj, ii = np.nonzero(m)
             cs.append((ii.mean() * G, jj.mean() * G))
         return sum(math.dist(a, b) for a, b in zip(cs, cs[1:]))
-    from design import SIGNALS
-    required = {s[0] for s in SIGNALS[:8]}
+    required = REQUIRED
     nets = [n for n in geom["nets"] if n != "GND"]
     power = sorted([n for n in nets if geom["nets"][n]["power"]], key=length, reverse=True)
-    req = sorted([n for n in nets if n in required], key=length, reverse=True)
+    req = sorted([n for n in nets if n in required and not geom["nets"][n]["power"]],
+                 key=length, reverse=True)
     opt = sorted([n for n in nets if not geom["nets"][n]["power"] and n not in required],
                  key=length, reverse=True)
     return power + req + opt + ["GND"]
@@ -291,6 +299,7 @@ def main():
     board = Board(geom)
     order = net_order(geom, board)
     best = None
+    gnd_try = 0
     for it in range(12):
         board.reset()
         failed = []
@@ -300,15 +309,27 @@ def main():
                 failed.append(net)
         print(f"pass {it + 1}: {len(failed)} failed {failed}")
         real = [n for n in failed if n != "GND"]   # GND is completed by the pours
-        if best is None or len(real) < best[0]:
-            best = (len(real), list(board.tracks), list(board.vias), failed)
+        gnd_fail = sorted(p for n, p in board.failed_pins if n == "GND")
+        score = (len(real), len(gnd_fail))
+        if best is None or score < best[0]:
+            best = (score, list(board.tracks), list(board.vias), failed)
+        if not real and not gnd_fail:
+            break
+        if not real and gnd_try < 2:
+            # Unrouted GND pins are left to the pours, but a pin boxed in by
+            # other nets' vias becomes an isolated island (seen on U1-33 AGND).
+            # Retry with GND routed before the optional (spare) nets.
+            gnd_try += 1
+            req_end = max(order.index(n) for n in order if n in REQUIRED) + 1
+            order = [n for n in order[:req_end] if n != "GND"] + ["GND"] +                     [n for n in order[req_end:] if n != "GND"]
+            continue
         if not real:
             break
         order = failed + [n for n in order if n not in failed]
-        if "GND" in order:
+        if "GND" in order and gnd_try == 0:
             order.remove("GND")
             order.append("GND")
-    nfail, tracks, vias, failed = best
+    _score, tracks, vias, failed = best
     with open(os.path.join(BUILD, "routes.json"), "w") as f:
         json.dump({"tracks": tracks, "vias": vias, "failed": failed}, f, indent=1)
     print(f"routes written: {len(tracks)} segments, {len(vias)} vias, failed nets: {failed}")

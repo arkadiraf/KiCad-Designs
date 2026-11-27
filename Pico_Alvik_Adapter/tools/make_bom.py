@@ -6,8 +6,8 @@ import xml.etree.ElementTree as ET
 
 NOTES = {
     "U1": "Raspberry Pi Pico W (SC0918), solder by castellated pads, no headers",
-    "J1": "2x 1x15 2.54mm SMD male pin header, e.g. Samtec TSM-115-01-T-SV",
-    "D1": "Nexperia PMEG6020ER Schottky 2A/60V SOD-123W, anode = Nano VIN (Alvik output), cathode = Pico VSYS. Optional: 1206 0R if the Alvik VIN output tolerates back-feed",
+    "J1": "2x TE Connectivity 6-146132-3 (1x15 2.54mm SMD male, matte tin; Digi-Key A124546-ND)",
+    "D1": "Nexperia PMEG6020ER Schottky 2A/60V SOD-123W, Digi-Key 1727-5217-1-ND. Anode = Nano VIN (Alvik output), cathode = Pico VSYS. Optional: 1206 0R if the Alvik VIN output tolerates back-feed",
     "C1": "MLCC 10uF 10V X5R 0805",
     "JP2": "solder jumper, bridged by default (cut to isolate)",
     "JP3": "solder jumper, open by default",

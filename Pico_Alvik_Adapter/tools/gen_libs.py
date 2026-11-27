@@ -163,8 +163,11 @@ def fp_nano():
     flipped onto B.Cu in the board the pin positions match a real Nano when the
     board is viewed from the top:  pin 1 (D1/TX) bottom-right, pin 16 (D13)
     top-left, USB end at -Y.
-    Rows 15.24 mm apart, 2.54 mm pitch, SMD header pads 2.51 x 1.0 mm
-    alternating +-1.655 mm about the pin line (KiCad PinHeader_1x15 SMD style).
+    Rows 15.24 mm apart, 2.54 mm pitch.  Pads per the recommended PCB layout of
+    TE Connectivity 6-146132-3 (drawing C-146132 rev N2, Materials/TE_6-146132_drawing_C-146132_N2.pdf): 1.27 x 3.56 mm,
+    alternating +-1.335 mm about the pin line (2.67 mm stagger, 6.22 mm overall).
+    The 15-pin header is symmetric (both end legs bend the same way), so it fits in
+    one of its two orientations; the stagger pattern on the board shows which.
     """
     items = []
     for p in range(1, 31):
@@ -173,8 +176,8 @@ def fp_nano():
         else:
             col, i = 7.62, p - 16
         y = -17.78 + 2.54 * i
-        dx = 1.655 if (i % 2 == 0) else -1.655
-        items.append(f'  (pad "{p}" smd rect (at {col + dx:g} {y:g}) (size 2.51 1) '
+        dx = 1.335 if (i % 2 == 0) else -1.335
+        items.append(f'  (pad "{p}" smd rect (at {col + dx:g} {y:g}) (size 3.56 1.27) '
                      f'(layers "F.Cu" "F.Paste" "F.Mask") (tstamp {uid(f"nano{p}")}))')
     g = [
         text("reference", "REF**", 0, -21.5, "F.SilkS"),
@@ -197,12 +200,12 @@ def fp_nano():
         text("user", "D12", -7.62, -18.4, "F.Fab", size=0.7, thick=0.12),
         text("user", "D13", 7.62, -18.4, "F.Fab", size=0.7, thick=0.12),
         # courtyard: one per header row (centre stays free for other parts)
-        rect(-10.8, -19.55, -4.45, 19.55, "F.CrtYd", 0.05),
-        rect(4.45, -19.55, 10.8, 19.55, "F.CrtYd", 0.05),
+        rect(-11.0, -19.55, -4.25, 19.55, "F.CrtYd", 0.05),
+        rect(4.25, -19.55, 11.0, 19.55, "F.CrtYd", 0.05),
     ]
     return f'''(footprint "Arduino_Nano_SMD_Headers_Bottom" (version 20221018) (generator pcbnew)
   (layer "F.Cu")
-  (descr "Arduino Nano footprint as 2x 1x15 2.54mm SMD male pin headers, drawn mirrored for placement on the bottom side (flip left/right). Classic Nano pin numbering: 1=D1/TX ... 15=D12, 16=D13 ... 30=VIN.")
+  (descr "Arduino Nano footprint as 2x 1x15 2.54mm SMD male pin headers, drawn mirrored for placement on the bottom side (flip left/right). Pads per TE 6-146132-3 recommended layout. Classic Nano pin numbering: 1=D1/TX ... 15=D12, 16=D13 ... 30=VIN.")
   (tags "Arduino Nano ESP32 SMD pin header bottom")
   (attr smd)
 {chr(10).join(g)}

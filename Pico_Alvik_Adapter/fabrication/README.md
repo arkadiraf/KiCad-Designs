@@ -62,19 +62,21 @@ mirrors the bottom one.
 | Stencil | Openings |
 |---|---|
 | **Top** (`.GTP`) | 40 × Pico W castellation pads, **3.8 × 2.2 mm**. That is the Pico W datasheet (Fig. 6) over-paste, 0.3 mm larger per side than the 3.2 × 1.6 mm pads, so solder wets the castellations properly. |
-| **Bottom** (`.GBP`) | 30 × SMD header pads (2.51 × 1.0 mm), C1 0805 (2 × 1.0 × 1.45 mm), D1 SOD-123W (2 × 1.2 × 1.2 mm) |
+| **Bottom** (`.GBP`) | 30 × SMD header pads (3.56 × 1.27 mm, TE 6-146132-3 recommended layout), C1 0805 (2 × 1.0 × 1.45 mm), D1 SOD-123W (2 × 1.2 × 1.2 mm) |
 
 Solder jumpers JP2/JP3 have no paste: JP2 is bridged in copper, and JP3 stays open.
 
-A 0.12–0.13 mm (5 mil) stainless or polyimide stencil suits both sides. OSH Stencils
+A 0.12–0.13 mm (5 mil) stainless or polyimide stencil suits both sides. TE specifies its header land
+pattern for a 0.2 mm (8 mil) stencil, so with a 5 mil stencil add a little solder to the header feet by
+iron, or simply solder the headers by iron (Option A). OSH Stencils
 (oshstencils.com) take these files directly.
 
 ## 3. Hand assembly
 
-Parts: U1 Pico W, J1 two 1×15 2.54 mm **SMD** male headers, C1 10 µF 0805, D1 PMEG6020ER (SOD-123W).
+Parts: U1 Pico W, J1 two TE Connectivity **6-146132-3** 1×15 2.54 mm SMD male headers (Digi-Key A124546-ND), C1 10 µF 0805, D1 Nexperia PMEG6020ER,115 (SOD-123W, Digi-Key 1727-5217-1-ND).
 JP2 is already bridged in copper, and JP3 stays open.
 
-The board has parts on **both** sides, and the headers stick about 8 mm out of the bottom, so the
+The board has parts on **both** sides, and the headers stick about 10 mm out of the bottom (TE 6-146132-3: ~4 mm body + 5.84 mm post), so the
 order matters.
 
 **Option A – soldering iron only (simplest)**
@@ -84,7 +86,8 @@ order matters.
    then solder the other pad.
 2. **Bottom, headers:** plug the two 1×15 headers into a breadboard or a spare female Nano socket
    strip. That holds the rows exactly 15.24 mm apart and square. Lay the board on top, bottom side
-   down, and solder each SMD foot. Tack the four end pins first, check alignment, then do the rest.
+   down, and solder each SMD foot. The 6-146132-3 legs alternate sides; turn the header so the leg pattern
+   matches the staggered pads (it only fits one way round). Tack the four end pins first, check alignment, then do the rest.
 3. **Top, Pico W:** tin one corner pad on the board. Align the Pico so its castellations sit centred
    on the pads, with the USB at the board's USB end (silkscreen "USB" on the bottom marks the same
    end). Tack two diagonal corners, check all 40 pads line up, then solder each castellation with a

@@ -25,7 +25,7 @@ Individual renders are in `fabrication/docs/render_*.png`.
 |---|---|
 | Board size | 24.0 x 51.0 mm, 2 layers, 1.6 mm FR4 |
 | Pico W | 21 x 51 mm module, top side, castellated SMD |
-| Nano headers | 2x 1x15 2.54 mm SMD male, bottom side, rows 15.24 mm apart |
+| Nano headers | 2x TE Connectivity 6-146132-3 (1x15 2.54 mm SMD male), bottom side, rows 15.24 mm apart |
 | Antenna | 14 x 9 mm board notch under the Pico W antenna (datasheet keep-out) |
 
 ## Project layout
@@ -99,7 +99,8 @@ The adapter:
 | USB unplugged | Alvik VIN output -> **D1** -> VSYS (Alvik powers the Pico) |
 | Both present | VSYS is diode-OR'ed (D1 / Pico diode); the higher source supplies the Pico |
 
-* **D1: Nexperia PMEG6020ER** (2 A / 60 V Schottky, SOD-123W, anode = VIN). It stops the USB-derived
+* **D1: Nexperia PMEG6020ER,115** (2 A / 60 V Schottky, SOD-123W, anode = VIN; Digi-Key 1727-5217-1-ND;
+  datasheet in `Materials/`, KiCad pads match its reflow land pattern 1.2 x 1.2 mm at 2.8 mm pitch). It stops the USB-derived
   VSYS (about 4.7 V) from back-feeding the Alvik's VIN output, in case the Alvik has no diode of its own
   there. Blocking that direction costs nothing, because the Alvik takes its power from VUSB, not VIN.
 * **Option: 1206 0 Ω on the D1 pads.** This removes the ~0.35 V drop and matches a Nano exactly, where
@@ -137,8 +138,13 @@ VIN (pin 30) should be ≤ 5.5 V. VUSB (pin 27) and 3V3 (pin 17) should be about
 * The board is 24 mm wide (Nano: 18 mm). Check the clearance inside the Alvik's
   top cover before ordering.
 * Bottom-side parts (C1, D1, jumpers) sit between the header rows and are at most about 1.2 mm high.
-* Use male headers with a standard 2.54 mm pin (about 6 mm mating length). Recommended stack:
-  SMD header, e.g. Samtec TSM-115-01-x-SV or any generic 1x15 SMD 2.54 mm male header.
+* **Headers: TE Connectivity 6-146132-3** (Digi-Key A124546-ND), 1x15, 2.54 mm, 0.63 mm square post,
+  5.84 mm mating length, matte tin. The J1 pads follow TE's recommended layout (drawing C-146132 rev N2,
+  `Materials/TE_6-146132_drawing_C-146132_N2.pdf`): 1.27 x 3.56 mm, staggered +-1.335 mm. The legs
+  alternate sides, so each header fits the staggered pads only one way round.
+* Stack height: the TE body stands about 4 mm off the PCB, versus 2.5 mm for a through-hole Nano header,
+  so the adapter sits roughly 1.5 mm higher in the Alvik than a Nano does. Check the top-cover clearance
+  (Pico W plus this extra height) before ordering in quantity.
 
 ## Firmware
 
@@ -167,8 +173,15 @@ bash export_fab.sh                  # gerbers, drill, BOM, PDFs
 python3 render_board.py             # renders in fabrication/docs/ (flat + angled)
 ```
 
-Status of the checked-in board: all nets routed, **KiCad DRC: 0 violations, 0 unconnected
-pads** (`build/` is regenerated and not committed). KiCad 7's command line has no ERC, so the
+Status of the checked-in board (v1.7): all nets routed, **KiCad DRC: 0 violations, 0 unconnected
+pads, 0 footprint errors** (`build/` is regenerated and not committed).
+
+The v1.7 files were generated with **KiCad 10** on Windows (the `.kicad_pcb` is now KiCad 10 format; the
+schematic keeps the KiCad 7 format). With KiCad 9+ run the PCB scripts with KiCad's own python
+(`"C:\Program Files\KiCad\10.0\bin\python.exe" gen_pcb.py ...`). `gen_pcb.py finish` skips
+`WriteDRCReport` (it needs the GUI) — run `kicad-cli pcb drc --severity-all -o build/drc_report.txt
+Pico_Alvik_Adapter.kicad_pcb` instead. KiCad 9+ `kicad-cli sch erc` reports two `lib_symbol_mismatch`
+warnings for the solder jumpers (embedded KiCad 7 symbol copies); they are cosmetic. KiCad 7's command line has no ERC, so the
 schematic is verified with `check_netlist.py`, which compares KiCad's exported netlist to `design.py`.
 Running ERC once in the KiCad GUI is still worthwhile.
 

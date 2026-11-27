@@ -11,9 +11,10 @@ from design import build_nets
 def parse(path):
     txt = open(path).read()
     nets = {}
-    for m in re.finditer(r'\(net \(code "\d+"\) \(name "([^"]*)"\)(.*?)\)\s*(?=\(net |\)\s*\)\s*$)', txt, re.S):
+    # whitespace-tolerant: KiCad 7 writes one net per line, KiCad 8+ one token per line
+    for m in re.finditer(r'\(net\s+\(code\s+"\d+"\)\s+\(name\s+"([^"]*)"\)(.*?)(?=\(net\s+\(code|\Z)', txt, re.S):
         name = m.group(1).lstrip("/")
-        nodes = re.findall(r'\(node \(ref "([^"]+)"\) \(pin "([^"]+)"\)', m.group(2))
+        nodes = re.findall(r'\(node\s+\(ref\s+"([^"]+)"\)\s+\(pin\s+"([^"]+)"\)', m.group(2))
         nets[name] = sorted(n for n in nodes if not n[0].startswith("#"))
     return nets
 

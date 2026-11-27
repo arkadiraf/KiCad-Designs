@@ -26,12 +26,17 @@ PRO = os.path.join(PRJ, f"{PROJECT}.kicad_pro")
 OUT = os.path.join(PRJ, "build")
 DSN = os.path.join(OUT, f"{PROJECT}.dsn")
 SES = os.path.join(OUT, f"{PROJECT}.ses")
-KFP = "/usr/share/kicad/footprints"
+KFP = next((p for p in ("/usr/share/kicad/footprints",
+                        os.path.join(os.path.dirname(os.path.dirname(sys.executable)), "share", "kicad", "footprints"))
+            if os.path.isdir(p)), "/usr/share/kicad/footprints")
 
 mm = pcbnew.FromMM
 V = pcbnew.VECTOR2I_MM
 
 CX = BX0 + BOARD_W / 2
+# KiCad 7/8: Flip(pos, True) = left/right; KiCad 9+: Flip(pos, FLIP_DIRECTION) where True
+# would mean TOP_BOTTOM. The J1 pin-1 assertion in place() catches a wrong mirror.
+FLIP_LR = getattr(pcbnew, "FLIP_DIRECTION_LEFT_RIGHT", True)
 
 # bottom side passive placement (top-view coordinates) and silk labels
 BOTTOM_PARTS = {
@@ -186,7 +191,8 @@ def add_rule_area(board, pts, layer, name):
     z.SetIsRuleArea(True)
     z.SetDoNotAllowTracks(True)
     z.SetDoNotAllowVias(True)
-    z.SetDoNotAllowCopperPour(True)
+    # KiCad 7/8: SetDoNotAllowCopperPour, KiCad 9+: SetDoNotAllowZoneFills
+    (z.SetDoNotAllowZoneFills if hasattr(z, "SetDoNotAllowZoneFills") else z.SetDoNotAllowCopperPour)(True)
     z.SetDoNotAllowPads(False)
     z.SetDoNotAllowFootprints(False)
     z.SetLayer(layer)
@@ -214,8 +220,8 @@ def place():
 
     tb = board.GetTitleBlock()
     tb.SetTitle("Pico Alvik Adapter")
-    tb.SetRevision("1.6")
-    tb.SetDate("2026-11-26")
+    tb.SetRevision("1.7")
+    tb.SetDate("2026-11-27")
     tb.SetCompany("KiCad-Designs")
     tb.SetComment(0, "Raspberry Pi Pico W carrier in Arduino Nano form factor for the Arduino Alvik")
 
@@ -243,13 +249,13 @@ def place():
             fp.Reference().SetVisible(False)       # covered by the module
         elif ref == "J1":
             fp.SetPosition(V(*NANO_C))
-            fp.Flip(fp.GetPosition(), True)        # to bottom, mirror left/right
+            fp.Flip(fp.GetPosition(), FLIP_LR)        # to bottom, mirror left/right
             fp.Reference().SetVisible(False)
         else:
             x, y, rot, _lbl = BOTTOM_PARTS[ref]
             fp.SetPosition(V(x, y))
             fp.SetOrientationDegrees(rot)
-            fp.Flip(fp.GetPosition(), True)
+            fp.Flip(fp.GetPosition(), FLIP_LR)
             fp.Reference().SetVisible(False)
         if extra.get("DNP"):
             fp.SetAttributes(fp.GetAttributes() | pcbnew.FP_EXCLUDE_FROM_BOM | pcbnew.FP_EXCLUDE_FROM_POS_FILES)
@@ -285,7 +291,7 @@ def place():
         if lbl:
             dx = 3.4 if ref.startswith("D") else 2.9
             add_text(board, lbl, x - dx, y, pcbnew.B_SilkS, 0.6, mirror=True)
-    add_text(board, "PICO-ALVIK v1.6", CX, 120.6, pcbnew.B_SilkS, 0.7, rot=90, mirror=True)
+    add_text(board, "PICO-ALVIK v1.7", CX, 120.6, pcbnew.B_SilkS, 0.7, rot=90, mirror=True)
     # component markings: diode direction and capacitor value
     d1 = board.FindFootprintByReference("D1")
     diode_mark(board, d1, pcbnew.ToMM(d1.GetPosition().y) + 2.0)
@@ -466,6 +472,11 @@ def finish():
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     pcbnew.SaveBoard(PCB, board)
     rpt = os.path.join(OUT, "drc_report.txt")
+    if int(pcbnew.Version().split(".")[0]) >= 9:
+        # KiCad 9+: WriteDRCReport needs the GUI process (asserts headless); use kicad-cli
+        print("finished; run DRC: kicad-cli pcb drc --severity-all -o build/drc_report.txt "
+              f"{PROJECT}.kicad_pcb")
+        return
     pcbnew.WriteDRCReport(board, rpt, pcbnew.EDA_UNITS_MILLIMETRES, True)
     print("finished; DRC report:", rpt)
 

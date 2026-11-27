@@ -10,7 +10,8 @@ import os
 import subprocess
 import tempfile
 
-import cairosvg
+import shutil
+
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 from scipy import ndimage
@@ -31,13 +32,41 @@ SILK = np.array([245, 245, 240])
 BG = (34, 36, 40)
 
 
+KICAD_CLI = (os.environ.get("KICAD_CLI") or shutil.which("kicad-cli")
+             or r"C:\Program Files\KiCad\10.0\bin\kicad-cli.exe")
+_VER = subprocess.run([KICAD_CLI, "version"], capture_output=True, text=True).stdout.strip()
+SVG_MODE = ["--mode-single"] if int((_VER or "7").split(".")[0]) >= 9 else []
+
+
+def font(*names, size):
+    """First available TrueType font (DejaVu on Linux, Arial on Windows)."""
+    for n in names:
+        try:
+            return ImageFont.truetype(n, size)
+        except OSError:
+            pass
+    return ImageFont.load_default(size)
+
+
+def svg_to_png(svg, width):
+    """SVG -> PNG bytes on a white background (cairosvg, else PyMuPDF)."""
+    try:
+        import cairosvg
+        return cairosvg.svg2png(url=svg, output_width=width, background_color="white")
+    except ImportError:
+        import fitz
+        page = fitz.open(svg)[0]
+        z = width / page.rect.width
+        return page.get_pixmap(matrix=fitz.Matrix(z, z), alpha=False).tobytes("png")
+
+
 def layer(name, tmp):
     svg = os.path.join(tmp, name.replace(".", "_") + ".svg")
-    subprocess.run(["kicad-cli", "pcb", "export", "svg", "--layers", name,
+    subprocess.run([KICAD_CLI, "pcb", "export", "svg", "--layers", name,
                     "--black-and-white", "--exclude-drawing-sheet",
-                    "--page-size-mode", "0", "-o", svg, PCB],
+                    "--page-size-mode", "0", *SVG_MODE, "-o", svg, PCB],
                    check=True, capture_output=True)
-    png = cairosvg.svg2png(url=svg, output_width=int(PAGE_W * PX), background_color="white")
+    png = svg_to_png(svg, int(PAGE_W * PX))
     im = np.asarray(Image.open(io.BytesIO(png)).convert("L"))
     x0, y0, x1, y1 = (int(v * PX) for v in (BX0, BY0, BX1, BY1))
     return im[y0:y1, x0:x1] < 128          # True where the layer has ink
@@ -129,7 +158,7 @@ def draw_pico(im):
     # antenna area
     d.rectangle([mm(cx - 6.5, cy + 18.0), mm(cx + 6.5, cy + 24.3)], outline=(200, 170, 80, 255), width=3)
     try:
-        f = ImageFont.truetype("DejaVuSans-Bold.ttf", int(PX * 0.95))
+        f = font("DejaVuSans-Bold.ttf", "arialbd.ttf", size=int(PX * 0.95))
         txt = Image.new("RGBA", (int(PX * 30), int(PX * 2)), (0, 0, 0, 0))
         ImageDraw.Draw(txt).text((0, 0), "Raspberry Pi Pico W", font=f, fill=(235, 235, 235, 255))
         txt = txt.rotate(90, expand=True)
@@ -166,10 +195,7 @@ def label(im, text):
     out = Image.new("RGB", (im.width, im.height + pad), BG)
     out.paste(im, (0, pad))
     d = ImageDraw.Draw(out)
-    try:
-        f = ImageFont.truetype("DejaVuSans.ttf", 34)
-    except OSError:
-        f = ImageFont.load_default()
+    f = font("DejaVuSans.ttf", "arial.ttf", size=34)
     w = d.textlength(text, font=f)
     d.text(((im.width - w) / 2, 18), text, font=f, fill=(230, 230, 230))
     return out
