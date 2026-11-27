@@ -37,7 +37,7 @@ FRAME_MPN = {
     "D1": ("Lite-On", "LTST-C191KRKT", "ok", "red 0603"),
     "R7": (YAGEO, "RC0603FR-072K2L", "ok", ""),
     "U2": (TI, "TPS22810DBVR", "ok", "SOT-23-6 (DBV)"),
-    "SW1": ("C&K", "PCM12SMTR", "ok", "SPDT slide, SMD"),
+    "SW1": ("APEM", "MA12RTR", "ok", "replaces PCM12SMTR (last-time buy); same PCM12 land pattern"),
     "C8 C9": (MURATA, "GRM188R71C105KA12D", "ok", "1 uF 16 V X7R 0603"),
     "R8 R9 R10": (YAGEO, "RC0603FR-07156KL / -07100KL / -071M27L", "DNP", "UVLO divider option"),
     "U3 U4 U5 U6": (TI, "TPS22997RYZR", "ok", ""),
@@ -107,7 +107,8 @@ DIGIKEY = {
     "LTST-C191KRKT": ("160-1447-1-ND", ""),
     "RC0603FR-072K2L": ("311-2.20KHRCT-ND", ""),
     "TPS22810DBVR": ("296-45297-1-ND", ""),
-    "PCM12SMTR": ("401-2016-1-ND", "LAST-TIME BUY, last order date 2026-05-08 (past) - choose a replacement"),
+    "PCM12SMTR": ("401-2016-1-ND", "LAST-TIME BUY - replaced by APEM MA12RTR"),
+    "MA12RTR": ("563-1102-1-ND", "active (user, Nov 2026)"),
     "GRM188R71C105KA12D": ("", "not found at Digi-Key under this MPN - pick an active 1 uF 0603"),
     "RC0603FR-07156KL": ("311-156KHRCT-ND", ""),
     "RC0603FR-07100KL": ("311-100KHRCT-ND", ""),
@@ -137,6 +138,14 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "MA12RTR": [
+        ("MA12RTR_APEM_datasheet.pdf",
+         "CONFIRMED (APEM MA series): 1P2T, right-angle actuator, 1.5 mm travel, body 6.7 x 2.6 x 1.4 mm; "
+         "300 mA at 4 VDC, 70 mOhm, 10k cycles, -10..+60 C, reflow 260 C 1 min / iron 305 C 6 s. PCB layout = "
+         "KiCad SW_SPDT_PCM12 pad positions (terminals -2.25/+0.75/+2.25 mm, bosses +-1.5 mm, shell tabs) and = "
+         "BetzDrive apem-MA12RTR.kicad_mod. Common = middle terminal (pad 2 = SW_SPDT pin B). Use: EN/UVLO signal at "
+         "<= 4.2 V, uA - within rating in current; the 4 VDC figure is a switching rating. Actuator side to the frame edge."),
+    ],
     "TPS22810DBVR": [
         ("TPS22810DBVR_TI_datasheet.pdf",
          "CONFIRMED (SLVSDH0C rev C): DBV pinout 1 VIN, 2 GND, 3 EN/UVLO, 4 CT, 5 QOD, 6 VOUT = KD_Power:TPS22810DBV; "

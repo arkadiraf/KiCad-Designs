@@ -275,7 +275,12 @@ FRAME_BOM = [
     ("R7", "2.2k", "Device:R", _R, "STAT LED series resistor (STAT sinks 6 mA max)"),
     # --- logic rail: TPS22810 + slide switch ---
     ("U2", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, 2.54 V UVLO"),
-    ("SW1", "SPDT slide (C&K PCM12)", "Switch:SW_SPDT", "Button_Switch_SMD:SW_SPDT_PCM12", "power switch on EN/UVLO (signal only)"),
+    # APEM MA12R/TR (Digi-Key 563-1102-1-ND), replaces the C&K PCM12SMTR (last-time buy). Same land pattern:
+    # terminals 0.7 x 1.5 mm at -2.25 / +0.75 / +2.25 mm, 2 x 0.9 mm bosses 3.0 mm apart, 4 shell tabs - checked
+    # against the APEM drawing and BetzDrive's apem-MA12RTR footprint. Common = middle terminal (pad 2 = pin B).
+    # Body 6.7 x 2.6 x 1.4 mm, right-angle actuator 1.3 mm out of the side opposite the terminals: that side faces
+    # the frame edge. 300 mA / 4 VDC contact rating (EN signal only, uA), -10..+60 C operating.
+    ("SW1", "SPDT slide (APEM MA12R/TR)", "Switch:SW_SPDT", "Button_Switch_SMD:SW_SPDT_PCM12", "power switch on EN/UVLO (signal only)"),
     ("C8 C9", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
     ("R8 R9 R10", "156k / 100k / 1.27M (DNP option)", "Device:R", _R,
      "external 2.70 / 3.30 V UVLO divider instead of the internal lockout (doc open item)"),

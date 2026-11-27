@@ -15,7 +15,7 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Lite-On,LTST-C191KRKT,160-1447-1-ND,Frame D1,"LED red 0603 (LED_0603_1608Metric); STAT charge indicator (optional), from SYS as TI's diagram",ok,red 0603
 1,Yageo,RC0603FR-072K2L,311-2.20KHRCT-ND,Frame R7,2.2k (R_0603_1608Metric); STAT LED series resistor (STAT sinks 6 mA max),ok,
 1,Texas Instruments,TPS22810DBVR,296-45297-1-ND,Frame U2,"TPS22810DBV (SOT-23-6); Pico VSYS switch, 2.54 V UVLO",ok,SOT-23-6 (DBV)
-1,C&K,PCM12SMTR,401-2016-1-ND,Frame SW1,SPDT slide (C&K PCM12) (SW_SPDT_PCM12); power switch on EN/UVLO (signal only),ok,"SPDT slide, SMD; LAST-TIME BUY, last order date 2026-05-08 (past) - choose a replacement"
+1,APEM,MA12RTR,563-1102-1-ND,Frame SW1,SPDT slide (APEM MA12R/TR) (SW_SPDT_PCM12); power switch on EN/UVLO (signal only),ok,"replaces PCM12SMTR (last-time buy); same PCM12 land pattern; active (user, Nov 2026)"
 2,Murata,GRM188R71C105KA12D,,Frame C8 C9,1uF 16V (C_0603_1608Metric); TPS22810 VIN / VOUT,ok,1 uF 16 V X7R 0603; not found at Digi-Key under this MPN - pick an active 1 uF 0603
 4,Texas Instruments,TPS22997RYZR,296-TPS22997RYZRCT-ND,Frame U3 U4 U5 U6,"TPS22997 (Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm); per-ESC high-side switch, ~7.5 A",ok,
 4,Murata,GRM188R71H103KA01D,,Frame C14 C15 C16 C17,"CT soft-start, TO CHECK (few ms) (C_0603_1608Metric); limits inrush into the ESC capacitors",TBD,10 nF placeholder; CT value from the TPS22997 datasheet; end of life at distributors - pick an active 10 nF 0603
