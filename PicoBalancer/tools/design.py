@@ -91,7 +91,7 @@ ZONES = {
     # user 2026-11-27: boost in the bottom part beside the Pico, next to the drivers (left side);
     # slide switch on the other side at the board edge (EG1218 body 11.6 x 4.0, long side along the edge)
     "U5 boost": (-29.0, 50.0, -12.0, 78.0),
-    "SW1": (18.25, 28.5, 22.25, 40.1),   # centred between the Pico edge (x 10.5) and the board edge, at the micro-USB height (user)
+    "SW1": (17.55, 29.4, 22.95, 39.2),   # centred between the Pico edge (x 10.5) and the board edge, at the micro-USB height (user)
     "U7 + D2": (17.2, 43.0, 23.3, 58.0),    # below the slide switch (user)
 }
 
@@ -170,9 +170,13 @@ BOM = [
     ("C12 C13", "100pF 50V", "Device:C", _C, "MP6550 VISEN filter (<= 500 pF)"),
     ("R10", "100k", "Device:R", _R, "MOTOR_EN (both nSLEEP_HB) pull-down"),
     # vertical (top-entry) header (user 2026-11-27): JST BM06B-SRSS-TB, body 8.0 x 2.9 x 4.25 mm (catalog p.3)
-    ("J3 J4", "JST SH 6-pin vertical (top entry)", "Connector_Generic_MountingPin:Conn_01x06_MountingPin",
+    ("J3 J4", "JST SH 6-pin vertical (top entry, BM06B-SRSS-G-TB)", "Connector_Generic_MountingPin:Conn_01x06_MountingPin",
      "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
      "motor + encoder (Pololu 4761 pinout: GND, B, A, VCC=3V3, M2, M1)"),
+    # user 2026-11-27: also 2 mm spaced solder pads for wiring the motors/encoders directly, pads named on silk
+    ("J3W J4W", "6 solder pads, 2.0 mm pitch (no part)", "Connector_Generic:Conn_01x06",
+     "KD_Connectors:SolderWire_Pads_1x06_P2.00mm_Named (TO CREATE)",
+     "direct-wire alternative to J3/J4, same pinout, silk GND B A VCC M2 M1"),
     # --- 5.1 V boost: TPS61235P (values from Drone_1S_Pico2W, checked against SLVSCK4A) ---
     ("U5", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5V1 for the motor drivers"),
     ("L2", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "boost inductor"),
@@ -207,11 +211,13 @@ BOM = [
     ("R20", "2.2k", "Device:R", _R, "STAT LED series"),
     # --- Pico switch: TPS22810 + slide switch + back-feed Schottky ---
     ("U7", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, input BAT (user 2026-11-27), UVLO 2.54 / 2.41 V"),
-    # E-Switch EG1218 (Digi-Key EG1903-ND, user pick): SPDT, top actuator, through hole, 0.2 A / 30 VDC,
-    # 3 pins 2.50 mm pitch, 0.90 mm holes, body 11.6 x 4.0 x 5.4 mm + 2.0 mm actuator, 2.5 mm travel
-    # (drawing P040040 rev C). Common = pin 2 (middle). Carries the EN/UVLO signal only (uA).
-    ("SW1", "SPDT slide (E-Switch EG1218)", "Switch:SW_SPDT",
-     "KD_Switches:SW_E-Switch_EG1218_SPDT_Vertical (TO CREATE)", "power switch on EN/UVLO"),
+    # Slide switch (user order 2026-11-27): NKK AS12AP (non-shorting, 3 pins 2.54 mm, body ~9.8 x 5.4 x 9.1 mm + 2.5 mm
+    # actuator) or NKK SS12SDP4 (SHORTING make-before-break, 3 pins 2.54 mm, body 6.54 x 4.0 x 4.5 mm). One footprint:
+    # 3 pins at 2.54 mm, 0.9 mm holes - also fits the earlier EG1218 (2.50 mm). Common = middle pin -> EN/UVLO (via R21);
+    # throws -> BAT through R34 and GND. R34 limits the SS12S make-before-break short of BAT to GND to ~4 mA.
+    ("SW1", "SPDT slide (NKK AS12AP; alt. SS12SDP4)", "Switch:SW_SPDT",
+     "KD_Switches:SW_Slide_SPDT_3pin_P2.54mm_Vertical (TO CREATE)", "power switch on EN/UVLO"),
+    ("R34", "1k", "Device:R", _R, "slide switch BAT leg: limits the make-before-break short (SS12SDP4) to ~4 mA"),
     ("C28 C29", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
     # UVLO by population (user 2026-11-27, both options on the board). Slide switch common -> R21 -> EN/UVLO:
     #   default  R21 = 0R, R22 / R23 not fitted: internal UVLO 2.54 V on / 2.41 V off.
@@ -306,6 +312,8 @@ REVIEW_PARTS = [
     ("J3", -14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
     ("U4", 14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
     ("J4", 14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
+    # direct-wire solder pad rows (6 x 2.0 mm pitch), between each driver and its connector
+    ("J3W", -14.0, 91.5, 11.5, 1.5, 0.05, "metal", 0), ("J4W", 14.0, 91.5, 11.5, 1.5, 0.05, "metal", 0),
     # boost on the left beside the Pico, above the left driver
     ("U5", -20.0, 62.0, 2.5, 2.5, 1.0, "ic", 0), ("L2", -20.0, 70.0, 4.1, 4.1, 3.1, "ind", 0),
     ("C16", -26.5, 56.0, 3.2, 1.6, 1.6, "cap", 0), ("C17", -26.5, 60.0, 3.2, 1.6, 1.6, "cap", 0),
@@ -313,6 +321,6 @@ REVIEW_PARTS = [
     ("C14", -14.5, 58.0, 2.0, 1.25, 1.25, "cap", 0), ("C15", -14.5, 62.0, 2.0, 1.25, 1.25, "cap", 0),
     # slide switch centred between the Pico edge and the board edge; Pico power path (U7, D2, D3) below it
     ("U7", 20.25, 45.5, 2.9, 2.8, 1.1, "ic", 0), ("D2", 20.25, 50.5, 3.7, 1.6, 1.1, "ic", 0),
-    ("SW1", 20.25, 34.3, 4.0, 11.6, 5.4, "switch", 0), ("SW1 actuator", 20.25, 34.3, 2.0, 2.0, 2.0, "white", 5.4),
+    ("SW1", 20.25, 34.3, 5.4, 9.8, 9.1, "switch", 0), ("SW1 actuator", 20.25, 34.3, 2.4, 2.4, 2.5, "white", 9.1),
     ("D3", 20.25, 55.5, 2.0, 1.25, 0.8, "led_green", 0),
 ]

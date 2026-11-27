@@ -16,6 +16,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 * [fabrication/BOM_to_source.md](fabrication/BOM_to_source.md): lines with no distributor number yet.
 
 **Datasheets and verification:** [Materials/bom_datasheets/README.md](Materials/bom_datasheets/README.md).
+**Order check:** `python tools/verify_order.py fabrication/DigiKey_order_2026-11-27T074756.xlsx 5` compares the Digi-Key cart with the BOM. The 27 Nov cart is missing the Pico WH and the BQ25606, and has 5 instead of 10 Würth 74438357010 inductors.
 
 ## Status: stage 0 (rev 0.1)
 
@@ -91,7 +92,8 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 * **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop: internal 2.54 / 2.41 V by default (R21 = 0 Ω), or 3.30 / 2.70 V by fitting R21 = 156 k, R22 and R23. Firmware sleeps well above it.
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the Pico power path (TPS22810, D2, power LED) below it.
 * **BNO086 on SPI0** (GP4–GP7; pin-for-pin SPI wiring from the SparkFun breakout schematic v10, `design.BNO086_PINS`), with INT on GP8, RST on GP9 and WAKE on GP3. PS1 and PS0/WAKE have pull-ups.
-* **Slide switch:** E-Switch EG1218 (Digi-Key EG1903-ND) on the TPS22810 EN/UVLO pin, signal only.
+* **Slide switch:** NKK AS12AP (non-shorting, 360-2121-ND) on the TPS22810 EN/UVLO pin, signal only. The alternative, SS12SDP4 (make-before-break), is usable thanks to R34 (1 k) in the BAT leg. One 3-pin 2.54 mm footprint fits both.
+* **Motor connectors:** vertical JST BM06B-SRSS-G-TB (Mouser), plus J3W / J4W rows of 2 mm solder pads (GND B A VCC M2 M1) for direct wiring.
 
 ## Regenerate
 

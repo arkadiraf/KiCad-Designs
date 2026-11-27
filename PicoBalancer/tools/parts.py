@@ -14,9 +14,9 @@ YAGEO, MURATA, TI = "Yageo", "Murata", "Texas Instruments"
 # key = refs string of a design.BOM line -> (manufacturer, MPN, status, note)
 MPN = {
     "U1": ("Raspberry Pi", "SC0919", "ok", "Pico WH (headers fitted) for the sockets; SC0918 = Pico W without headers; Pico 2 WH later"),
-    "J1 J2": ("Sullins", "PPPC201LFBN-RC", "verify", "1x20 female 2.54 mm, 8.5 mm"),
-    "U2": ("CEVA", "BNO086", "verify", "LGA-28; check Digi-Key / Mouser stock"),
-    "Y1": ("Epson", "Q13FC1350000400", "verify", "FC-135 32.768 kHz 12.5 pF 20 ppm"),
+    "J1 J2": ("Sullins", "PPPC201LFBN-RC", "ok", "1x20 female 2.54 mm, 8.50 mm insulator"),
+    "U2": ("CEVA", "BNO086", "ok", "LGA-28"),
+    "Y1": ("Epson", "FC-135 32.7680KA-A5", "ok", "32.768 kHz, 12.5 pF, +-20 ppm (ordered, Digi-Key SER4103CT-ND)"),
     "C1 C2": (MURATA, "GRM1885C1H220JA01D", "ok", "22 pF C0G 0603 (stock)"),
     "C3 C4 C5": ("Samsung", "CL10B104KB8NNNC", "ok", "100 nF 50 V X7R 0603 (stock); replaces GRM188R71H104KA93D (EOL at distributors)"),
     "R1 R2": (YAGEO, "RC0603FR-0710KL", "ok", ""),
@@ -24,16 +24,17 @@ MPN = {
     "R5 R6": (YAGEO, "RC0603FR-074K7L", "ok", ""),
     "R7": (YAGEO, "RC0603FR-0710KL", "ok", ""),
     "U3 U4": ("Monolithic Power Systems", "MP6550GG-Z", "ok", "QFN-12 2 x 2 mm"),
-    "C6 C7": (MURATA, "GRM21BR61C106KE15L", "ok", "10 uF 16 V X5R 0805"),
+    "C6 C7": (MURATA, "GRM21BR61E106KA73L", "ok", "10 uF 25 V X5R 0805 (ordered; replaces GRM21BR61C106KE15L)"),
     "C8 C9": ("Samsung", "CL10B105KA8NNNC", "ok", "1 uF 0603 (stock)"),
     "C10 C11": ("Samsung", "CL10B474KA8NNNC", "ok", "0.47 uF 0603 (stock)"),
     "R8 R9": (YAGEO, "RC0603FR-074K3L", "ok", "ISET 1.16 A for the Pololu 3072 (30:1 HPCB 6V)"),
     "C12 C13": (MURATA, "GRM1885C1H101JA01D", "ok", "100 pF C0G 0603 (stock)"),
     "R10": (YAGEO, "RC0603FR-07100KL", "ok", ""),
-    "J3 J4": ("JST", "BM06B-SRSS-TB(LF)(SN)", "ok", "vertical (top entry), mates the Pololu 4761 encoder cable (SHR-06V-S-B)"),
-    "U5": (TI, "TPS61235PRWLT", "ok", ""),
+    "J3 J4": ("JST", "BM06B-SRSS-G-TB(LF)(SN)", "ok", "vertical (top entry); from Mouser 306-6BSRSSGTBLPP (the one non-Digi-Key line)"),
+    "J3W J4W": ("-", "pads only", "ok", "2 mm solder pads for direct wiring"),
+    "U5": (TI, "TPS61235PRWLR", "ok", "ordered as the R reel variant (same part as RWLT)"),
     "L2": ("Wurth Elektronik", "74438357010", "ok", ""),
-    "C14 C15": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
+    "C14 C15": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
     "C16 C17 C18": ("Samsung", "CL31B226KPHNFNE", "ok", "22 uF 10 V X7R 1206"),
     "R11": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R12": (YAGEO, "RC0603FR-0749K9L", "ok", "E24 fallback 51k = 2.44 A"),
@@ -49,15 +50,16 @@ MPN = {
     "TH1": ("Semitec", "103AT-2", "DNP", "charger temperature left out (user 2026-11-27); R19 fitted instead"),
     "R19": (YAGEO, "RC0603FR-0710KL", "ok", "fixed TS: 30.9k parallel 10k, with 5.23k -> TS = 0.59 REGN (normal window, ~25 C)"),
     "C20": ("Samsung", "CL10B105KA8NNNC", "ok", "1 uF 25 V 0603 (stock)"),
-    "C21 C22": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
-    "C23 C24": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
-    "C25": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
+    "C21 C22": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
+    "C23 C24": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
+    "C25": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
     "C26": (MURATA, "GRM188R61A475KAAJD", "ok", "4.7 uF 10 V X5R 0603 (stock); Digi-Key upgrade of the obsolete GRM188R61A475KE15D"),
     "C27": ("Samsung", "CL10B473KB8NNNC", "ok", "47 nF 50 V X7R 0603 (stock); replaces GRM188R71H473KA61D (not found at Digi-Key)"),
     "D1": ("Lite-On", "LTST-C171KRKT", "ok", "red 0805 (stock)"),
     "R20": (YAGEO, "RC0603FR-072K2L", "ok", ""),
-    "U7": (TI, "TPS22810DBVR", "ok", ""),
-    "SW1": ("E-Switch", "EG1218", "ok", "user pick (Digi-Key EG1903-ND); footprint from drawing P040040"),
+    "U7": (TI, "TPS22810DBVT", "ok", "ordered as DBVT (small reel), same part as DBVR"),
+    "SW1": ("NKK Switches", "AS12AP", "ok", "non-shorting; alternative SS12SDP4 (shorting, needs R34) also ordered"),
+    "R34": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "C28 C29": ("Samsung", "CL10B105KA8NNNC", "ok", "1 uF 0603 (stock)"),
     "R21": (YAGEO, "RC0603FR-070RL", "ok", "0R default (internal UVLO); RC0603FR-07156KL for the 2.70 V option"),
     "R22 R23": (YAGEO, "RC0603FR-07100KL / -071M27L", "DNP", "fit with R21 = 156k for 3.30 / 2.70 V"),
@@ -70,7 +72,7 @@ MPN = {
     "BT1 BT2": ("Keystone", "1042", "ok", "SMT 18650 holder, not polarized, 64 mm bay for the stock plain cells (user 2026-11-27); "
                 "Q1-Q4 reverse protection fitted; alternative 1042P on the same footprint"),
     "F1 F2": ("Littelfuse", "1812L260THDR", "verify", "1812, Ihold 2.6 A, Itrip 5.2 A, 8 V; tape-and-reel suffix to confirm at Digi-Key / Mouser"),
-    "Q1 Q2": ("Diodes Inc.", "DMP2008UFG-7", "ok", "PowerDI3333-8, 9.8 mOhm max at -2.5 V, VGSS +-8 V; symbol pins 1-3 S, 4 G, 5 D"),
+    "Q1 Q2": ("Diodes Inc.", "DMP2008UFG-13", "ok", "PowerDI3333-8 (-13 = 13 in reel, -7 restricted), 9.8 mOhm max at -2.5 V, VGSS +-8 V; pins 1-3 S, 4 G, 5 D; SOT-23 fallback PMV48XPA2"),
     "Q3 Q4": ("Diodes Inc.", "DMG2302U-7", "ok", "SOT-23, VGS(th) 0.4-1.0 V, VGSS +-8 V"),
     "R28 R29": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R30 R31": (YAGEO, "RC0603FR-0710KL", "ok", ""),
@@ -83,7 +85,7 @@ MPN = {
 EXTRA = [
     ("BT1 BT2 alt.", 0, "18650 holder, SMT, polarized, 68.9 mm bay for protected cells (alternative, same footprint)",
      ("Keystone", "1042P", "ok", "qty 0 = alternative to the 1042")),
-    ("Cables", 2, "JST SH 6-pin F-F twisted cable, 10 cm, encoder color code",
+    ("Cables", 2, "JST SH 6-pin F-F twisted cable, 10 cm, encoder color code (Pololu 4765, bought from 4project 4P-537582)",
      ("Pololu", "4765", "ok", "straight through: same color on the same pin at both ends (pin 1 green ... 6 red) -> J3/J4 pin n = encoder pin n")),
     ("Cables alt.", 0, "JST SH 6-pin single-ended cable, 12 cm + SHR-06V-S-B housing + 6 x SSH-003T-P0.2-H contacts",
      ("Pololu / JST", "4762 + SHR-06V-S-B", "ok", "alternative: crimp the free end in the same color order (pin 1 green ... 6 red)")),
@@ -107,7 +109,15 @@ DIGIKEY = {
     "CL31B226KPHNFNE": ("1276-3145-1-ND", ""),
     "103AT-2": ("4316-103AT-2-ND", "bulk"),
     "PRPC040SAAN-RC": ("S1011EC-40-ND", "bulk"),
-    "SC0919": ("2648-SC0919-ND", "Active (Digi-Key listing)"),
+    "SC0919": ("2648-SC0919-ND", "Active (Digi-Key listing) - NOT in the 2026-11-27 Digi-Key cart"),
+    # from the user's Digi-Key cart 2026-11-27T074756 (fabrication/DigiKey_order_2026-11-27T074756.xlsx) and doc table
+    "PPPC201LFBN-RC": ("S7053-ND", ""), "BNO086": ("1888-BNO086CT-ND", ""), "FC-135 32.7680KA-A5": ("SER4103CT-ND", ""),
+    "MP6550GG-Z": ("1589-MP6550GG-ZCT-ND", ""), "TPS61235PRWLR": ("296-47376-1-ND", ""),
+    "USB4235-03-C": ("2073-USB4235-03-CCT-ND", ""), "AS12AP": ("360-2121-ND", ""), "SS12SDP4": ("360-2922-ND", "alternative"),
+    "1812L260THDR": ("F3376CT-ND", ""), "DMP2008UFG-13": ("DMP2008UFG-13DICT-ND", ""), "DMG2302U-7": ("DMG2302U-7DICT-ND", ""),
+    "MBR120VLSFT1G": ("MBR120VLSFT1GOSCT-ND", ""), "GRM21BR61E106KA73L": ("490-5523-1-ND", ""),
+    "TPS22810DBVT": ("296-45304-1-ND", ""), "1042P": ("36-1042P-ND", "optional alternative"),
+    "BM06B-SRSS-G-TB(LF)(SN)": ("", "Mouser 306-6BSRSSGTBLPP"),
     "1042": ("36-1042-ND", "user, Nov 2026"),
 }
 
@@ -163,7 +173,7 @@ DATASHEETS = {
         "pads >= 7.46 x 6.47 mm, >= 86.80 mm overall, holes 3.45 / 2.39 mm diagonal at 55.20 x 16.00 mm; for cells <= 67 mm "
         "with protection")],
     "1812L260THDR": [("1812L260_Littelfuse_datasheet.pdf",
-        "CONFIRMED (Littelfuse 1812L series datasheet): 1812L260TH Ihold 2.60 A, Itrip 5.20 A, Vmax 8 V, Imax 100 A, Pd 0.8 W, "
+        "CONFIRMED (Littelfuse 1812L series datasheet, rev 06/10/24 - user copy, same values as rev 01/10/23): 1812L260TH Ihold 2.60 A, Itrip 5.20 A, Vmax 8 V, Imax 100 A, Pd 0.8 W, "
         "time to trip 2.5 s at 8 A, R min 0.015 / R1max 0.047 Ohm; hold current derates to 2.15 A at 50 C, 1.63 A at 85 C. "
         "Pad layout (p.6): 1.78 x 3.15 mm pads, 3.45 mm gap -> KD_Power:Fuse_Littelfuse_1812L (KiCad's generic 1812 is smaller). "
         "OPEN: ordering suffix (DR = tape and reel) at the distributor.")],
@@ -183,6 +193,25 @@ DATASHEETS = {
     "4761": [("../pololu_4760_4761_encoder_side_entry_schematic.pdf",
         "CONFIRMED (schematic + product page): JST SH 6-pin 1 GND, 2 B, 3 A, 4 VCC (2.7-18 V), 5 M2, 6 M1; 10 k pull-ups on "
         "A/B to VCC; 12 CPR")],
+    "AS12AP": [("AS12AP_NKK_datasheet.pdf",
+        "CONFIRMED (NKK Series AS): SPDT, non-shorting (break-before-make), logic level 0.4 VA max @ 28 V, 50 mOhm max, "
+        "-30..+85 C; AS12AP = 2.5 mm actuator, straight PC pins: 3 pins at 2.54 mm, 0.8 mm PCB holes, body ~9.8 x 5.4 mm, "
+        "9.1 mm tall + 2.5 mm actuator, 2.5 mm travel -> shared 3-pin 2.54 mm footprint (0.9 mm holes)")],
+    "SS12SDP4": [("SS12SDP4_NKK_datasheet.pdf",
+        "CONFIRMED (NKK Series SS): SS12S = SHORTING (make-before-break); gold (code 4) logic level 0.4 VA @ 28 V; top actuated, "
+        "3 pins at 2.54 mm (0.6 x 0.4 mm), body 6.54 x 4.0 x 4.5 mm, -15..+60 C. With throws on BAT / GND the make-before-break "
+        "would short BAT to GND -> R34 1 k in the BAT leg.")],
+    "FC-135 32.7680KA-A5": [("FC-135_Epson_datasheet.pdf", "CONFIRMED (Epson FC-135): 32.768 kHz, CL 12.5 pF option, +-20 ppm option; 3.2 x 1.5 mm")],
+    "PPPC201LFBN-RC": [("PPPC201LFBN-RC_Sullins_datasheet.pdf", "CONFIRMED (Sullins female headers): straight PC, .335\" (8.50 mm) insulator height, 2.54 mm pitch")],
+    "MBR120VLSFT1G": [("MBR120VLSFT1G_onsemi_datasheet.pdf", "CONFIRMED (onsemi): 20 V, 1 A Schottky, very low VF, SOD-123FL; suited to battery 'OR-ing'")],
+    "GRM21BR61E106KA73L": [("GRM21BR61E106KA73L_Murata_catalog_page.pdf", "CONFIRMED (Murata CAT2021 p.108): 10 uF +-10 % 25 V X5R 0805")],
+    "PMV48XPA2": [("PMV48XPA2_Nexperia_datasheet.pdf", "fallback for Q1/Q2 only: SOT-23 P-FET -20 V, VGS +-12 V, RDSon 43 typ / 55 max mOhm at -4.5 V (several times the DMP2008UFG)")],
     "SC0919": [("../RPi_Pico_W_datasheet.pdf", "CONFIRMED: 51 x 21 mm, 2 x 20 pins at 2.54 mm, rows 17.78 mm"),
                ("../RPi_Pico_2_W_datasheet.pdf", "CONFIRMED: same outline and pinout (Pico 2 W upgrade)")],
 }
+
+# Ordered variants share the documents of the base part number (same die / package, different reel or plating).
+for _new, _old in (("TPS61235PRWLR", "TPS61235PRWLT"), ("TPS22810DBVT", "TPS22810DBVR"),
+                   ("DMP2008UFG-13", "DMP2008UFG-7"), ("BM06B-SRSS-G-TB(LF)(SN)", "BM06B-SRSS-TB(LF)(SN)")):
+    if _old in DATASHEETS and _new not in DATASHEETS:
+        DATASHEETS[_new] = [(f, f"(same part as {_old}) " + r) for f, r in DATASHEETS[_old]]
