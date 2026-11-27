@@ -30,7 +30,6 @@ MPN = {
     "R8 R9": (YAGEO, "RC0603FR-074K3L", "ok", "ISET 1.16 A for the Pololu 3072 (30:1 HPCB 6V)"),
     "C12 C13": (MURATA, "GRM1885C1H101JA01D", "ok", "100 pF C0G 0603 (stock)"),
     "R10": (YAGEO, "RC0603FR-07100KL", "ok", ""),
-    "J3 J4": ("JST", "BM06B-SRSS-G-TB(LF)(SN)", "ok", "vertical (top entry); from Mouser 306-6BSRSSGTBLPP (the one non-Digi-Key line)"),
     "J7 J8": ("-", "pads only", "ok", "2 mm solder pads for direct wiring"),
     "U5": (TI, "TPS61235PRWLR", "ok", "ordered as the R reel variant (same part as RWLT)"),
     "L2": ("Wurth Elektronik", "74438357010", "ok", ""),
@@ -88,9 +87,9 @@ EXTRA = [
     ("BT1 BT2 alt.", 0, "18650 holder, SMT, polarized, 68.9 mm bay for protected cells (alternative, same footprint)",
      ("Keystone", "1042P", "ok", "qty 0 = alternative to the 1042")),
     ("Cables", 2, "JST SH 6-pin F-F twisted cable, 10 cm, encoder color code (Pololu 4765, bought from 4project 4P-537582)",
-     ("Pololu", "4765", "ok", "straight through: same color on the same pin at both ends (pin 1 green ... 6 red) -> J3/J4 pin n = encoder pin n")),
-    ("Cables alt.", 0, "JST SH 6-pin single-ended cable, 12 cm + SHR-06V-S-B housing + 6 x SSH-003T-P0.2-H contacts",
-     ("Pololu / JST", "4762 + SHR-06V-S-B", "ok", "alternative: crimp the free end in the same color order (pin 1 green ... 6 red)")),
+     ("Pololu", "4765", "ok", "cut in half: one end per motor; solder the cut wires to J7 / J8 in color order (pin 1 green ... 6 red) -> pad n = encoder pin n")),
+    ("Cables alt.", 0, "JST SH 6-pin single-ended cable, 12 cm (encoder end only)",
+     ("Pololu", "4762", "ok", "alternative: single-ended cable, solder the free end to J7 / J8 in color order (pin 1 green ... 6 red)")),
     ("Cells", 2, "18650 Li-ion cell, plain (no protection PCB), flat or button top", ("any", "18650 plain", "ok",
      "user 2026-11-27; insert matched cells (within ~0.1 V); board protection: per-cell reverse FETs, BQ25606 4.208 V "
      "charge limit, TPS22810 UVLO (2.70 V option recommended), no cell temperature sensing (TS fixed); F1/F2 resettable fuses per cell")),
@@ -119,7 +118,7 @@ DIGIKEY = {
     "1812L260THDR": ("F3376CT-ND", ""), "DMP2008UFG-13": ("DMP2008UFG-13DICT-ND", ""), "DMG2302U-7": ("DMG2302U-7DICT-ND", ""),
     "MBR120VLSFT1G": ("MBR120VLSFT1GOSCT-ND", ""), "GRM21BR61E106KA73L": ("490-5523-1-ND", ""),
     "TPS22810DBVT": ("296-45304-1-ND", ""), "1042P": ("36-1042P-ND", "optional alternative"),
-    "BM06B-SRSS-G-TB(LF)(SN)": ("", "Mouser 306-6BSRSSGTBLPP"),
+    # BM06B-SRSS-G-TB (Mouser 306-6BSRSSGTBLPP): J3 / J4 dropped 2026-11-27, optional for future designs (see design.py)
     "1042": ("36-1042-ND", "user, Nov 2026"),
 }
 

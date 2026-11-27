@@ -127,7 +127,7 @@ PINMAP = {
     8: "M1_IN1", 9: "M1_IN2",                          # left motor, PWM slice 4 A/B
     10: "IMU_RST", 11: "IMU_INT",                      # left, bottom end
     12: "SPI1_MISO", 13: "SPI1_CS", 14: "SPI1_SCK", 15: "SPI1_MOSI",   # BNO086 on SPI1, bottom-left: nearest the IMU
-    16: "ENC2_A", 17: "ENC2_B",                        # right encoder, bottom-right: nearest J4
+    16: "ENC2_A", 17: "ENC2_B",                        # right encoder, bottom-right: nearest J8
     18: "SPARE", 19: "USER_LED",                       # right: GP18 spare, D4 user LED
     20: "M2_IN1", 21: "M2_IN2",                        # right motor, PWM slice 2 A/B
     22: "IMU_WAKE",                                    # right
@@ -175,14 +175,14 @@ BOM = [
     ("R8 R9", "4.3k", "Device:R", _R, "MP6550 ISET: current limit 1.16 A per motor (both stalled 2.33 A < boost 2.49 A)"),
     ("C12 C13", "100pF 50V", "Device:C", _C, "MP6550 VISEN filter (<= 500 pF)"),
     ("R10", "100k", "Device:R", _R, "MOTOR_EN (both nSLEEP_HB) pull-down"),
-    # vertical (top-entry) header (user 2026-11-27): JST BM06B-SRSS-TB, body 8.0 x 2.9 x 4.25 mm (catalog p.3)
-    ("J3 J4", "JST SH 6-pin vertical (top entry, BM06B-SRSS-G-TB)", "Connector_Generic_MountingPin:Conn_01x06_MountingPin",
-     "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
-     "motor + encoder (Pololu 4761 pinout: GND, B, A, VCC=3V3, M2, M1)"),
-    # user 2026-11-27: also 2 mm spaced solder pads for wiring the motors/encoders directly, pads named on silk
+    # Motor + encoder wiring (user 2026-11-27): the JST connectors J3 / J4 are dropped (not in the BOM); the motor cable
+    # ends are soldered straight to 2 mm pads, named on silk, in the Pololu 4761 encoder order (pad n = encoder pin n).
+    # OPTIONAL FOR FUTURE DESIGNS: vertical JST SH 6-pin BM06B-SRSS-G-TB (Mouser 306-6BSRSSGTBLPP), footprint
+    # Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical (pads 1-6 in the same order + MP to GND), symbol
+    # Connector_Generic_MountingPin:Conn_01x06_MountingPin; mates the Pololu 4765 cable without cutting it.
     ("J7 J8", "6 solder pads, 2.0 mm pitch (no part)", "Connector_Generic:Conn_01x06",
      "KD_Connectors:SolderWire_Pads_1x06_P2.00mm_Named",
-     "direct-wire alternative to J3/J4, same pinout, silk GND B A VCC M2 M1"),
+     "motor + encoder wires soldered directly (Pololu 4761 order: GND, B, A, VCC=3V3, M2, M1), silk names"),
     # --- 5.1 V boost: TPS61235P (values from Drone_1S_Pico2W, checked against SLVSCK4A) ---
     ("U5", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5V1 for the motor drivers"),
     ("L2", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "boost inductor"),
@@ -326,9 +326,7 @@ REVIEW_PARTS = [
     # motor drivers up and out to the sides beside the Pico's lower end (user); vertical connectors at the bottom
     # edge, x +-14 (closer to the encoders; clear of the bolt keep-outs)
     ("U3", -20.0, 75.0, 2.0, 2.0, 0.8, "ic", 0), ("C6", -24.5, 75.0, 2.0, 1.25, 1.25, "cap", 0),
-    ("J3", -14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
     ("U4", 20.0, 75.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 24.5, 75.0, 2.0, 1.25, 1.25, "cap", 0),
-    ("J4", 14.0, 96.8, 8.0, 2.9, 4.25, "conn", 0),
     # direct-wire solder pad rows (6 pads, 2.0 mm pitch, 3.0 mm long = twice the first draft), above each connector
     ("J7", -14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0), ("J8", 14.0, 91.5, 11.5, 3.0, 0.05, "metal", 0),
     # boost on the left beside the Pico, above the left driver
@@ -356,8 +354,8 @@ DNP = {"TH1", "R22", "R23", "R24"}
 VALUES = {"R22": "100k", "R23": "1.27M", "R21": "0R", "Q1": "DMP2008UFG", "Q2": "DMP2008UFG",
           "Q3": "DMG2302U", "Q4": "DMG2302U", "J5": "USB4235-03-C", "U1": "Pico W / Pico 2 W", "SW1": "AS12AP",
           "BT1": "Keystone 1042", "BT2": "Keystone 1042", "F1": "1812L260TH", "F2": "1812L260TH",
-          "L1": "1uH 74438357010", "L2": "1uH 74438357010", "Y1": "32.768kHz", "J3": "BM06B-SRSS-G-TB",
-          "J4": "BM06B-SRSS-G-TB", "J7": "wire pads", "J8": "wire pads", "TH1": "103AT-2 (DNP)",
+          "L1": "1uH 74438357010", "L2": "1uH 74438357010", "Y1": "32.768kHz",
+          "J7": "wire pads", "J8": "wire pads", "TH1": "103AT-2 (DNP)",
           "U3": "MP6550GG", "U4": "MP6550GG", "U6": "BQ25606", "U7": "TPS22810DBV"}
 # U6 VSET (pin 12) MUST stay floating: SLUSCK6C pin table - float (> 50 k to GND) = 4.208 V (4.187-4.229 V), the
 # right setting for plain 4.20 V Li-ion 18650s; 5-25 k to GND = 4.400 V and < 500 Ohm (short to GND) = 4.352 V are
@@ -407,9 +405,9 @@ def build_nets():
                    ("R6", "IMU_ENV_SCL"), ("R7", "IMU_PS1")):
         add("3V3", r, 1), add(net, r, 2)
     add("IMU_BOOTN", "TP1", 1)
-    # --- motor drivers: U3 = motor 1 (left, J3), U4 = motor 2 (right, J4) ---
-    for k, (u, cvin, cvcc, c33, riset, cvis, j, jw) in enumerate(
-            (("U3", "C6", "C8", "C10", "R8", "C12", "J3", "J7"), ("U4", "C7", "C9", "C11", "R9", "C13", "J4", "J8")), 1):
+    # --- motor drivers: U3 = motor 1 (left, J7), U4 = motor 2 (right, J8) ---
+    for k, (u, cvin, cvcc, c33, riset, cvis, jw) in enumerate(
+            (("U3", "C6", "C8", "C10", "R8", "C12", "J7"), ("U4", "C7", "C9", "C11", "R9", "C13", "J8")), 1):
         m = f"M{k}"
         add("5V1", u, 9)
         add("GND", u, 3, 5)                              # nSLEEP_LDO low: internal 3.3 V LDO off
@@ -423,11 +421,9 @@ def build_nets():
         add(f"{m}_V3P3", c33, 1), add("GND", c33, 2)
         add(f"{m}_ISET", riset, 1), add("GND", riset, 2)
         add(f"{m}_ISENSE", cvis, 1), add("GND", cvis, 2)
-        # connector / wire pads, Pololu 4761 order: 1 GND, 2 B, 3 A, 4 VCC (3V3), 5 M2, 6 M1
-        for ref in (j, jw):
-            add("GND", ref, 1), add(f"ENC{k}_B", ref, 2), add(f"ENC{k}_A", ref, 3), add("3V3", ref, 4)
-            add(f"{m}_OUT2", ref, 5), add(f"{m}_OUT1", ref, 6)
-        add("GND", j, "MP")
+        # wire pads, Pololu 4761 order: 1 GND, 2 B, 3 A, 4 VCC (3V3), 5 M2, 6 M1
+        add("GND", jw, 1), add(f"ENC{k}_B", jw, 2), add(f"ENC{k}_A", jw, 3), add("3V3", jw, 4)
+        add(f"{m}_OUT2", jw, 5), add(f"{m}_OUT1", jw, 6)
     add("MOTOR_EN", "R10", 1), add("GND", "R10", 2)
     # --- 5.1 V boost ---
     add("BAT", "U5", 3), add("BOOST_SW", "U5", 2), add("BOOST_EN", "U5", 7)
@@ -547,7 +543,9 @@ _P = {
     "R8": (-20.0, 80.0, 0), "C12": (-20.0, 72.3, 0),
     "U4": (20.0, 76.0, 0), "C7": (24.0, 76.0, 90), "C9": (26.5, 76.0, 90), "C11": (16.0, 76.0, 90),
     "R9": (20.0, 80.0, 0), "C13": (20.0, 72.3, 0),
-    "J7": (-14.0, 91.5, 0), "J8": (14.0, 91.5, 0), "J3": (-14.0, 96.8, 0), "J4": (14.0, 96.8, 0),
+    # wire pads near the bottom corners (user): pad bottoms 2.5 mm from the edge, outer pad 4.25 mm from the bolt centre
+    # (> the 3.75 mm head keep-out); the motor cables come in over the bottom edge
+    "J7": (-16.0, 96.0, 0), "J8": (16.0, 96.0, 0),
     # IMU at the centre bottom
     "U2": (0.0, 89.0, 0), "Y1": (5.0, 89.0, 90), "C1": (3.0, 93.6, 90), "C2": (6.0, 93.6, 90),
     "C3": (-3.0, 93.6, 90), "C4": (-6.0, 93.6, 90), "C5": (0.0, 93.6, 90),

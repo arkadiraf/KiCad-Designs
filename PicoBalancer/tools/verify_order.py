@@ -13,7 +13,6 @@ import openpyxl
 from export_bom import is_stock, rows
 
 OTHER_SOURCES = {           # MPN -> where it is ordered instead of Digi-Key
-    "BM06B-SRSS-G-TB(LF)(SN)": "Mouser 306-6BSRSSGTBLPP",
     "4765": "4project 4P-537582 (Pololu cable)",
     "3072": "Pololu", "4761": "Pololu",
     "SC0919": "Mouser / Piitel (user, 2026-11-27)",

@@ -16,7 +16,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 * [fabrication/BOM_to_source.md](fabrication/BOM_to_source.md): lines with no distributor number yet.
 
 **Datasheets and verification:** [Materials/bom_datasheets/README.md](Materials/bom_datasheets/README.md).
-**Order check:** `python tools/verify_order.py fabrication/DigiKey_order_2026-11-27T093456.xlsx 5` compares the Digi-Key cart with the BOM. Result for the 27 Nov cart (093456): ORDER OK for 5 boards. The Pico WH comes from Mouser / Piitel and J3/J4 from Mouser. Two cart lines are Pico_Alvik_Adapter parts.
+**Order check:** `python tools/verify_order.py fabrication/DigiKey_order_2026-11-27T093456.xlsx 5` compares the Digi-Key cart with the BOM. Result for the 27 Nov cart (093456): ORDER OK for 5 boards. The Pico WH comes from Mouser / Piitel. Two cart lines are Pico_Alvik_Adapter parts.
 
 ## Status: stage 2 (rev 0.1)
 
@@ -25,7 +25,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 | 0 | Folder, datasheets, outline + holes from the DXF (checked against Fusion), placement guides, BOM, design doc | **done** |
 | 1 | Decisions closed (motor, cells, TS fixed, UVLO option, placement); follow-up: BAT fuse | done |
 | 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, Pico socket, 1042, USB4235, slide switch, 1812L, wire pads), schematic | **done** |
-| 3 | Placement (first pass done: 96 parts, DRC clean), silkscreen for hand assembly, 3D render; routing next | in progress |
+| 3 | Placement (first pass done: 94 parts, DRC clean), silkscreen for hand assembly, 3D render; routing next | in progress |
 | 4 | DRC, fab outputs | |
 
 ![stage 0 guides](docs/board_stage0.png)
@@ -46,7 +46,7 @@ Fusion: `y_kicad = 121 - y_fusion`.
 | Channel between holders | x ±8.65, y −93.5…−6.9: vertical USB-C at the top, BQ25606 charger below, two battery-clamp holes in the middle (positions to come from Fusion) |
 | Pico | centred, x ±10.5, y 33…84 (antenna end 2.4 mm above the IMU), micro-USB up |
 | IMU | centre bottom, about (0, 89): nearest the wheel axle |
-| J3 / J4 motor connectors | bottom edge, left / right, with U3 / U4 drivers right above |
+| J7 / J8 motor wire pads | bottom corners, left / right, with U3 / U4 drivers above; motor cables soldered directly |
 
 Fusion findings, reported but not changed:
 * The 1042P locating pegs pass through the PCB body.
@@ -93,13 +93,13 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the Pico power path (TPS22810, D2, power LED) below it.
 * **Pin map v2** (`design.PINMAP`, placement-matched): BNO086 on SPI1 (GP12–GP15) with RST GP10, INT GP11, WAKE GP22. Left motor M1 on GP8/9 with encoder GP6/7; right motor M2 on GP20/21 with encoder GP16/17. MOTOR_EN GP2, BOOST_EN GP3, CHG STAT/PG GP4/5, user LED GP19 (no button), ADC GP26–28. SPI wiring follows the SparkFun breakout v10 (`design.BNO086_PINS`).
 * **Slide switch:** NKK AS12AP (non-shorting, 360-2121-ND) on the TPS22810 EN/UVLO pin, signal only. The alternative, SS12SDP4 (make-before-break), is usable thanks to R34 (1 k) in the BAT leg. One 3-pin 2.54 mm footprint fits both.
-* **Motor connectors:** vertical JST BM06B-SRSS-G-TB (Mouser), plus J7 / J8 rows of 2 mm solder pads (GND B A VCC M2 M1) for direct wiring.
+* **Motor wiring:** the motor and encoder cables are soldered directly to J7 / J8, two rows of 2 mm pads named GND B A VCC M2 M1 on the silkscreen. Cut a Pololu 4765 cable in half, one half per motor, and solder the wires in color order: pad n = encoder pin n, pin 1 green … pin 6 red. The JST connectors J3/J4 were dropped and are not in the BOM.
 
 ## Schematic (stage 2)
 
 `PicoBalancer.kicad_sch` (PDF: [docs/PicoBalancer_Schematic.pdf](docs/PicoBalancer_Schematic.pdf)) is generated from
 `build_nets()` in `tools/design.py`. Every pin has a net label, there are no wires between parts, and
-`check_netlist.py` compares KiCad's netlist with `design.py`. The sheet has 96 parts and 76 nets.
+`check_netlist.py` compares KiCad's netlist with `design.py`. The sheet has 94 parts and 76 nets.
 
 * **New shared library parts** in `Libraries/tools/gen_lib.py`. Each land pattern is taken from its datasheet; the sources are in the docstrings.
   * Symbols: KD_Sensors:BNO086, KD_Power:MP6550, KD_Modules:RPi_Pico_W_Socket.
@@ -147,6 +147,11 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   * All 16 pads now match SnapMagic's GCT_USB4235-03-C_REVA exactly. Pin order, pegs and shell slots were already right.
   * The drawing assumes a 1.0 mm board. On our 1.6 mm board the shell tabs don't come through the slots, so solder the slots from the top.
 * **3D models:** KiCad stock models on the holders, Pico sockets, BNO086 (LGA-28) and MP6550 (UQFN-12, which looks the same). The Pico module, USB4235 and slide switch have no model.
+
+## Options for future designs
+
+* **JST SH motor connectors (J3 / J4):** vertical BM06B-SRSS-G-TB (Mouser 306-6BSRSSGTBLPP), with footprint `Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical`. Pins 1–6 follow the same order as J7 / J8, and MP goes to GND. They take the Pololu 4765 cable without cutting it. Dropped on V01 in favour of soldered wires. Any already bought are spare.
+* **UART0 debug header (J6):** 1×4, 2.54 mm: GND, GP0 TX, GP1 RX, 3V3. Dropped on V01. GP0 / GP1 are spare.
 
 ## Regenerate
 
