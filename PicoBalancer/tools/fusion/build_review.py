@@ -24,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 COLORS = {"pcb": (25, 85, 45), "ic": (45, 45, 48), "conn": (235, 228, 210), "ind": (120, 120, 125),
           "cap": (205, 170, 110), "prot": (230, 130, 30), "socket": (25, 25, 25), "pico": (0, 135, 75),
           "metal": (185, 185, 190), "switch": (40, 40, 40), "white": (245, 245, 245),
-          "led_red": (220, 40, 40), "led_green": (40, 190, 70), "keepout": (230, 60, 60), "res": (30, 30, 30)}
+          "led_red": (220, 40, 40), "led_green": (40, 190, 70), "keepout": (230, 60, 60), "res": (30, 30, 30), "led_blue": (40, 90, 230)}
 
 data = {
     "board": [design.BOARD_W, design.BOARD_H, design.BOARD_T],

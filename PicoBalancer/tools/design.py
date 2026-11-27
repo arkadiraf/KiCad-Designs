@@ -99,33 +99,38 @@ PICO_SOCKET_PITCH = 17.78              # 2 x 1x20, 2.54 mm, Pico W / Pico 2 W
 
 # Operating modes (user 2026-11-27): the robot is never driven while charging; it is left disabled (slide switch
 # off) to charge slowly. If power is left on, firmware drops MOTOR_EN and BOOST_EN (TPS61235P disconnects 5V1),
-# puts the BNO086 to sleep and sends the Pico dormant (wake: RTC, GP21 button or CHG_PG). The 100 k pull-downs on
+# puts the BNO086 to sleep and sends the Pico dormant (wake: RTC or CHG_PG when the adapter is plugged / removed; no user button). The 100 k pull-downs on
 # MOTOR_EN / BOOST_EN keep motor power off through resets; the TPS22810 UVLO is the final backstop.
 
 # BNO086 pins (LGA-28) and their SPI-mode connections, from SparkFun VR IMU Breakout BNO086 schematic v10
 # (Materials/extracted/sparkfun_bno086/, CC BY-SA 4.0) and the CEVA BNO08X datasheet. SparkFun selects SPI with
 # PS0/PS1 solder jumpers to 3V3 (10 k pull-downs) and opens its I2C pull-up jumper; here SPI is fixed: PS1 pulled up,
-# PS0/WAKE pulled up and driven by GP3, no I2C pull-ups, no SA0/ADR resistor (H_SA0 is MOSI in SPI mode).
+# PS0/WAKE pulled up and driven by GP22, no I2C pull-ups, no SA0/ADR resistor (H_SA0 is MOSI in SPI mode).
 BNO086_PINS = {
     3: ("VDD", "3V3, 100 nF"), 28: ("VDDIO", "3V3, 100 nF"), 2: ("GND", "GND"), 25: ("GNDIO", "GND"),
     10: ("CLKSEL0", "GND (crystal)"), 27: ("XIN32", "Y1 + 22 pF"), 26: ("CLKSEL1/XOUT32", "Y1 + 22 pF"), 9: ("CAP", "100 nF"),
-    17: ("H_SA0/MOSI", "SPI0 MOSI GP7"), 20: ("H_SDA/MISO/TX", "SPI0 MISO GP4"), 19: ("H_SCL/SCLK/RX", "SPI0 SCK GP6"),
-    18: ("H_CS", "SPI0 CS GP5, 10 k pull-up"), 14: ("H_INT", "IMU_INT GP8"), 11: ("RST", "IMU_RST GP9, 10 k pull-up"),
-    6: ("PS0/WAKE", "IMU_WAKE GP3, 10 k pull-up"), 5: ("PS1", "10 k pull-up (SPI)"), 4: ("BOOT", "10 k pull-up, TP1"),
+    17: ("H_SA0/MOSI", "SPI1 MOSI GP15"), 20: ("H_SDA/MISO/TX", "SPI1 MISO GP12"), 19: ("H_SCL/SCLK/RX", "SPI1 SCK GP14"),
+    18: ("H_CS", "SPI1 CS GP13, 10 k pull-up"), 14: ("H_INT", "IMU_INT GP11"), 11: ("RST", "IMU_RST GP10, 10 k pull-up"),
+    6: ("PS0/WAKE", "IMU_WAKE GP22, 10 k pull-up"), 5: ("PS1", "10 k pull-up (SPI)"), 4: ("BOOT", "10 k pull-up, TP1"),
     16: ("S_SDA", "4.7 k pull-up, unused"), 15: ("S_SCL", "4.7 k pull-up, unused"),
 }
 
 # ---------------------------------------------------------------------------
-# Draft pin map (Pico W and Pico 2 W). GP23/24/25/29 belong to the CYW43439 on both modules.
-# ---------------------------------------------------------------------------
+# Pin map v2 (Pico W and Pico 2 W, user-approved 2026-11-27), matched to the placement: USB end up, so pins 1-20 run
+# down the left side and 21-40 up the right side. GP23/24/25/29 belong to the CYW43439 on both modules.
 PINMAP = {
-    0: "UART0_TX", 1: "UART0_RX", 2: "MOTOR_EN", 3: "IMU_WAKE",
-    4: "SPI0_MISO", 5: "SPI0_CS", 6: "SPI0_SCK", 7: "SPI0_MOSI",    # BNO086 over SPI0 (RP2040 SPI0 pins)
-    8: "IMU_INT", 9: "IMU_RST",
-    10: "M1_IN1", 11: "M1_IN2", 12: "M2_IN1", 13: "M2_IN2",
-    14: "ENC1_A", 15: "ENC1_B", 16: "ENC2_A", 17: "ENC2_B",
-    18: "CHG_STAT", 19: "CHG_PG", 20: "BOOST_EN", 21: "SPARE_BTN", 22: "SPARE_LED",
-    26: "M1_ISENSE", 27: "M2_ISENSE", 28: "VBAT_SENSE",
+    0: "UART0_TX", 1: "UART0_RX",                      # left, top (debug header J6)
+    2: "MOTOR_EN", 3: "BOOST_EN",                      # left; boost sits on the left
+    4: "CHG_STAT", 5: "CHG_PG",                        # left, top end
+    6: "ENC1_A", 7: "ENC1_B",                          # left encoder (PIO)
+    8: "M1_IN1", 9: "M1_IN2",                          # left motor, PWM slice 4 A/B
+    10: "IMU_RST", 11: "IMU_INT",                      # left, bottom end
+    12: "SPI1_MISO", 13: "SPI1_CS", 14: "SPI1_SCK", 15: "SPI1_MOSI",   # BNO086 on SPI1, bottom-left: nearest the IMU
+    16: "ENC2_A", 17: "ENC2_B",                        # right encoder, bottom-right: nearest J4
+    18: "SPARE", 19: "USER_LED",                       # right: GP18 spare, D4 user LED
+    20: "M2_IN1", 21: "M2_IN2",                        # right motor, PWM slice 2 A/B
+    22: "IMU_WAKE",                                    # right
+    26: "M1_ISENSE", 27: "M2_ISENSE", 28: "VBAT_SENSE",   # right, the only ADC pins
 }
 
 # ---------------------------------------------------------------------------
@@ -147,7 +152,7 @@ BOM = [
      "Connector_PinSocket_2.54mm:PinSocket_1x20_P2.54mm_Vertical", "Pico sockets, rows 17.78 mm apart"),
     # --- IMU: BNO086, reference = SparkFun BNO086 breakout (CC BY-SA 4.0) + CEVA BNO08X datasheet ---
     ("U2", "BNO086", "KD_Sensors:BNO086 (TO CREATE)", "KD_Sensors:CEVA_LGA-28_3.8x5.2mm_P0.5mm (TO CREATE)",
-     "9-axis IMU with fusion, SPI (PS1 high, PS0/WAKE high at reset)"),
+     "9-axis IMU with fusion, SPI1 (PS1 high, PS0/WAKE high at reset)"),
     ("Y1", "32.768kHz 12.5pF", "Device:Crystal", "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm", "BNO086 XIN32 / XOUT32"),
     ("C1 C2", "22pF 50V", "Device:C", _C, "crystal load (check vs crystal CL)"),
     ("C3 C4 C5", "100nF 16V", "Device:C", _C, "BNO086 VDD, VDDIO, CAP"),
@@ -269,6 +274,9 @@ BOM = [
     ("R28 R29", "100k", "Device:R", _R, "Qp gate -> source (default off)"),
     ("R30 R31", "10k", "Device:R", _R, "Qn gate series from CELLx"),
     ("R32 R33", "1M", "Device:R", _R, "CELLx pull-down: empty holder = Qp off"),
+    # user LED (GP19), user-approved 2026-11-27; no user button (user: not needed)
+    ("D4", "LED blue 0805", "Device:LED", _LED, "USER_LED (GP19)"),
+    ("R35", "1k", "Device:R", _R, "user LED series"),
     ("J6", "1x4 2.54 mm header (DNP)", "Connector_Generic:Conn_01x04",
      "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical", "UART0 debug: GND, TX, RX, 3V3"),
     ("TP1", "test pad", "Connector:TestPoint", "TestPoint:TestPoint_Pad_D1.5mm", "BNO086 BOOTN"),
@@ -325,4 +333,5 @@ REVIEW_PARTS = [
     ("U7", 20.25, 45.5, 2.9, 2.8, 1.1, "ic", 0), ("D2", 20.25, 50.5, 3.7, 1.6, 1.1, "ic", 0),
     ("SW1", 20.25, 34.3, 5.4, 9.8, 9.1, "switch", 0), ("SW1 actuator", 20.25, 34.3, 2.4, 2.4, 2.5, "white", 9.1),
     ("D3", 20.25, 55.5, 2.0, 1.25, 0.8, "led_green", 0),
+    ("D4", 20.25, 62.0, 2.0, 1.25, 0.8, "led_blue", 0),
 ]

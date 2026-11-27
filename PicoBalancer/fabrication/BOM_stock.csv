@@ -8,6 +8,7 @@ Capacitor 0603,1uF 25V,1,C20,ok
 Capacitor 0603,22pF 50V,2,C1 C2,ok
 Capacitor 0603,4.7uF 10V,1,C26,ok
 Capacitor 0603,47nF 16V,1,C27,ok
+LED 0805,LED blue 0805,1,D4,ok
 LED 0805,LED green 0805,1,D3,ok
 LED 0805,LED red 0805,1,D1,ok
 Resistor 0603,0R (DNP),0,R24,DNP
@@ -17,7 +18,7 @@ Resistor 0603,100k / 1.27M (DNP option),0,R22 R23,DNP
 Resistor 0603,10k,8,"R1 R2, R3 R4, R7, R19, R30 R31",ok
 Resistor 0603,150,1,R16,ok
 Resistor 0603,1M,2,R32 R33,ok
-Resistor 0603,1k,2,"R34, R25",ok
+Resistor 0603,1k,3,"R34, R25, R35",ok
 Resistor 0603,2.2k,1,R20,ok
 Resistor 0603,226,1,R15,ok
 Resistor 0603,30.9k,1,R18,ok

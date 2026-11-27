@@ -77,6 +77,8 @@ MPN = {
     "R28 R29": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R30 R31": (YAGEO, "RC0603FR-0710KL", "ok", ""),
     "R32 R33": (YAGEO, "RC0603FR-071ML", "ok", ""),
+    "D4": ("Lite-On", "LTST-C171TBKT", "ok", "blue 0805 (stock; any 0805 LED colour)"),
+    "R35": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "J6": ("Sullins", "PRPC040SAAN-RC", "DNP", "cut 4 pins from a 1x40 strip"),
     "TP1": ("-", "pad only", "ok", "copper pad"),
 }

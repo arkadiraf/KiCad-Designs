@@ -3,7 +3,7 @@
 One 60 × 200 × 1.6 mm PCB for a two-wheel balancing robot:
 * **MCU:** Raspberry Pi Pico W (RP2040) on 2 × 20 female sockets, upgradable to a Pico 2 W (RP2350) with no board change.
 * **Cells:** plain 2 × 18650 (no protection PCB) in parallel (1S2P) in Keystone 1042 holders (not polarized, Digi-Key 36-1042-ND), or the polarized 1042P on the same footprint. Each cell has its own reverse-polarity FET.
-* **IMU:** BNO086 on SPI0.
+* **IMU:** BNO086 on SPI1.
 * **Motors:** 2 × MP6550 H-bridges for Pololu #3072 micro metal gearmotors (30:1 HPCB 6V, extended shaft), each with a Pololu 4761 magnetic encoder on one JST-SH 6-pin connector. ISET 4.3 k caps each motor at 1.16 A.
 * **Power:** the blocks are reused from [Drone_1S_Pico2W](../Drone_1S_Pico2W/): BQ25606 USB-C charger (vertical GCT USB4235), TPS22810 Pico switch with UVLO, TPS61235P 5.1 V boost.
 
@@ -86,12 +86,12 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   programming and cannot push current into the cells.
 * **Encoder VCC = 3V3.** The Pololu encoder pulls A/B up to its VCC, and RP2040 GPIOs are not 5 V tolerant.
 * **BAT feeds both paths:** the TPS22810 (Pico VSYS) and the TPS61235P boost take their input from BAT, after the per-cell FETs. The BQ25606 SYS pin carries only its own capacitors.
-* **Boost EN** comes only from the Pico (GP20, 100 k pull-down), so motor power is off by default. MOTOR_EN (GP2) gates
+* **Boost EN** comes only from the Pico (GP3, 100 k pull-down), so motor power is off by default. MOTOR_EN (GP2) gates
   both MP6550 nSLEEP_HB pins the same way.
 * **Charger temperature left out:** TS is held in its normal window by R19 10 k (TH1 not fitted), so charging never stops for temperature.
 * **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop: internal 2.54 / 2.41 V by default (R21 = 0 Ω), or 3.30 / 2.70 V by fitting R21 = 156 k, R22 and R23. Firmware sleeps well above it.
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the Pico power path (TPS22810, D2, power LED) below it.
-* **BNO086 on SPI0** (GP4–GP7; pin-for-pin SPI wiring from the SparkFun breakout schematic v10, `design.BNO086_PINS`), with INT on GP8, RST on GP9 and WAKE on GP3. PS1 and PS0/WAKE have pull-ups.
+* **Pin map v2** (`design.PINMAP`, placement-matched): BNO086 on SPI1 (GP12–GP15) with RST GP10, INT GP11, WAKE GP22. Left motor M1 on GP8/9 with encoder GP6/7; right motor M2 on GP20/21 with encoder GP16/17. MOTOR_EN GP2, BOOST_EN GP3, CHG STAT/PG GP4/5, user LED GP19 (no button), ADC GP26–28. SPI wiring follows the SparkFun breakout v10 (`design.BNO086_PINS`).
 * **Slide switch:** NKK AS12AP (non-shorting, 360-2121-ND) on the TPS22810 EN/UVLO pin, signal only. The alternative, SS12SDP4 (make-before-break), is usable thanks to R34 (1 k) in the BAT leg. One 3-pin 2.54 mm footprint fits both.
 * **Motor connectors:** vertical JST BM06B-SRSS-G-TB (Mouser), plus J3W / J4W rows of 2 mm solder pads (GND B A VCC M2 M1) for direct wiring.
 
