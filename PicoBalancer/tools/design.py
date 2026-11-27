@@ -298,13 +298,12 @@ BOM = [
 # the 3.45 mm hole and which the 2.39 mm hole is TO VERIFY on the part. BT2 holes are for a real holder in the same
 # orientation as BT1 (+ end toward the board centre); the Fusion right holder is a mirrored copy, not a buildable part.
 # offsets from the holder centre (model bosses): + end (+8 toward the board centre line, +27.6 in y), - end (-8, -27.6)
-# Keystone 1042 drawing rev H mounting pad layout (same as KiCad's stock footprint): two 3.45 mm peg holes on the
-# 55.20 x 16.00 diagonal and a 2.39 mm hole for the small peg 8.51 mm beyond one 3.45 hole, on the other side, at the
-# spring (-) end (KiCad stock model / footprint; TO CHECK on a real holder).
-# Offsets from the holder centre on the board (+ end at -y, holder footprint rotated 180): (-8, -27.62) 3.45,
-# (+8, +27.62) 3.45, (-8, +36.13) 2.39 (small peg at the - spring end, toward the board centre).
+# Keystone 1042 drawing rev H mounting pad layout: two 3.45 mm peg holes on the 55.20 x 16.00 diagonal and a 2.39 mm
+# hole for the small peg 8.51 mm beyond the + end 3.45 hole, on the other side (small peg at the + end: SnapMagic
+# BAT_1042 and KiCad stock footprint agree). Offsets from the holder centre on the board (+ end at -y, footprint
+# rotated 180): (-8, -27.62) 3.45, (+8, +27.62) 3.45, (+8, -36.13) 2.39.
 HOLDER_HOLES = [(sx + dx, _hy + dy, d) for sx in (-_hx, _hx)
-                for dx, dy, d in ((-8.0, -27.62, 3.45), (8.0, 27.62, 3.45), (-8.0, 36.13, 2.39))]
+                for dx, dy, d in ((-8.0, -27.62, 3.45), (8.0, 27.62, 3.45), (8.0, -36.13, 2.39))]
 
 REVIEW_PARTS = [
     # top channel between the holders: USB-C + charger

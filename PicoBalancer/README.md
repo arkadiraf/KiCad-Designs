@@ -139,9 +139,9 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 * **Keystone 1042 footprint, corrected against the drawing (rev H):**
   * Two Ø3.45 mm peg holes on the 55.20 × 16.00 mm diagonal, plus a Ø2.39 mm hole for the small peg.
   * Orientation follows the + and − moulded on the Fusion 1042P holder (checked against your screenshot): **+ at the top end (USB side), − spring at the board-centre end.** Both holders are rotated 180° on the board. Large + and − silk marks beside each contact stay visible with the holder fitted.
-  * Per KiCad's stock model, the small peg sits at the spring (−) end, which is now the board-centre end.
+  * The small peg is at the **+ end**, which is now the top end. SnapMagic's BAT_1042 (pads P / N) and KiCad's stock footprint agree. Hole spacing follows the Keystone drawing (8.51 mm). SnapMagic uses 8.22 mm, which still fits the 0.8 mm play around the peg.
   * Routing consequence: CELLx comes out at the top pad, so it runs about 80 mm under the holder to F1/F2. Route it wide, on both layers.
-  * **TO CHECK on a real holder:** that the small peg is at the spring end. The Fusion review holes are not rebuilt yet.
+  * The Fusion review holes are not rebuilt yet.
 * **3D models:** KiCad stock models on the holders, Pico sockets, BNO086 (LGA-28) and MP6550 (UQFN-12, which looks the same). The Pico module, USB4235 and slide switch have no model.
 
 ## Regenerate

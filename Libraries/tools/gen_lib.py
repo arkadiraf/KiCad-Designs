@@ -574,20 +574,19 @@ def fp_mp6550():
 def fp_keystone_1042():
     """Keystone 1042 / 1042P SMT 18650 holder, drawing 1042 rev H "mounting pad layout" (1042P rev C identical): two
     pads >= 6.47 x 7.46 mm, >= 86.80 mm overall (pads 6.5 x 7.5 mm, outer edges y +-43.4); two 3.45 mm peg holes on a
-    diagonal 55.20 along x 16.00 across, and one 2.39 mm hole for the small 1.57 mm peg, 8.51 mm beyond one 3.45 hole
-    and on the other side. That small peg is at the SPRING end: KiCad's stock footprint and 3D model put the 2.39 hole
-    and the coil spring at the same end (the stock silk calls that end "+", but the spring is the - contact, as in the
-    Fusion 1042P model). Pad 1 = + (flat contact, +y), pad 2 = - (spring, -y): this footprint is the
-    stock one rotated -90 deg. TO CHECK on a real 1042: small peg at the spring end. Body 77.05 x 20.65 x 14.86 mm."""
+    diagonal 55.20 along x 16.00 across, and one 2.39 mm hole for the small 1.57 mm peg, 8.51 mm beyond the + end 3.45
+    hole and on the other side. Small peg at the + END: SnapMagic BAT_1042 (pads P / N, 2.39 hole next to P) and KiCad's
+    stock BatteryHolder_Keystone_1042_1x18650 (silk "+" at that end) agree. Pad 1 = + (+y), pad 2 = - (-y); this is
+    the stock footprint rotated +90 deg. Body 77.05 x 20.65 x 14.86 mm. 3D: KiCad stock model, rotated to match."""
     pads = [smd(1, "rect", 0, 39.65, 6.5, 7.5, "k1042p1"), smd(2, "rect", 0, -39.65, 6.5, 7.5, "k1042p2"),
-            npth(8.0, 27.62, 3.45, "k1042h1"), npth(-8.0, -27.62, 3.45, "k1042h2"), npth(8.0, -36.13, 2.39, "k1042h3")]
+            npth(8.0, 27.62, 3.45, "k1042h1"), npth(-8.0, -27.62, 3.45, "k1042h2"), npth(-8.0, 36.13, 2.39, "k1042h3")]
     g = [text("reference", "REF**", 0, 0, "F.SilkS", size=1.2, thick=0.18, ang=90),
          text("value", "Keystone_1042", 0, 0, "F.Fab", size=1.0, thick=0.15, ang=90),
          rect(-10.325, -38.525, 10.325, 38.525, "F.Fab", 0.12),
          line(-10.05, -38.65, -10.05, 38.65, "F.SilkS", 0.15), line(10.05, -38.65, 10.05, 38.65, "F.SilkS", 0.15),   # inside the body (holder flush with the board edge)
          rect(-10.7, -43.7, 10.7, 43.7, "F.CrtYd", 0.05)]
     # cell polarity marks, visible with the holder fitted: between the body ends (y +-38.5) and the pad ends (+-43.4),
-    # both sides of each contact. + = flat contact (pad 1, +y); - = spring (pad 2, -y). Drawn as 0.4 mm strokes.
+    # both sides of each contact. + = pad 1 (+y), - = pad 2 (-y). Drawn as 0.4 mm strokes.
     for sx in (-1, 1):
         x, yp, ym, a = sx * 6.6, 41.1, -41.1, 1.2
         g += [line(x - a, yp, x + a, yp, "F.SilkS", 0.4), line(x, yp - a, x, yp + a, "F.SilkS", 0.4),
@@ -599,7 +598,7 @@ def fp_keystone_1042():
     return footprint("Keystone_1042_1x18650_SMD", "Keystone 1042 / 1042P SMT holder for one 18650 cell, pads and "
                      "locating holes from the Keystone drawings (1042 rev H, 1042P rev C)", "battery holder 18650 "
                      "Keystone 1042", "smd", g, pads,
-                     [("Battery.3dshapes/BatteryHolder_Keystone_1042_1x18650.step", (0, 0, 0), (0, 0, -90))])
+                     [("Battery.3dshapes/BatteryHolder_Keystone_1042_1x18650.step", (0, 0, 0), (0, 0, 90))])
 
 
 def fp_usb4235():
