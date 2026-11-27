@@ -173,8 +173,10 @@ BOM = [
     ("R17", "5.23k", "Device:R", _R, "TS divider top (0-60 C)"),
     ("R18", "30.9k", "Device:R", _R, "TS divider bottom"),
     ("TH1", "10k NTC 103AT-2", "Device:Thermistor_NTC", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
-     "cell temperature, taped between the cells"),
-    ("R19", "10k (DNP option)", "Device:R", _R, "fixed TS resistor in place of TH1 (no temperature cut-off)"),
+     "cell temperature (DNP: charger temperature left out, user 2026-11-27)"),
+    # TS fixed (no NTC): bottom = R18 30.9k || R19 10k = 7.55k, top R17 5.23k -> TS = 0.591 x REGN, inside the BQ25606
+    # normal window (between its 10 C and 45 C thresholds) -> charging always allowed, no temperature cut-off.
+    ("R19", "10k", "Device:R", _R, "fixed TS resistor in place of TH1 (charger temperature left out)"),
     ("C20", "1uF 25V", "Device:C", _C, "VBUS"),
     ("C21 C22", "10uF 16V", "Device:C", _C08, "PMID"),
     ("C23 C24", "10uF 16V", "Device:C", _C08, "SYS (only load on SYS: <= 20 uF per datasheet)"),

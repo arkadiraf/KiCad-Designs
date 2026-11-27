@@ -2,7 +2,7 @@
 
 One 60 × 200 × 1.6 mm PCB for a two-wheel balancing robot:
 * **MCU:** Raspberry Pi Pico W (RP2040) on 2 × 20 female sockets, upgradable to a Pico 2 W (RP2350) with no board change.
-* **Cells:** 2 × 18650 in parallel (1S2P) in Keystone 1042P holders, or the non-polarized 1042 on the same footprint. Each cell has its own reverse-polarity FET.
+* **Cells:** plain 2 × 18650 (no protection PCB) in parallel (1S2P) in Keystone 1042P holders, or the non-polarized 1042 on the same footprint. Each cell has its own reverse-polarity FET.
 * **IMU:** BNO086 on SPI0.
 * **Motors:** 2 × MP6550 H-bridges for Pololu #3072 micro metal gearmotors (30:1 HPCB 6V, extended shaft), each with a Pololu 4761 magnetic encoder on one JST-SH 6-pin connector. ISET 4.3 k caps each motor at 1.16 A.
 * **Power:** the blocks are reused from [Drone_1S_Pico2W](../Drone_1S_Pico2W/): BQ25606 USB-C charger (vertical GCT USB4235), TPS22810 Pico switch with UVLO, TPS61235P 5.1 V boost.
@@ -22,7 +22,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 | Stage | Content | State |
 |---|---|---|
 | 0 | Folder, datasheets, outline + holes from the DXF (checked against Fusion), placement guides, BOM, design doc | **done** |
-| 1 | Close the open decisions (cells, TS, UVLO, boost / slide-switch placement) | next |
+| 1 | Decisions closed (motor, cells, TS fixed, UVLO option, placement); follow-up: BAT fuse | done |
 | 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, 1042P, USB4235, EG1218), schematic | |
 | 3 | Placement, 3D review against the Fusion model, routing | |
 | 4 | DRC, fab outputs | |
@@ -65,6 +65,7 @@ Fusion findings, reported but not changed:
 * **BAT feeds both paths:** the TPS22810 (Pico VSYS) and the TPS61235P boost take their input from BAT, after the per-cell FETs. The BQ25606 SYS pin carries only its own capacitors.
 * **Boost EN** comes only from the Pico (GP20, 100 k pull-down), so motor power is off by default. MOTOR_EN (GP2) gates
   both MP6550 nSLEEP_HB pins the same way.
+* **Charger temperature left out:** TS is held in its normal window by R19 10 k (TH1 not fitted), so charging never stops for temperature.
 * **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop: internal 2.54 / 2.41 V by default (R21 = 0 Ω), or 3.30 / 2.70 V by fitting R21 = 156 k, R22 and R23. Firmware sleeps well above it.
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch on the right edge, with the TPS22810 and D2 beside it.
 * **BNO086 on SPI0** (GP4–GP7; pin-for-pin SPI wiring from the SparkFun breakout schematic v10, `design.BNO086_PINS`), with INT on GP8, RST on GP9 and WAKE on GP3. PS1 and PS0/WAKE have pull-ups.

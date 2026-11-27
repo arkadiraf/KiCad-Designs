@@ -11,7 +11,6 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 3,Samsung,CL31B226KPHNFNE,1276-3145-1-ND,C16 C17 C18,22uF 10V,ok,22 uF 10 V X7R 1206
 1,GCT,USB4235-03-C,,J5,USB-C receptacle vertical (GCT USB4235-03-C),verify,"vertical SMT, 6.5 mm; footprint from the GCT drawing; fallback USB4120-03-C"
 1,Texas Instruments,BQ25606RGER,296-47743-1-ND,U6,BQ25606,ok,
-1,Semitec,103AT-2,4316-103AT-2-ND,TH1,10k NTC 103AT-2,TBD,or R19 fixed 10k (decision open); bulk
 1,Texas Instruments,TPS22810DBVR,296-45297-1-ND,U7,TPS22810DBV,ok,
 1,E-Switch,EG1218,EG1903-ND,SW1,SPDT slide (E-Switch EG1218),ok,"user pick (Digi-Key EG1903-ND); footprint from drawing P040040; user, Nov 2026"
 1,onsemi,MBR120VLSFT1G,,D2,Schottky 20V 1A (MBR120VLSFT1G),verify,same diode family as on the Pico; SOD-123FL
