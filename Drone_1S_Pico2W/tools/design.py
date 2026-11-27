@@ -201,8 +201,8 @@ B2B = dict(
     # micro-USB, so 6 mm leaves ~2 mm under the frame: keep tall frame-bottom parts
     # out of the area above the Pico. To confirm with the chosen part datasheets.
     standoff=5.0,                # FC top to frame bottom = M2 standoff (lowest standard length over the Pico USB)
-    male_plastic=2.0,            # FC header plastic (Bitcraze pins: 2 mm)
-    male_pin=2.8,                # mating pin above the plastic, after trimming
+    male_plastic=1.5,            # FC header plastic: Samtec TMM-110-01-L-S (drawing F-226): 1.50 mm
+    male_pin=3.2,                # TMM -01 post above the plastic: 3.20 mm -> 1.8 mm into the 2.1 mm socket
     socket_h=2.1,                # Bitcraze female deck connector
     pico_top=3.73,               # Pico micro-USB top above the FC top (KiCad-RP-Pico Pico.wrl)
 )

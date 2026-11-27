@@ -16,7 +16,7 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Raspberry Pi,SC1633,2648-SC1633CT-ND,FC U1,Raspberry Pi Pico 2 W,verify,Pico 2 W without headers
 1,Bosch Sensortec,BMI088,828-1082-1-ND,FC U2,BMI088 IMU,ok,pin 2 (NC) to GND per Bosch
 1,Bosch Sensortec,BMP390,828-BMP390CT-ND,FC U3,BMP390 barometer,ok,"replaces the obsolete BMP388, same LGA-10 footprint; active (user, Nov 2026)"
-2,Samtec,TMM-110-01-L-S-SM,,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),verify,"0.5 mm square posts; check the post length vs the Flow deck sockets; not listed in this variant; Samtec direct / Mouser, or a listed variant"
-2,Samtec,TMM-110-01-L-S,,FC J1 J2,2.00 mm male 1x10 THT (to the frame),verify,"mates SMM; post length vs the chosen socket / standoff; not listed in this variant; Samtec direct / Mouser, or a listed variant"
+2,Samtec,TMM-110-04-L-S-SM,,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),verify,-04: 1.91 mm post into the Flow deck's 2.1 mm Bitcraze sockets; check availability; Samtec direct / Mouser; -04 is a non-standard length at Samtec - confirm
+2,Samtec,TMM-110-01-L-S,,FC J1 J2,2.00 mm male 1x10 THT (to the frame),ok,"-01: 3.20 mm post, 1.8 mm into the Bitcraze socket on 5 mm standoffs (-02 for SMM on 6 mm); not listed in this variant; Samtec direct / Mouser, or a listed variant"
 0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
 1,Omron,B3U-1000P,SW1020CT-ND,FC SW1,BOOTSEL tactile switch,ok,"top-actuated, 3.0 x 2.5 mm"

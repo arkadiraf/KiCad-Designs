@@ -71,9 +71,9 @@ FC_PARTS = [
     ("U3", 1, "BMP390 barometer", ("Bosch Sensortec", "BMP390", "ok", "replaces the obsolete BMP388, same LGA-10 footprint")),
     ("C1 C2", 2, "100nF 16V", (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 50 V X7R 0603")),
     ("P1 P2", 2, "2.00 mm male 1x10 SMD vertical (to the Flow deck)",
-     ("Samtec", "TMM-110-01-L-S-SM", "verify", "0.5 mm square posts; check the post length vs the Flow deck sockets")),
+     ("Samtec", "TMM-110-04-L-S-SM", "verify", "-04: 1.91 mm post into the Flow deck's 2.1 mm Bitcraze sockets; check availability")),
     ("J1 J2", 2, "2.00 mm male 1x10 THT (to the frame)",
-     ("Samtec", "TMM-110-01-L-S", "verify", "mates SMM; post length vs the chosen socket / standoff")),
+     ("Samtec", "TMM-110-01-L-S", "ok", "-01: 3.20 mm post, 1.8 mm into the Bitcraze socket on 5 mm standoffs (-02 for SMM on 6 mm)")),
     ("J9", 1, "JST-SH 3 horizontal, SWD", ("JST", "SM03B-SRSS-TB(LF)(SN)", "DNP", "fit when SWD is needed")),
     ("SW1", 1, "BOOTSEL tactile switch", ("Omron", "B3U-1000P", "ok", "top-actuated, 3.0 x 2.5 mm")),
 ]
@@ -129,7 +129,7 @@ DIGIKEY = {
     "BMP388": ("828-1079-1-ND", "OBSOLETE - replaced by BMP390"),
     "BMP390": ("828-BMP390CT-ND", "active (user, Nov 2026)"),
     "GRM188R71H104KA93D": ("", "end of life at distributors - pick an active 100 nF 0603"),
-    "TMM-110-01-L-S-SM": ("", "not listed in this variant; Samtec direct / Mouser, or a listed variant"),
+    "TMM-110-04-L-S-SM": ("", "Samtec direct / Mouser; -04 is a non-standard length at Samtec - confirm"),
     "TMM-110-01-L-S": ("", "not listed in this variant; Samtec direct / Mouser, or a listed variant"),
     "SM03B-SRSS-TB(LF)(SN)": ("455-SM03B-SRSS-TBCT-ND", ""),
     "B3U-1000P": ("SW1020CT-ND", ""),
@@ -141,6 +141,19 @@ DIGIKEY = {
 # Index: Materials/bom_datasheets/README.md (tools/datasheet_index.py).
 # ---------------------------------------------------------------------------
 DATASHEETS = {
+    "TMM-110-01-L-S": [
+        ("TMM-1xx-01_Samtec_TH_drawing.pdf",
+         "CONFIRMED (F-226): 2.00 mm pitch, 0.5 mm posts, plastic 1.50 mm, 1.97 mm wide; lead style -01: post 3.20, tail "
+         "3.50 (A 8.20); -02: 3.70 / 3.00. On 5 mm standoffs with the 2.1 mm Bitcraze socket: 1.4 mm free, post 1.8 mm in; "
+         "tail 1.9 mm below the 1.6 mm FC. With SMM-110-02 on 6 mm: use -02 (2.88 mm in, 0.85 mm past the contact point)."),
+    ],
+    "TMM-110-04-L-S-SM": [
+        ("TMM-1xx-xx-SM_Samtec_SM_drawing.pdf",
+         "CONFIRMED (F-226): plastic 1.50 mm sitting 1.27 mm above the board (2.77 mm to its top), single-row foot span "
+         "4.83 mm (alternating) - fits KiCad PinHeader_1x10_P2.00mm_Vertical_SMD_Pin1Left (2.35 mm pads at +-1.175); "
+         "post -01 3.20 / -04 1.91 / -05 1.65 / -06 4.27 mm. -04 (1.91) ~ Bitcraze's 2 mm pin: seats in the Flow deck's "
+         "2.1 mm socket, deck top 4.87 mm below the FC (-01 would bottom out)."),
+    ],
     "TPS61235PRWLT": [
         ("TPS61235PRWLT_TI_datasheet_SLVSCK4A.pdf",
          "CONFIRMED (SLVSCK4A rev A): pinout 1 PGND, 2 SW, 3 VIN, 4 CC, 5 AGND, 6 FB, 7 EN, 8 INACT, 9 VOUT = KD_Power:TPS61235P; "
@@ -214,8 +227,11 @@ DATASHEETS = {
          "CONFIRMED: VBUS pins A4/A9/B4/B9 5.0 A total (charger needs 3.2 A max), GND A1/A12/B1/B12 6.25 A, "
          "48 V DC, -40..+85 C; reflow peak 255 C (+5/-0), 50 s above 230 C. KiCad symbol "
          "USB_C_Receptacle_USB2.0_16P pins = footprint pads (A1-B12 + S1). "
-         "OPEN: no dimensions in this spec ('refer to drawing') - the land pattern needs the GCT drawing "
-         "gct.co/files/drawings/usb4105.pdf (cited by the KiCad footprint)."),
+         "No dimensions in this spec; the land pattern is confirmed by the SnapMagic footprint (next entry)"),
+        ("(SnapMagic GCT_USB4105-GF-A.kicad_mod, user-supplied, not redistributable)",
+         "CONFIRMED: all 12 signal pads, 4 shield slots (0.6 x 1.7 / 0.6 x 1.4) and 2 x 0.65 NPTH identical to KiCad "
+         "USB_C_Receptacle_GCT_USB4105-xx-A_16P (origin offset 1.075 mm); merged pads A1_B12 / A4_B9 / B4_A9 / B1_A12 = "
+         "KiCad's paired pins."),
     ],
     "SC1633": [("../RPi_Pico_2_W_datasheet.pdf", "CONFIRMED: pinout, Fig. 5 footprint; TP/SWD names from the module photo")],
     "BMI088": [
