@@ -96,12 +96,12 @@ def run(context):
         tbm.booleanOperation(board, tbm.createCylinderOrCone(a, d / 20.0, b, d / 20.0),
                              adsk.fusion.BooleanTypes.DifferenceBooleanType)
     items = [('PCB_review', board, 'pcb')]
-    for x, y, d in DATA['keepout']:                 # M2.5 head keep-out marker: 15 mm disc, 0.05 mm on the board top
+    for x, y, d in DATA['keepout']:                 # M2.5 head keep-out marker: 7.5 mm disc, 0.05 mm on the board top
         a = P(x, y, 0); a = adsk.core.Point3D.create(a.x, a.y, TOP)
         b = adsk.core.Point3D.create(a.x, a.y, TOP + 0.005)
         disc = tbm.createCylinderOrCone(a, d / 20.0, b, d / 20.0)
         tbm.booleanOperation(disc, tbm.createCylinderOrCone(a, 0.1325, b, 0.1325), adsk.fusion.BooleanTypes.DifferenceBooleanType)
-        items.append(('Keep-out 15mm (%.0f, %.0f)' % (x, y), disc, 'keepout'))
+        items.append(('Keep-out 7.5mm (%.0f, %.0f)' % (x, y), disc, 'keepout'))
     for ref, x, y, sx, sy, sz, kind, z0 in DATA['parts']:
         items.append((ref, box(x, y, z0, sx, sy, sz), kind))
     parametric = des.designType == adsk.fusion.DesignTypes.ParametricDesignType

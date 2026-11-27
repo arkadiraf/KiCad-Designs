@@ -56,11 +56,12 @@ HOLE_KEEPOUT = 8.0                       # DXF 8 x 8 squares centred on each hol
 HOLDER = dict(body=(20.65, 77.05), pad_span_min=86.80, pad_min=(6.47, 7.46), height=14.86,
               holes=((3.45, 2.39), 55.20, 16.00))
 # Holder placement (user 2026-11-27): housing outer wall flush with the board's long edges. M2.5 bolts, 5 mm heads:
-# keep the housing >= 7.5 mm from every bolt-hole centre (15 mm keep-out circle, marked on Dwgs.User and in Fusion).
-# HOLDER_TOP_OFFSET = distance from the PCB top edge (y = -100) to the housing's top end - the user measures and sets
-# it; default 11.5 mm = the minimum that keeps 7.5 mm from the y = -96 holes.
+# head keep-out circle 7.5 mm diameter (r 3.75 mm) around every bolt hole, marked on Dwgs.User and in Fusion. The holder
+# position itself is set by HOLDER_TOP_OFFSET (confirmed 11.5 mm), which leaves 7.5 mm from the top hole centres.
+# HOLDER_TOP_OFFSET = distance from the PCB top edge (y = -100) to the housing's top end: 11.5 mm, confirmed by the user
+# 2026-11-27 (= the minimum that keeps 7.5 mm from the y = -96 holes).
 BOLT_HEAD_D = 5.0
-BOLT_KEEPOUT_R = 7.5
+BOLT_KEEPOUT_R = 3.75                    # 7.5 mm diameter mark (user 2026-11-27)
 HOLDER_TOP_OFFSET = 11.5
 _hx = BOARD_W / 2 - HOLDER["body"][0] / 2                                  # 19.675
 _hy = -BOARD_H / 2 + HOLDER_TOP_OFFSET + HOLDER["body"][1] / 2             # -49.975 with the default
@@ -298,8 +299,8 @@ REVIEW_PARTS = [
     ("U1 Pico W", 0.0, 39.5, 21.0, 51.0, 1.0, "pico", 8.5), ("U1 micro-USB", 0.0, 15.3, 7.5, 5.5, 2.7, "metal", 9.5),
     # IMU at the centre bottom, nearest the wheel axle
     ("U2 BNO086", 0.0, 89.0, 3.8, 5.2, 1.1, "ic", 0), ("Y1", 5.0, 89.0, 3.2, 1.5, 0.9, "metal", 0),
-    # motor drivers above their connectors, connectors at the bottom edge (opening toward +y), x +-14 to stay
-    # outside the 7.5 mm bolt keep-out of the y = 96 holes
+    # motor drivers above their connectors, connectors at the bottom edge (opening toward +y), x +-14 (closer to the
+    # encoders; clear of the bolt keep-outs)
     ("U3", -14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C6", -18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),
     ("J3", -14.0, 96.5, 8.0, 4.25, 2.95, "conn", 0),
     ("U4", 14.0, 85.0, 2.0, 2.0, 0.8, "ic", 0), ("C7", 18.0, 85.0, 2.0, 1.25, 1.25, "cap", 0),

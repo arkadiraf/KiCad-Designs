@@ -40,7 +40,7 @@ Fusion: `y_kicad = 121 - y_fusion`.
 | Item | Position (mm) |
 |---|---|
 | Outline | 60 × 200 |
-| Holes | 6 × Ø2.65 NPTH (M2.5) at x ±26, y −96 / 0 / +96, 8 × 8 squares from the DXF and Ø15 mm head keep-outs; 2 clamp holes at (0, −61) / (0, −81) (`KD_Mechanical:MountingHole_2.65mm_NPTH`) |
+| Holes | 6 × Ø2.65 NPTH (M2.5) at x ±26, y −96 / 0 / +96, 8 × 8 squares from the DXF and Ø7.5 mm head keep-out marks; 2 clamp holes at (0, −61) / (0, −81) (`KD_Mechanical:MountingHole_2.65mm_NPTH`) |
 | BT1 / BT2 (1042, alt. 1042P) | centres (±19.675, −49.975): outer walls on the board edges, top end 11.5 mm from the top edge, + contact toward the board centre; pads ≥ 7.46 × 6.47 mm, ≥ 86.80 mm overall, holes Ø3.45 / Ø2.39 mm |
 | Channel between holders | x ±8.65, y −93.5…−6.9: vertical USB-C at the top, BQ25606 charger below, two battery-clamp holes in the middle (positions to come from Fusion) |
 | Pico | centred, x ±10.5, y 14…65, micro-USB up, antenna down |
@@ -63,8 +63,8 @@ python build_review.py                 # needs Fusion running with the PicoBalan
 python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_review_top.png 900 1500
 ```
 
-* **Bolt keep-out:** Ø15 mm circle at each M2.5 hole (5 mm head, housing ≥ 7.5 mm from the centre).
-* **Holder position:** `HOLDER_TOP_OFFSET` is the distance from the PCB top edge to the housing top end; 11.5 mm minimum, set to your measured value.
+* **Bolt keep-out:** Ø7.5 mm circle marked at each M2.5 hole (5 mm head).
+* **Holder position:** `HOLDER_TOP_OFFSET` is the distance from the PCB top edge to the housing top end: 11.5 mm (confirmed 27 Nov 2026, also the minimum for the keep-out).
 * **Battery clamp:** holes at (0, −61) and (0, −81), with the cover pillar (x ±5, y −86…−56) kept free of parts. The charger sits below the pillar and the USB-C above it.
 * **Holder joints:**
   * The left holder is positioned through the offsets of the model's rigid joint "Rigid 6".
