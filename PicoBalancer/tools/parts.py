@@ -109,7 +109,7 @@ DIGIKEY = {
     "CL31B226KPHNFNE": ("1276-3145-1-ND", ""),
     "103AT-2": ("4316-103AT-2-ND", "bulk"),
     "PRPC040SAAN-RC": ("S1011EC-40-ND", "bulk"),
-    "SC0919": ("2648-SC0919-ND", "Active (Digi-Key listing) - NOT in the 2026-11-27 Digi-Key cart"),
+    "SC0919": ("2648-SC0919-ND", "ordered from Mouser / Piitel (user, 2026-11-27), not Digi-Key"),
     # from the user's Digi-Key cart 2026-11-27T074756 (fabrication/DigiKey_order_2026-11-27T074756.xlsx) and doc table
     "PPPC201LFBN-RC": ("S7053-ND", ""), "BNO086": ("1888-BNO086CT-ND", ""), "FC-135 32.7680KA-A5": ("SER4103CT-ND", ""),
     "MP6550GG-Z": ("1589-MP6550GG-ZCT-ND", ""), "TPS61235PRWLR": ("296-47376-1-ND", ""),

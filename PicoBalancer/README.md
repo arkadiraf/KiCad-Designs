@@ -16,7 +16,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 * [fabrication/BOM_to_source.md](fabrication/BOM_to_source.md): lines with no distributor number yet.
 
 **Datasheets and verification:** [Materials/bom_datasheets/README.md](Materials/bom_datasheets/README.md).
-**Order check:** `python tools/verify_order.py fabrication/DigiKey_order_2026-11-27T074756.xlsx 5` compares the Digi-Key cart with the BOM. The 27 Nov cart is missing the Pico WH and the BQ25606, and has 5 instead of 10 Würth 74438357010 inductors.
+**Order check:** `python tools/verify_order.py fabrication/DigiKey_order_2026-11-27T093456.xlsx 5` compares the Digi-Key cart with the BOM. Result for the 27 Nov cart (093456): ORDER OK for 5 boards. The Pico WH comes from Mouser / Piitel and J3/J4 from Mouser. Two cart lines are Pico_Alvik_Adapter parts.
 
 ## Status: stage 0 (rev 0.1)
 

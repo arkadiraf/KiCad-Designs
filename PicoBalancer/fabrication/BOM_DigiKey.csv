@@ -1,5 +1,5 @@
 Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Reference,Description,Status,Note
-1,Raspberry Pi,SC0919,2648-SC0919-ND,U1,Raspberry Pi Pico W / Pico 2 W,ok,Pico WH (headers fitted) for the sockets; SC0918 = Pico W without headers; Pico 2 WH later; Active (Digi-Key listing) - NOT in the 2026-11-27 Digi-Key cart
+1,Raspberry Pi,SC0919,2648-SC0919-ND,U1,Raspberry Pi Pico W / Pico 2 W,ok,"Pico WH (headers fitted) for the sockets; SC0918 = Pico W without headers; Pico 2 WH later; ordered from Mouser / Piitel (user, 2026-11-27), not Digi-Key"
 2,Sullins,PPPC201LFBN-RC,S7053-ND,J1 J2,1x20 female 2.54 mm,ok,"1x20 female 2.54 mm, 8.50 mm insulator"
 1,CEVA,BNO086,1888-BNO086CT-ND,U2,BNO086,ok,LGA-28
 1,Epson,FC-135 32.7680KA-A5,SER4103CT-ND,Y1,32.768kHz 12.5pF,ok,"32.768 kHz, 12.5 pF, +-20 ppm (ordered, Digi-Key SER4103CT-ND)"

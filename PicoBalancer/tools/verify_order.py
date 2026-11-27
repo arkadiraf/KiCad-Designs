@@ -16,6 +16,11 @@ OTHER_SOURCES = {           # MPN -> where it is ordered instead of Digi-Key
     "BM06B-SRSS-G-TB(LF)(SN)": "Mouser 306-6BSRSSGTBLPP",
     "4765": "4project 4P-537582 (Pololu cable)",
     "3072": "Pololu", "4761": "Pololu",
+    "SC0919": "Mouser / Piitel (user, 2026-11-27)",
+}
+OTHER_PROJECT = {           # cart lines that belong to another board in this repo
+    "6-146132-3": "Pico_Alvik_Adapter J1 (2 x 1x15 SMD male header per adapter)",
+    "PMEG6020ER,115": "Pico_Alvik_Adapter D1",
 }
 ALTERNATIVES = {"SS12SDP4": "AS12AP"}     # alternative ordered in the same cart -> part it backs up
 
@@ -61,7 +66,9 @@ def main():
     if extra:
         print("\nCart lines not in the BOM:")
         for m in extra:
-            print(f"  {m}: {c[m][0]} x {c[m][1]} {c[m][2]}" + (f"  (alternative to {ALTERNATIVES[m]})" if m in ALTERNATIVES else ""))
+            tag = (f"  (alternative to {ALTERNATIVES[m]})" if m in ALTERNATIVES else
+                   f"  (other project: {OTHER_PROJECT[m]})" if m in OTHER_PROJECT else "  (NOT IN ANY BOM)")
+            print(f"  {m}: {c[m][0]} x {c[m][1]} {c[m][2]}" + tag)
     print("\nORDER OK" if not bad else f"\nORDER INCOMPLETE: {bad} line(s) short or missing")
     return 1 if bad else 0
 
