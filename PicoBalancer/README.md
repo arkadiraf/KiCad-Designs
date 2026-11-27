@@ -25,7 +25,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 | 0 | Folder, datasheets, outline + holes from the DXF (checked against Fusion), placement guides, BOM, design doc | **done** |
 | 1 | Decisions closed (motor, cells, TS fixed, UVLO option, placement); follow-up: BAT fuse | done |
 | 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, Pico socket, 1042, USB4235, slide switch, 1812L, wire pads), schematic | **done** |
-| 3 | Placement (first pass done: 97 parts, DRC clean), silkscreen for hand assembly, 3D render; routing next | in progress |
+| 3 | Placement (first pass done: 96 parts, DRC clean), silkscreen for hand assembly, 3D render; routing next | in progress |
 | 4 | DRC, fab outputs | |
 
 ![stage 0 guides](docs/board_stage0.png)
@@ -42,7 +42,7 @@ Fusion: `y_kicad = 121 - y_fusion`.
 |---|---|
 | Outline | 60 × 200 |
 | Holes | 6 × Ø2.65 NPTH (M2.5) at x ±26, y −96 / 0 / +96, 8 × 8 squares from the DXF and Ø7.5 mm head keep-out marks; 2 clamp holes at (0, −61) / (0, −81) (`KD_Mechanical:MountingHole_2.65mm_NPTH`) |
-| BT1 / BT2 (1042, alt. 1042P) | centres (±19.675, −49.975): outer walls on the board edges, top end 11.5 mm from the top edge, + contact toward the board centre; pads ≥ 7.46 × 6.47 mm, ≥ 86.80 mm overall, holes Ø3.45 / Ø2.39 mm |
+| BT1 / BT2 (1042, alt. 1042P) | centres (±19.675, −49.975): outer walls on the board edges, top end 11.5 mm from the top edge, + contact at the top end (USB side), − spring toward the board centre; pads ≥ 7.46 × 6.47 mm, ≥ 86.80 mm overall, holes Ø3.45 / Ø2.39 mm |
 | Channel between holders | x ±8.65, y −93.5…−6.9: vertical USB-C at the top, BQ25606 charger below, two battery-clamp holes in the middle (positions to come from Fusion) |
 | Pico | centred, x ±10.5, y 33…84 (antenna end 2.4 mm above the IMU), micro-USB up |
 | IMU | centre bottom, about (0, 89): nearest the wheel axle |
@@ -99,7 +99,7 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 
 `PicoBalancer.kicad_sch` (PDF: [docs/PicoBalancer_Schematic.pdf](docs/PicoBalancer_Schematic.pdf)) is generated from
 `build_nets()` in `tools/design.py`. Every pin has a net label, there are no wires between parts, and
-`check_netlist.py` compares KiCad's netlist with `design.py`. The sheet has 97 parts and 78 nets.
+`check_netlist.py` compares KiCad's netlist with `design.py`. The sheet has 96 parts and 76 nets.
 
 * **New shared library parts** in `Libraries/tools/gen_lib.py`. Each land pattern is taken from its datasheet; the sources are in the docstrings.
   * Symbols: KD_Sensors:BNO086, KD_Power:MP6550, KD_Modules:RPi_Pico_W_Socket.
@@ -114,7 +114,7 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
   * Q1/Q2 use Transistor_FET:DMP3013SFV, which has the same PowerDI3333-8 pinout as the DMP2008UFG: S 1-3, G 4, D 5.
   * Q3/Q4 use Transistor_FET:DMG2302U, flattened from Q_NMOS_GSD.
 * **Unconnected pins:**
-  * Pico: GP18 (spare), RUN, ADC_VREF, 3V3_EN, VBUS.
+  * Pico: GP0, GP1 and GP18 (spare), RUN, ADC_VREF, 3V3_EN, VBUS. The UART0 debug header J6 was dropped (not needed).
   * Charger U6: NC, and VSET. VSET must float to give 4.208 V, which suits plain 4.20 V cells. A short to GND would set 4.352 V and 5–25 k would set 4.400 V, both of which overcharge. Layout: keep GND copper off pin 12.
   * U7: CT.
   * J5: SBU1/2.
@@ -164,6 +164,6 @@ python check_netlist.py ../build/net.net     # prints NETLIST OK
 
 Current results:
 * `BOM EXPORT OK`: 74 lines.
-* `NETLIST OK`: 78 nets; ERC 0 errors, 2 expected warnings.
+* `NETLIST OK`: 76 nets; ERC 0 errors, 2 expected warnings.
 * `IMPORT OK`: 6 holes match the DXF.
 * DRC (KiCad 10.0.8): 0 violations, 0 unconnected.

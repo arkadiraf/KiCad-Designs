@@ -80,7 +80,6 @@ MPN = {
     "D4": ("Lite-On", "LTST-C171TBKT", "ok", "blue 0805 (stock; any 0805 LED colour)"),
     "R35": (YAGEO, "RC0603FR-071KL", "ok", ""),
     "R36": (YAGEO, "RC0603FR-0710KL", "ok", "CHG_STAT series"),
-    "J6": ("Sullins", "PRPC040SAAN-RC", "DNP", "cut 4 pins from a 1x40 strip"),
     "TP1": ("-", "pad only", "ok", "copper pad"),
 }
 

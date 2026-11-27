@@ -120,7 +120,7 @@ BNO086_PINS = {
 # Pin map v2 (Pico W and Pico 2 W, user-approved 2026-11-27), matched to the placement: USB end up, so pins 1-20 run
 # down the left side and 21-40 up the right side. GP23/24/25/29 belong to the CYW43439 on both modules.
 PINMAP = {
-    0: "UART0_TX", 1: "UART0_RX",                      # left, top (debug header J6)
+    0: "SPARE", 1: "SPARE",                            # left, top: spare (UART0 debug header J6 dropped, user 2026-11-27)
     2: "MOTOR_EN", 3: "BOOST_EN",                      # left; boost sits on the left
     4: "CHG_STAT", 5: "CHG_PG",                        # left, top end
     6: "ENC1_A", 7: "ENC1_B",                          # left encoder (PIO)
@@ -282,8 +282,6 @@ BOM = [
     # user LED (GP19), user-approved 2026-11-27; no user button (user: not needed)
     ("D4", "LED blue 0805", "Device:LED", _LED, "USER_LED (GP19)"),
     ("R35", "1k", "Device:R", _R, "user LED series"),
-    ("J6", "1x4 2.54 mm header (DNP)", "Connector_Generic:Conn_01x04",
-     "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical", "UART0 debug: GND, TX, RX, 3V3"),
     ("TP1", "test pad", "Connector:TestPoint", "TestPoint:TestPoint_Pad_D1.5mm", "BNO086 BOOTN"),
 ]
 
@@ -354,17 +352,17 @@ REVIEW_PARTS = [
 PICO_GP_PIN = {0: 1, 1: 2, 2: 4, 3: 5, 4: 6, 5: 7, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14, 11: 15, 12: 16, 13: 17, 14: 19,
                15: 20, 16: 21, 17: 22, 18: 24, 19: 25, 20: 26, 21: 27, 22: 29, 26: 31, 27: 32, 28: 34}
 PICO_GND = (3, 8, 13, 18, 23, 28, 33, 38)          # 33 = AGND
-DNP = {"TH1", "R22", "R23", "R24", "J6"}
+DNP = {"TH1", "R22", "R23", "R24"}
 VALUES = {"R22": "100k", "R23": "1.27M", "R21": "0R", "Q1": "DMP2008UFG", "Q2": "DMP2008UFG",
           "Q3": "DMG2302U", "Q4": "DMG2302U", "J5": "USB4235-03-C", "U1": "Pico W / Pico 2 W", "SW1": "AS12AP",
           "BT1": "Keystone 1042", "BT2": "Keystone 1042", "F1": "1812L260TH", "F2": "1812L260TH",
           "L1": "1uH 74438357010", "L2": "1uH 74438357010", "Y1": "32.768kHz", "J3": "BM06B-SRSS-G-TB",
-          "J4": "BM06B-SRSS-G-TB", "J7": "wire pads", "J8": "wire pads", "J6": "UART (DNP)", "TH1": "103AT-2 (DNP)",
+          "J4": "BM06B-SRSS-G-TB", "J7": "wire pads", "J8": "wire pads", "TH1": "103AT-2 (DNP)",
           "U3": "MP6550GG", "U4": "MP6550GG", "U6": "BQ25606", "U7": "TPS22810DBV"}
 # U6 VSET (pin 12) MUST stay floating: SLUSCK6C pin table - float (> 50 k to GND) = 4.208 V (4.187-4.229 V), the
 # right setting for plain 4.20 V Li-ion 18650s; 5-25 k to GND = 4.400 V and < 500 Ohm (short to GND) = 4.352 V are
 # for high-voltage cells and would overcharge these. Layout: no GND pour or via touching pin 12 (stage 3 rule).
-NO_CONNECT = {"U1": [24, 30, 35, 37, 40], "U2": [1, 7, 8, 12, 13, 21, 22, 23, 24], "U7": [4], "U6": [2, 12],
+NO_CONNECT = {"U1": [1, 2, 24, 30, 35, 37, 40], "U2": [1, 7, 8, 12, 13, 21, 22, 23, 24], "U7": [4], "U6": [2, 12],
               "J5": ["A8", "B8"]}
 
 
@@ -375,7 +373,7 @@ def build_nets():
         for p in pins:
             nets.setdefault(net, []).append((ref, str(p)))
 
-    # --- Pico W: GPIO per PINMAP (GP18 SPARE left open), supplies ---
+    # --- Pico W: GPIO per PINMAP (GP0 / GP1 / GP18 SPARE left open), supplies ---
     for gp, net in PINMAP.items():
         if net != "SPARE":
             add(net, "U1", PICO_GP_PIN[gp])
@@ -503,10 +501,9 @@ def build_nets():
         add(f"Q{k}P_G", rgs, 1), add("BAT", rgs, 2)
         add(c, rg, 1), add(f"Q{k}N_G", rg, 2)
         add(c, rpd, 1), add("GND", rpd, 2)
-    # --- user LED, UART header ---
+    # --- user LED ---
     add("USER_LED", "R35", 1), add("USER_LED_A", "R35", 2)
     add("USER_LED_A", "D4", 2), add("GND", "D4", 1)
-    add("GND", "J6", 1), add("UART0_TX", "J6", 2), add("UART0_RX", "J6", 3), add("3V3", "J6", 4)
     return nets
 
 # ---------------------------------------------------------------------------
@@ -535,7 +532,7 @@ _P = {
     # Pico on its sockets, micro-USB end up
     "U1": (0.0, 58.5, 0),
     # left column: UART header, MOTOR_EN pull-down, boost
-    "J6": (-22.0, 38.0, 0), "R10": (-14.5, 45.0, 0),
+    "R10": (-14.5, 45.0, 0),
     "U5": (-20.0, 56.0, 0), "L2": (-20.0, 64.0, 0), "C16": (-26.5, 50.0, 0), "C17": (-26.5, 54.0, 0),
     "C18": (-26.5, 58.0, 0), "C14": (-14.5, 52.0, 0), "C15": (-14.5, 56.0, 0), "R11": (-14.5, 59.5, 0),
     "R12": (-20.0, 52.0, 0), "C19": (-20.0, 50.0, 0),

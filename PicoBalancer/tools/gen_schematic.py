@@ -210,7 +210,7 @@ def extent(ref, sym, val=""):
 
 
 BLOCKS = [   # (title, x, y, width, refs) on an A2 sheet (594 x 420 mm)
-    ("MCU: Raspberry Pi Pico W / Pico 2 W on 2 x 20 sockets (J1, J2)", 20, 30, 120, ["U1", "J6", "D4", "R35"]),
+    ("MCU: Raspberry Pi Pico W / Pico 2 W on 2 x 20 sockets (J1, J2)", 20, 30, 120, ["U1", "D4", "R35"]),
     ("IMU: BNO086 on SPI1 (PS1 = 1, PS0/WAKE = 1 at reset). Ref: SparkFun BNO086 breakout v10, CEVA BNO08X datasheet",
      150, 30, 200, ["U2", "Y1", "C1", "C2", "C3", "C4", "C5", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "TP1"]),
     ("Motor drivers: 2 x MP6550 from 5V1, ILIM 1.16 A (R8/R9 4.3k); connectors in Pololu 4761 order", 360, 30, 220,
@@ -278,7 +278,7 @@ def build():
     note("Operating modes: the robot is not driven while charging (switch off). If power is left on, firmware drops\n"
          "MOTOR_EN and BOOST_EN, puts the BNO086 to sleep and sends the Pico dormant. TPS22810 UVLO is the backstop.\n"
          "UVLO options: R21 0R = internal 2.54 / 2.41 V; R21 156k + R22 100k + R23 1.27M = 3.30 / 2.70 V.\n"
-         "DNP: TH1, R22, R23, R24, J6.  Design doc: docs/PicoBalancer_Hardware_Design.pdf", 20, 395, 1.5)
+         "DNP: TH1, R22, R23, R24.  Design doc: docs/PicoBalancer_Hardware_Design.pdf", 20, 395, 1.5)
 
 
 def write():
