@@ -1,0 +1,18 @@
+Kind,Value,Quantity,Refs,Status
+Capacitor 0603,100nF 16V,2,FC C1 C2,ok
+Capacitor 0603,1uF 16V,2,Frame C8 C9,ok
+Capacitor 0603,1uF 25V,1,Frame C1,verify
+Capacitor 0603,4.7uF 10V,1,Frame C6,ok
+Capacitor 0603,47nF 16V,1,Frame C7,ok
+Capacitor 0603,"CT soft-start, value TO CHECK",4,Frame C14 C15 C16 C17,TBD
+LED 0805,LED red 0805,1,Frame D1,verify
+Resistor 0603,100k,5,"Frame R11 R12 R13 R14, Frame R19",ok
+Resistor 0603,150,1,Frame R4,ok
+Resistor 0603,156k / 100k / 1.27M,0,Frame R8 R9 R10,DNP
+Resistor 0603,2.2k,1,Frame R7,ok
+Resistor 0603,226,1,Frame R3,ok
+Resistor 0603,30.9k,1,Frame R6,ok
+Resistor 0603,47k,4,Frame R15 R16 R17 R18,TBD
+Resistor 0603,5.1k,2,Frame R1 R2,ok
+Resistor 0603,5.23k,1,Frame R5,ok
+Resistor 0603,"current limit ~2.5 A, TO CHECK",1,Frame R20,TBD
