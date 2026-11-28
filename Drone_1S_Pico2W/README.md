@@ -30,6 +30,7 @@ sockets J5/J6, the FC standoffs and the SWD cable, for 5 modules (`export_bom.py
 options not taken: [Materials/connector_options/](Materials/connector_options/README.md).
 **Stock parts** (0603 resistors and capacitors from the sample book, 0805 LEDs): [fabrication/BOM_stock.md](fabrication/BOM_stock.md)
 (16 values, with E24 fallbacks for the E96 values); they are left out of the Digi-Key CSV.
+**Frame BOM review** (shared libraries, PicoBalancer lessons, decisions of 28 Nov): [Materials/FRAME_BOM_REVIEW.md](Materials/FRAME_BOM_REVIEW.md).
 **Still to source** (cables, standoffs, screws, inserts, Samtec parts): [fabrication/BOM_to_source.md](fabrication/BOM_to_source.md).
 
 | Stage | Content | State |
@@ -121,7 +122,7 @@ datasheets: [Materials/connector_options/](Materials/connector_options/README.md
   * Pins are assigned in stage 2.
 
 **Connectors to the Pi Zero 2 W, on the frame top:**
-* **J7, Pi USB:** JST-SH 4 (SM04B-SRSS-TB), at (5, 18.3). Carries GND, USB D−, USB D+, GND. Four pins so
+* **J7, Pi USB:** JST-SH 4 **vertical** (BM04B-SRSS-TB, top entry; 28 Nov), at (8.9, −18.8) on the frame top: right under the Pi Zero's USB-data port, just outside its −y edge, so the lead goes straight up. Carries GND, USB D−, USB D+, GND. Four pins so
   it can't be confused with the 3-pin SWD connector.
   * The Pi is the Pico's USB host (`dtoverlay=dwc2,dr_mode=host`). It flashes the Pico with
     `picotool reboot -f -u` then `picotool load -x`, talks to it over USB serial, and runs the
@@ -262,17 +263,18 @@ doc. Items marked TO CHECK need the TI datasheet.
 | D1 | LED red 0603 | `LED_0603_1608Metric` | STAT charge indicator (optional, from REGN) |
 | R7 | 2.2k | `R_0603_1608Metric` | STAT LED series resistor |
 | U2 | TPS22810DBV | `SOT-23-6` | Pico VSYS switch, 2.54 V UVLO |
-| SW1 | SPDT slide (C&K PCM12) | `SW_SPDT_PCM12` | power switch on EN/UVLO (signal only) |
+| SW1 | SPDT slide (Nidec CUS-12TB, 563-1102-1-ND; PCM12 land pattern) | `SW_SPDT_PCM12` | power switch on EN/UVLO (signal only) |
 | C8 C9 | 1uF 10V | `C_0603_1608Metric` | TPS22810 VIN / VOUT |
-| R8 R9 R10 | 156k / 100k / 1.27M (DNP option) | `R_0603_1608Metric` | external 2.70 / 3.30 V UVLO divider instead of the internal lockout (doc open item) |
+| R8 R9 R10 | 156k / 100k / 1.27M (DNP option) | `R_0603_1608Metric` | 3.30 / 2.70 V UVLO divider option, NOT fitted: the internal 2.54 / 2.41 V lockout is used (28 Nov) |
 | U3 U4 U5 U6 | TPS22997 | `Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm` | per-ESC high-side switch, ~7.5 A |
 | C10 C11 C12 C13 | 10uF 10V | `C_0805_2012Metric` | TPS22997 VIN, at the pins |
 | C14 C15 C16 C17 | CT soft-start, TO CHECK (few ms) | `C_0603_1608Metric` | limits inrush into the ESC capacitors |
 | R11 R12 R13 R14 | 100k | `R_0603_1608Metric` | ON pull-downs: Pico off = motors off |
-| R15 R16 R17 R18 | 47k (or Pico internal pull-ups) | `R_0603_1608Metric` | PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE) |
+| ~~R15-R18~~ | - | - | removed (28 Nov): the four PG outputs tie into MOTOR_PG, pull-up R7 on the FC |
+| D2 | Schottky MBR120VLSFT1G | `D_SOD-123F` | TPS22810 VOUT -> VSYS, blocks back-feed from the Pico's USB (28 Nov) |
 | U7 | TPS61235P | `Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm` | 5.1 V boost, true disconnect |
 | L2 | 1uH (TO CHECK vs datasheet) | `L_Coilcraft_XAL4020-XXX` | boost inductor |
-| C18 C19 | 10uF 10V | `C_0805_2012Metric` | boost input |
+| C18 C19 | 10uF 10V | `C_0805_2012Metric` | boost input, on BAT (28 Nov) |
 | C20 C21 C22 | 22uF 10V (TO CHECK) | `C_0805_2012Metric` | boost output |
 | R19 | 100k | `R_0603_1608Metric` | BOOST_EN pull-down: Pico off = Pi off |
 | R20 | current limit ~2.5 A, TO CHECK | `R_0603_1608Metric` | boost output current limit set resistor |
@@ -426,7 +428,9 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 ## Design summary (from the design doc)
 
 * **Power:** a 1S 18650 cell (30 A peak) feeds two paths.
-  * **A, logic:** TPS22810 load switch to Pico VSYS (0.5 A). UVLO at about 2.54 V on / 2.41 V off
+  * **A, logic:** TPS22810 load switch -> D2 Schottky (MBR120VLSFT1G, blocks back-feed from the Pico's own USB;
+    user 28 Nov) -> Pico VSYS (0.5 A). UVLO: the internal lockout, about 2.54 V on / 2.41 V off, chosen so the drone has
+    time to land (user 28 Nov)
     (datasheet: 2.00–2.62 V rising, 125 mV hysteresis). An SPDT slide switch ties EN/UVLO to VIN (on) or GND
     (off, < 1 µA shutdown) and only carries the signal. QOD tied to VOUT, CT left open. Option: the
     R8/R9/R10 divider moves the thresholds to 3.30 V on / 2.70 V off (checked); the switch then feeds the
@@ -447,7 +451,8 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
   * **Open:** the internal loop compensation wants ≤ 20 µF on SYS. The TPS22810 input (1 µF) and the boost
     input (2 × 10 µF) also sit on SYS, about 41 µF in total.
   * SYS feeds the TPS22810 only. The motors stay on BAT. PG goes to the header.
-* **Boost (optional):** TPS61235P, 5.1 V for the Pi Zero, enabled by a Pico GPIO (100 k pull-down).
+* **Boost (optional):** TPS61235P, 5.1 V for the Pi Zero, enabled by a Pico GPIO (100 k pull-down). Input on BAT, not
+  SYS (user 28 Nov, as PicoBalancer: the BQ25606 wants <= 20 uF on SYS).
   * Checked against SLVSCK4A: FB to VOUT, INACT to AGND, L 1 µH (Würth), CO ≥ 20 µF effective (3 × 22 µF 1206),
     CC current limit R20 49.9 kΩ = 2.49 A with C24 10 nF in parallel. CC mode is meant for resistive loads, so the
     2.5 A limit acts as a fault limit above the Pi's draw.
@@ -477,12 +482,22 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 * [ ] OpenSCAD: draw the 7.0 mm printed spacer, update the stack (M2 × 20 bolt, nyloc nut, no standoff) and
       re-run `export_scad.py` + `1S_PiZero_verify.py` (not done: the scad repo is untouched by the 28 Nov update).
 * [ ] Future: landing gear on **M2.5** bolts instead of M2 (user, 28 Nov 2026): H_LG1–4 holes, skid inserts, BOM.
+* [ ] **Frame rear tab** (user, 28 Nov 2026): the frame grows a tab behind its rear edge (x −50…−40, |y| ≤ 11,
+      `FRAME_USB_TAB` in `design.py`) carrying, on the bottom, the USB-C J10 (off-centre, y −4.9) and the slide
+      switch SW1 beside it (y +5.6, knob ~1 mm past the rear edge), both opening backwards at the cell's ground end
+      (BT1 pad 2, x −33.6), with the BQ25606 block between them and the cell end. OpenSCAD: add the same tab.
+* [ ] **Landing gear redesign** (user, 28 Nov 2026): the rear skid beam (bottom, x −37…−33) runs through the
+      charger block; move/reshape it for clearance from the battery pad and the parts by the USB (take as much
+      room as needed). Combine with the M2.5 change above.
+* [ ] **Battery holder pocket for TH1** (user, 28 Nov 2026): the NTC is the only top-side part, lying along the
+      cell's left side at x −30…−24, y 9.6…13.2, bead glued to the cell; the printed holder / cover rail needs a
+      pocket there.
 * [ ] The 20-pin assignment of J1/J2 ↔ J5/J6. The doc's bus fits: VSYS, 4 × ON, 4 × PG, 4 × DShot,
       BOOST_EN, CHG_PG, GND.
 * [x] Deck connector gender and height (male SMD headers on the FC into the Flow deck's female
       sockets). Flow deck v2 pin use is verified from its schematic (see "Validation" below).
-* [ ] The Pico 2 W antenna faces up at the frame. Keep frame copper out above the antenna area, or
-      move the antenna out from under the frame.
+* [x] The Pico 2 W antenna faces up at the frame: no antenna keep-out on the frame - the stack gap is enough
+      distance (user, 28 Nov 2026).
 * [ ] Battery tab polarity (BT1 pad 1 is at the front).
 * [ ] Datasheets still to collect: see [Materials/MISSING_DATASHEETS.md](Materials/MISSING_DATASHEETS.md) (18 items, by priority).
 

@@ -24,7 +24,7 @@ import pcbnew
 import dxf_import
 from gen_libs import gen_lib                      # shared library generator (Libraries/tools)
 PICO_TP, PICO_SWD = gen_lib.PICO_TP, gen_lib.PICO_SWD
-from design import (FC, FRAME, SHARED_LIBS, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, FRAME_CONN, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
+from design import (FRAME_BOM, FRAME_PLACE, FRAME_MOTOR_BLOCKS, FRAME_USB_TAB, FC, FRAME, SHARED_LIBS, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, FRAME_CONN, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
                     REVISION, DATE, to_kicad, uid, ORIGIN_X, ORIGIN_Y)
 import fc_design
 
@@ -443,6 +443,93 @@ def nearest_motor(x, y):
     return min(range(4), key=lambda i: math.hypot(MOTORS[i][0] - x, MOTORS[i][1] - y))
 
 
+def frame_outline_pts():
+    """DXF frame outline (OpenSCAD) united with the rear USB tab (FRAME_USB_TAB), scad coordinates."""
+    outline, _holes = dxf_import.load()
+    t = FRAME_USB_TAB
+    r, rf, xe, hw, n = t["r"], t["rf"], t["edge"], t["half_w"], 12
+
+    def arc(cx, cy, rad, a0, a1):
+        return [(cx + rad * math.cos(math.radians(a0 + (a1 - a0) * k / n)),
+                 cy + rad * math.sin(math.radians(a0 + (a1 - a0) * k / n))) for k in range(n + 1)]
+    # outer corners r; concave flares rf where the tab sides meet the frame's rear edge (x = edge), matching the
+    # DXF's own 4 mm concave fillets at the rear corners
+    tab = [(t["x1"], -hw - rf)] + arc(xe - rf, -hw - rf, rf, 0, 90) \
+        + arc(t["x0"] + r, -hw + r, r, 270, 180) + arc(t["x0"] + r, hw - r, r, 180, 90) \
+        + arc(xe - rf, hw + rf, rf, 270, 360) + [(t["x1"], hw + rf)]
+    s = poly_set(outline)
+    s.BooleanAdd(poly_set(tab), *_PM)
+    assert s.OutlineCount() == 1
+    o = s.Outline(0)
+    return [(pcbnew.ToMM(o.CPoint(i).x) - ORIGIN_X, ORIGIN_Y - pcbnew.ToMM(o.CPoint(i).y)) for i in range(o.PointCount())]
+
+
+def place_usb_rear(board, fp_val):
+    """J10 on the BOTTOM of the rear tab, opening toward -x: the front of its courtyard 1.4 mm past the tab edge (the
+    receptacle lip at the edge, as on the side placement before), signal pads toward the board."""
+    lib, name = fp_val[0].split(":")
+    fp = load_fp(lib, name)
+    fp.SetReference("J10")
+    fp.SetValue("USB4105-GF-A")
+    board.Add(fp)
+    fp.Flip(fp.GetPosition(), True)
+    for rot in (0, 90, 180, 270):
+        fp.SetOrientationDegrees(rot)
+        fp.SetPosition(VS(0, 0))
+        sig = [p.GetPosition() for p in fp.Pads() if p.GetNumber()[:1] in ("A", "B")]
+        cy = fp.GetCourtyard(pcbnew.B_Cu).BBox()
+        if max(v.x for v in sig) - min(v.x for v in sig) < mm(0.01) and sig[0].x > cy.Centre().x:
+            break
+    else:
+        raise AssertionError("J10: no orientation with the opening toward -x")
+    front = pcbnew.ToMM(fp.GetCourtyard(pcbnew.B_Cu).BBox().GetLeft()) - ORIGIN_X
+    fp.SetPosition(VS(FRAME_USB_TAB["x0"] - 1.4 - front, FRAME_PLACE["J10"][1]))
+    fp.Reference().SetLayer(pcbnew.B_Fab)
+    fp.Value().SetVisible(False)
+
+
+def place_frame_parts(board):
+    """FRAME_BOM parts at FRAME_PLACE, and one TPS22997 block per ESC at its arm root."""
+    fpn = {}
+    for refs, val, _sym, fp, _role in FRAME_BOM:
+        for r in refs.split():
+            fpn[r] = (fp, val)
+    pos = dict(FRAME_PLACE)
+    for jref, (u, cvin, cct, ron) in FRAME_MOTOR_BLOCKS.items():
+        j = board.FindFootprintByReference(jref)
+        pins = [p for p in j.Pads() if p.GetNumber() in ("1", "2", "3", "4")]
+        cx = sum(pcbnew.ToMM(p.GetPosition().x) for p in pins) / 4 - ORIGIN_X
+        cy = ORIGIN_Y - sum(pcbnew.ToMM(p.GetPosition().y) for p in pins) / 4
+        r = math.hypot(cx, cy)
+        ux, uy = cx / r, cy / r                      # outward along the arm
+        vx, vy = -uy, ux                             # across the arm
+        px, py = cx - 5.0 * ux, cy - 5.0 * uy        # block centre, 5 mm inside the inner header row (BOTTOM)
+        ang = math.degrees(math.atan2(uy, ux))
+        pos[u] = (px, py, ang, "B")
+        pos[cvin] = (px + 2.9 * vx, py + 2.9 * vy, ang, "B")               # VIN cap and CT cap across the arm
+        pos[cct] = (px - 2.9 * vx, py - 2.9 * vy, ang, "B")
+        pos[ron] = (px - 2.6 * ux, py - 2.6 * uy, ang + 90, "B")           # ON pull-down toward the centre
+    missing = sorted(set(fpn) - set(pos))
+    if missing:
+        raise SystemExit(f"FRAME_PLACE: no position for {missing}")
+    for ref, (x, y, rot, side) in pos.items():
+        if ref == "J10":
+            place_usb_rear(board, fpn[ref])
+            continue
+        lib, name = fpn[ref][0].split(":")
+        fp = load_fp(lib, name)
+        fp.SetReference(ref)
+        fp.SetValue(fpn[ref][1].split(" (")[0][:24])
+        board.Add(fp)
+        if side == "B":
+            fp.Flip(fp.GetPosition(), True)
+        fp.SetOrientationDegrees(rot)
+        fp.SetPosition(VS(x, y))
+        fp.Reference().SetLayer(pcbnew.B_Fab if side == "B" else pcbnew.F_Fab)
+        fp.Value().SetVisible(False)
+    return len(pos)
+
+
 def build_frame():
     d = os.path.join(ROOT, "Frame")
     os.makedirs(d, exist_ok=True)
@@ -453,7 +540,7 @@ def build_frame():
                       "Outline + holes imported from OpenScad-Designs/Drones/1S_PiZero (pcb_outline DXF)")
 
     outline, holes = dxf_import.load()
-    poly(board, [VS(x, y) for x, y in outline], pcbnew.Edge_Cuts, 0.1)
+    poly(board, [VS(x, y) for x, y in frame_outline_pts()], pcbnew.Edge_Cuts, 0.1)     # DXF + rear USB tab
 
     # --- motor mounts: shaft clearance + 4 x M2, one footprint per motor ---
     for i, (mx, my) in enumerate(MOTORS):
@@ -549,6 +636,9 @@ def build_frame():
     fp.SetPosition(VS(ph[0]["x"], ph[0]["y"]))                 # pad 1 is the footprint origin
     p2 = [p for p in fp.Pads() if p.GetNumber() == "2"][0].GetPosition()
     assert abs(p2.x - VS(ph[1]["x"], 0).x) < mm(0.01) and abs(p2.y - VS(0, ph[1]["y"]).y) < mm(0.01), "J8 pads off the DXF holes"
+
+    # --- frame circuit parts (FRAME_BOM), first-pass placement for review ---
+    place_frame_parts(board)
 
     # --- guides: top side on Dwgs.User, bottom side on Cmts.User ---
     top, bot = pcbnew.Dwgs_User, pcbnew.Cmts_User

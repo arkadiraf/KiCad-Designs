@@ -259,8 +259,12 @@ FRAME_CONN = [
     # USB serial link, boot/shutdown handshake). No VBUS: the Pico runs from VSYS, and VBUS
     # would back-feed VSYS through the Pico's Schottky. 4 pins (GND, D-, D+, GND) so it cannot be
     # confused with the 3-pin SWD connector J9.
-    ("J7", "Connector_JST", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
-     "Pi USB: GND, D-, D+, GND", (5.0, 18.3), 180),
+    # 2026-11-28 (user): VERTICAL (top-entry BM04B) so the lead goes straight up to the Pi, beside the Pi's USB edge:
+    # the Pi Zero 2 W (scad: centred, SD end at the rear) has its micro-USB ports on its -y edge, USB data (OTG) at
+    # x = +8.9, PWR at x = +21.5; J7 sits under the data port, just outside the Pi (edge y = -15, ports to -16),
+    # clear of the cover rails (|y| <= 15.45) and of the frame side edge (y = -22).
+    ("J7", "Connector_JST", "JST_SH_BM04B-SRSS-TB_1x04-1MP_P1.00mm_Vertical",
+     "Pi USB: GND, D-, D+, GND", (8.9, -18.8), 0),
 ]
 
 
@@ -274,12 +278,58 @@ FRAME_CONN = [
 _R, _C = "Resistor_SMD:R_0603_1608Metric", "Capacitor_SMD:C_0603_1608Metric"
 _C08 = "Capacitor_SMD:C_0805_2012Metric"
 _C12 = "Capacitor_SMD:C_1206_3216Metric"   # passives rule: see the repository README
+# ---------------------------------------------------------------------------
+# Frame placement, first pass for review (2026-11-28). ref -> (x, y, rotation, side "F"/"B"), scad coordinates.
+# Keep-outs: TOP - cell |y| < 9.2 (|x| < 32.6), cover rails |y| 9.45..15.45 (|x| < 37.6), cover bosses and gear screws
+# at (+-24, +-17.5) / (+-35, +-18.5). BOTTOM - landing-gear beams x +-33..37 full width, FC 7 mm below the centre
+# (J5/J6 |x| < 10.8, |y| 13.4..17.6; standoffs at (+-24, +-17.5)); parts over the FC <= 3.1 mm (Pico ~2.7 mm tall,
+# its micro-USB 3.73 mm at x -28..-22: nothing tall there). User 2026-11-28: ALL parts on the BOTTOM; the top carries
+# only the cell (tab pads) and the NTC. The Pico antenna needs no keep-out on the frame (distance is enough, user).
+# The four TPS22997 blocks are placed by gen_pcb.py at their arm roots (FRAME_MOTOR_BLOCKS).
+# ---------------------------------------------------------------------------
+# Rear USB + charger area (user 2026-11-28): USB-C at the REAR, next to the cell's ground tab (BT1 pad 2, x -33.6), and
+# the charger with it. The frame gets a tab behind its rear edge (x = -40): x -50..-40, |y| <= 10, outer corners
+# rounded, unioned onto the DXF outline by gen_pcb.py. The landing gear is to be redesigned around it (user): the rear
+# skid beam (now x -37..-33 on the bottom) must move clear of the charger; the OpenSCAD frame needs the same tab.
+FRAME_USB_TAB = dict(x0=-50.0, x1=-39.0, half_w=11.5, r=2.0, rf=4.0, edge=-40.0)   # rf: concave flares into the rear edge
+
+FRAME_PLACE = {
+    # charger, BOTTOM, rear: USB-C on the tab (opening backwards), BQ25606 block between the tab and the FC (x > -28)
+    "J10": (-50.0, -4.9, 0, "B"),         # gen_pcb.py turns it to open toward -x and sets x from the tab edge
+    "R1": (-42.9, 2.2, 90, "B"), "R2": (-40.8, -10.1, 0, "B"),             # CC 5.1k beside J10
+    "C1": (-40.6, 7.0, 90, "B"),                                           # VBUS
+    "U1": (-35.0, 0.0, 0, "B"), "L1": (-35.0, 6.8, 0, "B"),
+    "C2": (-38.8, 3.8, 90, "B"), "C23": (-38.8, 7.4, 90, "B"),            # PMID
+    "C3": (-31.0, 3.2, 90, "B"), "C4": (-31.0, 6.8, 90, "B"),             # SYS
+    "C5": (-31.0, -3.2, 90, "B"),                                          # BAT
+    "C6": (-35.0, -4.0, 0, "B"), "C7": (-38.8, 0.4, 90, "B"),             # REGN, BTST
+    "R3": (-39.4, -3.4, 0, "B"), "R4": (-39.4, -5.1, 0, "B"),             # ICHG, ILIM
+    "R5": (-39.4, -6.8, 0, "B"), "R6": (-39.4, -8.5, 0, "B"),             # TS divider
+    "D1": (-32.8, -7.0, 0, "B"), "R7": (-36.2, -7.0, 0, "B"),             # STAT LED (visible from below)
+    # NTC: the only part on TOP (user) - lying along the cell's left side near its rear end, bead glued to the cell;
+    # the printed battery holder gets a pocket for it there (user)
+    "TH1": (-28.0, 11.4, 90, "F"),
+    # logic rail, all BOTTOM: SW1 on the rear tab beside J10 (actuator out of the rear edge), TPS22810 path at the left
+    "SW1": (-47.7, 5.0, 90, "B"),        # rear tab beside J10 (user): knob (opposite the terminals, Nidec drawing) ~1 mm past the rear edge
+    "U2": (-19.5, 13.6, 0, "B"), "D2": (-14.4, 14.4, 0, "B"),
+    "C8": (-18.6, 10.4, 0, "B"), "C9": (-14.0, 12.0, 0, "B"),
+    "R8": (-22.6, 11.0, 0, "B"), "R9": (-22.6, 9.3, 0, "B"), "R10": (-22.6, 7.6, 0, "B"),   # UVLO divider, DNP
+    # boost, BOTTOM over the FC's front-left (x 11..21, y 8..21: clear of J5 and the standoff)
+    "U7": (13.0, 11.0, 0, "B"), "L2": (18.0, 11.0, 0, "B"), "C24": (10.0, 10.5, 90, "B"),
+    "C18": (12.6, 14.2, 0, "B"), "C19": (12.6, 16.6, 0, "B"),             # input, on BAT
+    "C20": (17.4, 14.6, 0, "B"), "C21": (17.4, 17.0, 0, "B"), "C22": (17.4, 19.4, 0, "B"),   # output 3 x 22 uF
+    "R19": (12.6, 19.0, 0, "B"), "R20": (12.6, 20.7, 0, "B"),
+}
+# per ESC header Jk: (TPS22997, VIN cap, CT cap, ON pull-down)
+FRAME_MOTOR_BLOCKS = {"J1": ("U3", "C10", "C14", "R11"), "J2": ("U4", "C11", "C15", "R12"),
+                      "J3": ("U5", "C12", "C16", "R13"), "J4": ("U6", "C13", "C17", "R14")}
+
 FRAME_BOM = [
     # --- charger: BQ25606 from USB-C ---
     ("J10", "USB-C receptacle (GCT USB4105-GF-A)", "Connector:USB_C_Receptacle_USB2.0_16P",
      "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal", "charging input, USB 2.0 D+/D- to the charger"),
     ("U1", "BQ25606", "KD_Power:BQ25606",
-     "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias", "1S 3 A standalone charger, power path"),
+     "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm", "1S 3 A standalone charger, power path"),
     # Wurth WE-MAPI 74438357010 (Digi-Key stock): 1 uH +-20 %, Isat 6.2 A (10 %), RDC 13.5 mOhm max,
     # 4.1 x 4.1 x 3.1 mm max; land pattern 1 of its datasheet = KiCad L_Wuerth_MAPI-4030. No vias/traces under it.
     ("L1", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "charger buck inductor"),
@@ -306,16 +356,23 @@ FRAME_BOM = [
     ("D1", "LED red 0805", "Device:LED", "LED_SMD:LED_0805_2012Metric", "STAT charge indicator (optional), from SYS as TI's diagram"),
     ("R7", "2.2k", "Device:R", _R, "STAT LED series resistor (STAT sinks 6 mA max)"),
     # --- logic rail: TPS22810 + slide switch ---
-    ("U2", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, 2.54 V UVLO"),
-    # APEM MA12R/TR (Digi-Key 563-1102-1-ND), replaces the C&K PCM12SMTR (last-time buy). Same land pattern:
-    # terminals 0.7 x 1.5 mm at -2.25 / +0.75 / +2.25 mm, 2 x 0.9 mm bosses 3.0 mm apart, 4 shell tabs - checked
-    # against the APEM drawing and BetzDrive's apem-MA12RTR footprint. Common = middle terminal (pad 2 = pin B).
-    # Body 6.7 x 2.6 x 1.4 mm, right-angle actuator 1.3 mm out of the side opposite the terminals: that side faces
-    # the frame edge. 300 mA / 4 VDC contact rating (EN signal only, uA), -10..+60 C operating.
-    ("SW1", "SPDT slide (APEM MA12R/TR)", "Switch:SW_SPDT", "Button_Switch_SMD:SW_SPDT_PCM12", "power switch on EN/UVLO (signal only)"),
+    # UVLO (user 2026-11-28): the INTERNAL lockout, 2.54 V on / 2.41 V off, so the drone keeps flying long enough
+    # to land; firmware warns and lands well above it (VSYS on GPIO29). R8-R10 stay a DNP option.
+    ("U2", "TPS22810DBV", "KD_Power:TPS22810DBV", "Package_TO_SOT_SMD:SOT-23-6", "Pico VSYS switch, internal 2.54 / 2.41 V UVLO"),
+    # Nidec Components CUS-12TB (Digi-Key 563-1102-1-ND; user 2026-11-28 - the APEM MA12R/TR is obsolete). Nidec CUS
+    # catalog (2024-03) recommended pad layout = KiCad SW_SPDT_PCM12: terminals 0.7 x 1.5 mm at -2.25 / +0.75 / +2.25 mm,
+    # 2 x phi 0.9 mm boss holes 3.0 mm apart, 4 shell tabs 1.0 x 0.8 mm at +-3.65 mm. Common = terminal 2 (middle,
+    # SW_SPDT pin B). Body 6.7 x 2.6 x 1.4 mm, right-angle actuator 1.3 mm, 1.5 mm travel, non-shorting; 300 mA / 4 VDC
+    # (EN signal only, uA), -20..+70 C. Actuator side faces the frame edge.
+    ("SW1", "SPDT slide (Nidec CUS-12TB)", "Switch:SW_SPDT", "Button_Switch_SMD:SW_SPDT_PCM12", "power switch on EN/UVLO (signal only)"),
     ("C8 C9", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
     ("R8 R9 R10", "156k / 100k / 1.27M (DNP option)", "Device:R", _R,
-     "external 2.70 / 3.30 V UVLO divider instead of the internal lockout (doc open item)"),
+     "external 3.30 / 2.70 V UVLO divider - NOT fitted: the internal 2.54 / 2.41 V lockout is the choice (user 2026-11-28)"),
+    # Back-feed Schottky (user 2026-11-28, as PicoBalancer D2): TPS22810 VOUT -> D2 -> VSYS (to the FC). With the Pico's
+    # own micro-USB plugged in on the bench, VBUS -> the Pico's Schottky -> VSYS would otherwise back-feed the
+    # TPS22810 output. Costs ~0.3 V at the Pico (its buck-boost runs down to 1.8 V); GPIO29 reads VSYS after D2.
+    ("D2", "Schottky 20V 1A (MBR120VLSFT1G)", "Device:D_Schottky", "Diode_SMD:D_SOD-123F",
+     "TPS22810 VOUT -> VSYS, blocks back-feed from the Pico's own USB"),
     # --- motor switches: 4 x TPS22997 ---
     ("U3 U4 U5 U6", "TPS22997", "KD_Power:TPS22997", "KD_Power:Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm",
      "per-ESC high-side switch, ~7.5 A"),
@@ -324,8 +381,8 @@ FRAME_BOM = [
     # = ~2.0 ms (inrush ~40 mA into ~20 uF of ESC capacitance). CT pin reaches 15 V: capacitor rated >= 30 V.
     ("C14 C15 C16 C17", "3.3nF 50V", "Device:C", _C, "CT soft-start ~2 ms (>= 30 V rating, datasheet)"),
     ("R11 R12 R13 R14", "100k", "Device:R", _R, "ON pull-downs: Pico off = motors off"),
-    ("R15 R16 R17 R18", "47k (or Pico internal pull-ups)", "Device:R", _R,
-     "PG pull-ups: 3V3 is not on the B2B header - place on the FC or use Pico pull-ups (TO DECIDE)"),
+    # PG (2026-11-28): the four TPS22997 PG outputs are tied into one MOTOR_PG line (open drain, wired-AND) to J6;
+    # its 47k pull-up R7 is on the FC (3V3 is not on the header), so the frame has no PG resistors.
     # --- optional 5.1 V boost for the Pi Zero ---
     ("U7", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5.1 V boost, true disconnect"),
     # TPS61235P datasheet SLVSCK4A: FB (6) to VOUT on the fixed 5.1 V part; INACT (8) to AGND (unused); EN (7)
@@ -333,7 +390,8 @@ FRAME_BOM = [
     # CO >= 20 uF effective (after DC-bias derating).
     ("L2", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030",
      "boost inductor (peak ~5.3 A at 2.5 A out, 3.0 V in)"),
-    ("C18 C19", "10uF 16V", "Device:C", _C08, "boost input"),
+    # Boost input on BAT, not SYS (user 2026-11-28, as PicoBalancer): BQ25606 SLUSCK6C wants <= 20 uF on SYS.
+    ("C18 C19", "10uF 16V", "Device:C", _C08, "boost input, on BAT"),
     ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C12, "boost output"),
     ("R19", "100k", "Device:R", _R, "BOOST_EN pull-down: Pico off = Pi off"),
     # IOUT_CC = 1.244 V / RCC x 100000 -> 49.9 k = 2.49 A (E24 51 k = 2.44 A); 10 nF in parallel (datasheet).

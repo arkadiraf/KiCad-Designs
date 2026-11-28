@@ -17,7 +17,6 @@ Resistor 0603,2.2k,1,Frame R7,ok
 Resistor 0603,226,1,Frame R3,ok
 Resistor 0603,30.9k,1,Frame R6,ok
 Resistor 0603,4.7k 0603,2,FC R1 R2,ok
-Resistor 0603,47k,4,Frame R15 R16 R17 R18,TBD
 Resistor 0603,47k 0603,1,FC R7,ok
 Resistor 0603,49.9k,1,Frame R20,ok
 Resistor 0603,5.1k,2,Frame R1 R2,ok

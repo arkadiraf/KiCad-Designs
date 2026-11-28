@@ -37,14 +37,14 @@ FRAME_MPN = {
     "D1": ("Lite-On", "LTST-C171KRKT", "verify", "red 0805 (LEDs are 0805 in this repo)"),
     "R7": (YAGEO, "RC0603FR-072K2L", "ok", ""),
     "U2": (TI, "TPS22810DBVR", "ok", "SOT-23-6 (DBV)"),
-    "SW1": ("APEM", "MA12RTR", "ok", "replaces PCM12SMTR (last-time buy); same PCM12 land pattern"),
+    "SW1": ("Nidec Components", "CUS-12TB", "ok", "user 2026-11-28 (APEM MA12R/TR obsolete); PCM12 land pattern"),
     "C8 C9": (MURATA, "GRM188R71C105KA12D", "ok", "1 uF 16 V X7R 0603"),
-    "R8 R9 R10": (YAGEO, "RC0603FR-07156KL / -07100KL / -071M27L", "DNP", "UVLO divider option"),
+    "R8 R9 R10": (YAGEO, "RC0603FR-07156KL / -07100KL / -071M27L", "DNP", "UVLO divider option (internal lockout used)"),
+    "D2": ("onsemi", "MBR120VLSFT1G", "ok", "VSYS back-feed Schottky, SOD-123FL (as PicoBalancer D2)"),
     "U3 U4 U5 U6": (TI, "TPS22997RYZR", "ok", ""),
     "C10 C11 C12 C13": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
     "C14 C15 C16 C17": (MURATA, "GRM188R71H332KA01D", "ok", "3.3 nF 50 V X7R 0603 (stock book; >= 30 V needed)"),
     "R11 R12 R13 R14": (YAGEO, "RC0603FR-07100KL", "ok", ""),
-    "R15 R16 R17 R18": (YAGEO, "RC0603FR-0747KL", "TBD", "or Pico internal pull-ups (decision open)"),
     "U7": (TI, "TPS61235PRWLT", "ok", "also sold as the larger reel TPS61235PRWLR"),
     "L2": ("Wurth Elektronik", "74438357010", "ok", "same part as L1; TPS61235P wants 0.7-1.3 uH effective"),
     "C18 C19": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
@@ -60,7 +60,7 @@ FRAME_PLACED = [
      ("Sullins", "PRPC040SAAN-RC", "ok", "1x40 break-away strip, cut to 4 + 3")),
     ("J5 J6", 2, "B2B socket 1x10 2.00 mm SMD, frame bottom (mates with FC J1/J2)",
      ("Sullins", "NPPN101BFLD-RC", "ok", "4.6 mm tall, 7 mm printed spacers; nylon: hand-solder after reflow; footprint update pending")),
-    ("J7", 1, "JST-SH 4, Pi USB", ("JST", "SM04B-SRSS-TB(LF)(SN)", "ok", "")),
+    ("J7", 1, "JST-SH 4 vertical (top entry), Pi USB", ("JST", "BM04B-SRSS-TB(LF)(SN)", "ok", "frame top, under the Pi's USB port")),
     ("J8", 1, "JST-PH 2 vertical, Pi 5.1 V", ("JST", "B2B-PH-K-S(LF)(SN)", "ok", "")),
 ]
 
@@ -145,8 +145,9 @@ DIGIKEY = {
     "LTST-C171KRKT": ("160-1427-1-ND", "Digi-Key PN from memory - confirm"),
     "RC0603FR-072K2L": ("311-2.20KHRCT-ND", ""),
     "TPS22810DBVR": ("296-45297-1-ND", ""),
-    "PCM12SMTR": ("401-2016-1-ND", "LAST-TIME BUY - replaced by APEM MA12RTR"),
-    "MA12RTR": ("563-1102-1-ND", "active (user, Nov 2026)"),
+    "PCM12SMTR": ("401-2016-1-ND", "LAST-TIME BUY - replaced by Nidec CUS-12TB"),
+    "MA12RTR": ("", "OBSOLETE - replaced by Nidec CUS-12TB"),
+    "CUS-12TB": ("563-1102-1-ND", "active, 12 weeks lead time (user, Nov 2026)"),
     "GRM188R71C105KA12D": ("", "not found at Digi-Key under this MPN - pick an active 1 uF 0603"),
     "RC0603FR-07156KL": ("311-156KHRCT-ND", ""),
     "RC0603FR-07100KL": ("311-100KHRCT-ND", ""),
@@ -159,11 +160,13 @@ DIGIKEY = {
     "CL31B226KPHNFNE": ("1276-3145-1-ND", "active (user, Nov 2026)"),
     "PRPC040SAAN-RC": ("S1011EC-40-ND", "bulk"),
     "SMM-110-02-S-S": ("612-SMM-110-02-S-S-ND", "not used: replaced by Sullins NPPN101BFLD-RC"),
+    "MBR120VLSFT1G": ("MBR120VLSFT1GOSCT-ND", "Digi-Key PN as PicoBalancer"),
     "NPPN101BFLD-RC": ("S5902-10-ND", "user, Nov 2026"),
     "62001011121": ("732-62001011121-ND", "user, Nov 2026"),
     "A03SR03SR30K51B": ("455-3708-ND", "not used: the Raspberry Pi Debug Probe's own SH-3 cable is used for J9"),
     "B3U-1000PM-B": ("39-B3U-1000PM-BCT-ND", "in stock at digikey.co.il (user, Nov 2026)"),
     "SM04B-SRSS-TB(LF)(SN)": ("455-SM04B-SRSS-TBCT-ND", ""),
+    "BM04B-SRSS-TB(LF)(SN)": ("455-BM04B-SRSS-TBCT-ND", ""),
     "B2B-PH-K-S(LF)(SN)": ("455-1704-ND", "bulk"),
     "SC1633": ("2648-SC1633CT-ND", ""),
     "BMI088": ("828-1082-1-ND", ""),
@@ -189,6 +192,11 @@ DATASHEETS = {
          "CONFIRMED: top-actuated, 3.0 x 2.5 mm body 1.2 mm high, plunger to 1.6 mm, 1.5 N, 1-50 mA / 3-12 VDC, "
          "-25..+70 C. PCB pads 0.8 x 1.7 mm at +-1.7 mm (2.6 inner / 4.2 outer) = KiCad SW_SPST_B3U-1000P centres "
          "(KiCad pads 0.9 mm wide). BOOTSEL current is below the 1 mA rating minimum - normal for a logic button."),
+    ],
+    "BM04B-SRSS-TB(LF)(SN)": [
+        ("JST_SH_series_catalog.pdf",
+         "SH 1.0 mm top-entry (BM type), same family / housing SHR-04V-S-B as SM04B. Footprint = KiCad stock "
+         "JST_SH_BM04B-SRSS-TB_1x04-1MP_P1.00mm_Vertical: TO CONFIRM against the catalog's BM PCB layout drawing."),
     ],
     "SM04B-SRSS-TB(LF)(SN)": [
         ("JST_SH_series_catalog.pdf",
@@ -259,8 +267,15 @@ DATASHEETS = {
          "CONFIRMED: RYZ0010A land pattern = KD_Power:Texas_RYZ0010A footprint (corner pads 0.575 x 0.25 at x +-0.6625 / "
          "y +-0.75, VIN/VOUT 0.825 x 0.25 at x +-0.5375 / y +-0.25, pads 5/10 0.25 x 0.575 at y +-0.9125); 0.8 mm max height."),
     ],
+    "CUS-12TB": [
+        ("CUS-12TB_Nidec_CUS_series_catalog.pdf",
+         "CONFIRMED (Nidec CUS catalog 2024-03): SPDT, non-shorting, right-angle (side) actuator, 1.5 mm travel, body "
+         "6.7 x 2.6 x 1.4 mm, gull-wing; recommended pads = KiCad SW_SPDT_PCM12 (terminals 0.7 x 1.5 at -2.25 / +0.75 / "
+         "+2.25 mm, phi 0.9 boss holes +-1.5 mm, shell tabs 1.0 x 0.8 at +-3.65 mm). Common = terminal 2 (SW_SPDT pin B). "
+         "300 mA / 4 VDC, 10k cycles, -20..+70 C (Digi-Key). Use: EN/UVLO signal, uA."),
+    ],
     "MA12RTR": [
-        ("MA12RTR_APEM_datasheet.pdf",
+        ("../connector_options/MA12RTR_APEM_datasheet_obsolete.pdf",
          "CONFIRMED (APEM MA series): 1P2T, right-angle actuator, 1.5 mm travel, body 6.7 x 2.6 x 1.4 mm; "
          "300 mA at 4 VDC, 70 mOhm, 10k cycles, -10..+60 C, reflow 260 C 1 min / iron 305 C 6 s. PCB layout = "
          "KiCad SW_SPDT_PCM12 pad positions (terminals -2.25/+0.75/+2.25 mm, bosses +-1.5 mm, shell tabs) and = "
@@ -332,6 +347,8 @@ DATASHEETS = {
          "10 VDD); LGA-10 2.0 x 2.0 x 0.75 mm, bottom-view pads 0.275 x 0.25 (sides, 1.525 / 1.000 mm) and 0.25 x 0.275 "
          "(ends, 0.5 mm) = KD_Sensors:Bosch_LGA-10 footprint: drop-in for the obsolete BMP388."),
     ],
+    "MBR120VLSFT1G": [("MBR120VLSFT1G_onsemi_datasheet.pdf",
+                       "CONFIRMED (onsemi): 20 V, 1 A Schottky, very low VF, SOD-123FL = KiCad D_SOD-123F; battery OR-ing")],
     "62001011121": [
         ("62001011121_Wurth_datasheet.pdf",
          "CONFIRMED (rev 003.001, 2024-04-04): 2.00 mm, 0.5 mm sq gold, plastic 2.0, pin 4.0 above it, tail 2.7, hole 0.9 "
