@@ -13,7 +13,7 @@ from design import FC, FRAME_BOM, SHARED_LIBS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SHARED = os.path.normpath(os.path.join(ROOT, SHARED_LIBS))
-STOCK = "/usr/share/kicad"
+STOCK = next(p for p in ("C:/Program Files/KiCad/10.0/share/kicad", "/usr/share/kicad") if os.path.isdir(p))
 
 
 def sym_ok(lib_id):

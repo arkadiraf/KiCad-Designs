@@ -10,18 +10,17 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",ok,also sold as the larger reel TPS61235PRWLR
 3,Samsung,CL31B226KPHNFNE,1276-3145-1-ND,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,ok,"22 uF 10 V X7R 1206 (user pick, Digi-Key 1276-3145-1-ND); active (user, Nov 2026)"
 1,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,Frame J1 J2 J3 J4,"2.54 mm male header strip 1x40 (ESC seats: 28 pins, 4 + 3 per ESC)",ok,"1x40 break-away strip, cut to 4 + 3; bulk"
-2,Samtec,SMM-110-02-S-S,,Frame J5 J6,"B2B socket 1x10 2.00 mm, frame bottom",TBD,"SMT socket, needs 6 mm standoffs; current design = Bitcraze socket from Bitcraze (5 mm); not listed (Digi-Key stocks the -LC clip version); Samtec direct / Mouser"
+2,Sullins,NPPN101BFLD-RC,S5902-10-ND,Frame J5 J6,"B2B socket 1x10 2.00 mm SMD, frame bottom (mates with FC J1/J2)",ok,"4.6 mm tall, 7 mm printed spacers; nylon: hand-solder after reflow; footprint update pending; user, Nov 2026"
 1,JST,SM04B-SRSS-TB(LF)(SN),455-SM04B-SRSS-TBCT-ND,Frame J7,"JST-SH 4, Pi USB",ok,
 1,JST,B2B-PH-K-S(LF)(SN),455-1704-ND,Frame J8,"JST-PH 2 vertical, Pi 5.1 V",ok,bulk
 1,Raspberry Pi,SC1633,2648-SC1633CT-ND,FC U1,Raspberry Pi Pico 2 W,verify,Pico 2 W without headers
 1,Bosch Sensortec,BMI088,828-1082-1-ND,FC U2,BMI088 IMU,ok,pin 2 (NC) to GND per Bosch
 1,Bosch Sensortec,BMP390,828-BMP390CT-ND,FC U3,BMP390 barometer,ok,"replaces the obsolete BMP388, same LGA-10 footprint; active (user, Nov 2026)"
-2,Samtec,TMM-110-04-L-S-SM,,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),verify,-04: 1.91 mm post into the Flow deck's 2.1 mm Bitcraze sockets; check availability; Samtec direct / Mouser; -04 is a non-standard length at Samtec - confirm
-2,Samtec,TMM-110-01-L-S,,FC J1 J2,2.00 mm male 1x10 THT (to the frame),ok,"-01: 3.20 mm post, 1.8 mm into the Bitcraze socket on 5 mm standoffs (-02 for SMM on 6 mm); not listed in this variant; Samtec direct / Mouser, or a listed variant"
+2,Samtec,TMM-110-01-T-S-SM-P-TR,612-TMM-110-01-T-S-SM-P-CT-ND,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),ok,"same SM footprint as -04; 3.20 mm tin post: TRIM to ~1.9 mm after soldering, else the deck hangs ~1.3 mm lower; pull off the -P pick-and-place cap; cut tape (user, Nov 2026)"
+2,Wurth Elektronik,62001011121,732-62001011121-ND,FC J1 J2,2.00 mm male 1x10 THT (to the frame),ok,"plastic 2.0, pin 4.0: ~3.6 mm into the Sullins socket on the 7 mm spacers; user, Nov 2026"
 0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
-1,Aratas (formerly Omron),B3U-1000P,SW1020CT-ND,FC SW1,BOOTSEL tactile switch,ok,"top-actuated, 3.0 x 2.5 x 1.6 mm"
+1,Aratas (formerly Omron),B3U-1000PM-B,39-B3U-1000PM-BCT-ND,FC SW1,BOOTSEL tactile switch,ok,"with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole), update pending; in stock at digikey.co.il (user, Nov 2026)"
 1,JST,SHR-04V-S-B,,Cable J7 cable,"JST SH 4-pin housing (to frame J7, Pi USB)",ok,frame end; Pi end soldered to the Pi Zero 2 W USB test pads
-1,JST,SHR-03V-S-B,,Cable J9 cable,"JST SH 3-pin housing (to FC J9, SWD, optional)",ok,or the JST-SH 3-pin cable that comes with the Raspberry Pi Debug Probe
-7,JST,SSH-003T-P0.2-H,,Cable J7 J9 cables,JST SH crimp contact 28-32 AWG (4 + 3),ok,"or pre-crimped SH leads (28 AWG, ~100 mm)"
+4,JST,SSH-003T-P0.2-H,,Cable J7 cable,JST SH crimp contact 28-32 AWG,ok,"or pre-crimped SH leads (28 AWG, ~100 mm)"
 1,JST,PHR-2,,Cable J8 cable,"JST PH 2-pin housing (to frame J8, Pi 5.1 V)",ok,"frame end; Pi end to GPIO pins 4 (5 V) / 6 (GND), soldered or a 1x2 2.54 mm housing"
 2,JST,SPH-002T-P0.5S,,Cable J8 cable,JST PH crimp contact 24-30 AWG,ok,24-26 AWG for up to 2.5 A; or pre-crimped PH leads

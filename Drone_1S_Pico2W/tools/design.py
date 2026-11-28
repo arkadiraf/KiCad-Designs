@@ -42,8 +42,8 @@ def to_kicad(x, y):
     return ORIGIN_X + x, ORIGIN_Y - y
 
 
-REVISION = "0.1"
-DATE = "2026-11-26"
+REVISION = "0.2"     # 0.2 (2026-11-28): orderable B2B pair (Wurth male + Sullins socket) on 7 mm printed spacers, SW1 B3U-1000PM-B
+DATE = "2026-11-28"
 
 # ---------------------------------------------------------------------------
 # Values copied from 1S_PiZero.scad (OpenScad-Designs @ 115559d). The DXF is
@@ -111,7 +111,7 @@ CRAD = SCAD["crad_hole"]
 FC = dict(
     project="Drone_1S_FC",
     title="1S Pico 2 W drone - flight controller module",
-    silk_name="Pico 2W Flight Controller V01",
+    silk_name="Pico 2W Flight Controller V02",   # follows REVISION 0.2
     thickness=1.6,
     holes=[(sx * CRAD[0], sy * CRAD[1]) for sx, sy in ((1, 1), (1, -1), (-1, -1), (-1, 1))],
     hole_d=SCAD["crad_hole_d"],  # 2.2 mm, M2
@@ -151,8 +151,10 @@ FC = dict(
     # against the frame once the FC is mounted). Wired from the Pico's TP6 (BOOTSEL, datasheet 2.1:
     # "shorting it low at power-up" enters USB mass-storage mode) to GND. Omron B3U-1000P, 3.0 x 2.5 x
     # 1.6 mm, top-actuated, on the FC BOTTOM next to J9 at the rear edge, so it is pressed from below:
-    # the Flow deck only covers |x| <= 10.5. [ref, lib, footprint, value, (x, y) scad, rotation]
-    bootsel=("SW1", "Button_Switch_SMD", "SW_SPST_B3U-1000P", "BOOTSEL (Pico TP6 to GND)", (-24.6, -6.2), 0),
+    # the Flow deck only covers |x| <= 10.5. The stocked part is B3U-1000PM-B (with locating boss), so the
+    # footprint is the -B one: same pads + a 0.8 mm NPTH for the boss (Omron/Aratas B3U datasheet).
+    # [ref, lib, footprint, value, (x, y) scad, rotation]
+    bootsel=("SW1", "Button_Switch_SMD", "SW_SPST_B3U-1000P-B", "BOOTSEL B3U-1000PM-B (Pico TP6 to GND)", (-24.6, -6.2), 0),
 )
 
 # Crazyflie 2.x deck connector pinout (docs/cf2_exp_pinout.png in the Bitcraze
@@ -176,10 +178,16 @@ DECK_RIGHT = ["UART2_TX", "UART2_RX", "SPI_SCK", "SPI_MISO", "SPI_MOSI",
 # ---------------------------------------------------------------------------
 # Board-to-board: the FC hangs under the frame on the 4 shared M2 holes and plugs
 # into it, so it can be pulled off and replaced (nothing soldered between them).
-#   FC top    : 2 x male pin header 1x10, 2.00 mm, through-hole (J1 left, J2 right)
-#   Frame bot : 2 x Bitcraze female deck connector 1x10, 2.00 mm, SMD, 2.1 mm high
-#               (J5 left, J6 right) - the same part as on the Flow deck; SMD pads only,
-#               no holes, so nothing comes up under the battery-cover rails.
+#   FC top    : 2 x Wurth WR-PHD 62001011121 male 1x10, 2.00 mm, through-hole (J1 left, J2 right):
+#               plastic 2.0 mm, pin 4.0 mm above it; Wurth's 0.90 mm hole (gen_pcb sets it).
+#   Frame bot : 2 x Sullins NPPN101BFLD-RC female 1x10, 2.00 mm, SMD, 4.6 mm high (J5 left,
+#               J6 right; drawing 10489): SMD pads only, no holes, so nothing comes up under the
+#               battery-cover rails. Nylon body: hand-soldered after the frame's reflow.
+# 2026-11-28: replaces the Bitcraze socket (not sold as a part) on 5 mm standoffs. The FC now hangs
+# on one M2 x 20 through-bolt per shared hole (cover boss 4 + frame 2.0 + printed spacer 7.0 + FC 1.6,
+# nylon-insert nut below). Seated stack 2.0 + 4.6 = 6.6 mm (up to ~6.85 at the socket tolerance), so the
+# printed spacer is 7.0 mm (never < 6.9): the pin goes ~3.6 mm in, past the 2.5 mm contact point.
+# The text below describes the original Bitcraze stack:
 # Height (low profile, standard standoff): the Pico 2 W's micro-USB reaches 3.73 mm above
 # the FC (KiCad-RP-Pico 3D model), so the lowest standard M2 standoff that clears it is
 # 5 mm (1.2 mm left). Mated: 2.0 mm male plastic + 2.1 mm socket = 4.1 mm + 0.9 mm air;
@@ -200,10 +208,12 @@ B2B = dict(
     # 1.5 mm header on 6 mm standoffs. Pico 2 W on the FC top is ~4 mm tall at the
     # micro-USB, so 6 mm leaves ~2 mm under the frame: keep tall frame-bottom parts
     # out of the area above the Pico. To confirm with the chosen part datasheets.
-    standoff=5.0,                # FC top to frame bottom = M2 standoff (lowest standard length over the Pico USB)
-    male_plastic=1.5,            # FC header plastic: Samtec TMM-110-01-L-S (drawing F-226): 1.50 mm
-    male_pin=3.2,                # TMM -01 post above the plastic: 3.20 mm -> 1.8 mm into the 2.1 mm socket
-    socket_h=2.1,                # Bitcraze female deck connector
+    standoff=7.0,                # FC top to frame bottom = 3D-printed spacer on the M2 x 20 through-bolt
+    male_plastic=2.0,            # FC header plastic: Wurth 62001011121: 2.0 mm
+    male_pin=4.0,                # Wurth pin above the plastic: 4.0 mm -> ~3.6 mm into the 4.6 mm socket
+    socket_h=4.6,                # Sullins NPPN101BFLD-RC: body 4.40, 4.60 +-0.25 overall (drawing 10489)
+    male_hole=0.90,              # Wurth recommended PCB hole for the 0.5 mm square pins
+    socket_fp=("KD_Connectors", "Sullins_NPPN101BFLD_1x10_P2.00mm_SMD"),
     pico_top=3.73,               # Pico micro-USB top above the FC top (KiCad-RP-Pico Pico.wrl)
 )
 B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of pins 1..10

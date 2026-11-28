@@ -18,13 +18,16 @@ The design intent comes from
 | **Frame** (power board) | [Frame/](Frame/) | 117 × 117 mm, the quad frame itself | **2.0 mm** | 18650 tab pads, USB-C + BQ25606 charger, TPS22810 Pico rail switch + SPDT slide switch, 4 × TPS22997 motor switches, TPS61235P 5.1 V boost (optional), 4 × DYS XSD7A ESCs on pin headers, Pi Zero 5.1 V output, 2 × 10 header to the FC |
 | **FC** (flight controller module) | [FC/](FC/) | 55.3 × 41.5 mm bbox, minimum outline | 1.6 mm | **Top:** Pico 2 W only (castellated SMD, faces the frame). **Bottom:** BMI088 IMU (SPI0), BMP388 baro (I2C0), support ICs, and the Crazyflie deck connectors for the Flow deck v2 (SPI1 + I2C0), which plugs in from below as it does under a Crazyflie. Also JST-SH 4 to the Pi Zero and the 2 × 10 header to the frame |
 
-## Status: stage 1, bare boards (rev 0.1)
+## Status: stage 1, bare boards (rev 0.2: orderable B2B connectors, printed-spacer stack, B3U-1000PM-B)
 
 **Design document (PDF, 27 Nov 2026):** [docs/Toothpick_Drone_Hardware_Design_1S_Pico2W.pdf](docs/Toothpick_Drone_Hardware_Design_1S_Pico2W.pdf),
 exported from the shared design doc. It has the design status, renders, the parts list and the to-do list.
 **Orderable BOM:** [fabrication/BOM.md](fabrication/BOM.md) and
 [fabrication/BOM_DigiKey.csv](fabrication/BOM_DigiKey.csv) (upload to the Digi-Key BOM Manager; MPNs are not
 yet checked for stock).
+**FC order sheet:** [fabrication/BOM_FC.xlsx](fabrication/BOM_FC.xlsx), the flight-controller parts plus the frame's mating
+sockets J5/J6, the FC standoffs and the SWD cable, for 5 modules (`export_bom.py`). Connector selection and the
+options not taken: [Materials/connector_options/](Materials/connector_options/README.md).
 **Stock parts** (0603 resistors and capacitors from the sample book, 0805 LEDs): [fabrication/BOM_stock.md](fabrication/BOM_stock.md)
 (16 values, with E24 fallbacks for the E96 values); they are left out of the Digi-Key CSV.
 **Still to source** (cables, standoffs, screws, inserts, Samtec parts): [fabrication/BOM_to_source.md](fabrication/BOM_to_source.md).
@@ -76,16 +79,19 @@ cover). It **plugs into the frame through male/female headers**. Nothing is sold
 boards, so the FC can be pulled off and replaced.
 
 **The battery cover and the FC share four M2 holes** at (±24, ±17.5). The printed battery cover
-also carries the Pi Zero 2 W posts. One bolt stack per hole, top to bottom:
+also carries the Pi Zero 2 W posts. One M2 × 20 through-bolt per hole (decided 28 Nov 2026), top to bottom:
 
 | Layer | Thickness | |
 |---|---|---|
-| M2 × 8 screw, head on the cover boss | | into the standoff, 2.0 mm of thread |
+| M2 × 20 galvanized screw ([4project](https://www.4project.co.il/product/screw-m2x20mm-galvanized)), head on the cover boss | | through everything below |
 | printed battery cover boss + rail | 4 mm | |
 | frame PCB | 2.0 mm | H_CV1–4 |
-| M2 × 5 standoff, female-female, 4 mm hex | 5 mm | lowest standard length over the Pico USB |
+| **3D-printed spacer**, OD 5 mm, hole 2.3 mm, PETG or ASA (not PLA: creep, softens ~55 °C) | **7.0 mm** | print 7.0–7.2 mm, never under 6.9 mm: the headers seat at 6.6 mm (up to ~6.85 mm at tolerance) |
 | FC module | 1.6 mm | H1–H4 (ears) |
-| M2 × 4 screw from below | | 2.4 mm of thread |
+| M2 nylon-insert lock nut (DIN 985) | ~2.8 mm | 14.6 mm grip; about 2.6 mm of the screw left for the nut |
+
+Removing the four nuts frees the FC; the cover is then held only by the bolt heads, so keep the drone upright
+or take the cover off with it.
 
 **The landing gear has its own four M2 holes** (H_LG1–4) at (±35, ±18.5), near the front and rear
 ends of the centre plate and outside the cover rails, so it swaps without touching the cover or the
@@ -93,21 +99,21 @@ FC. It is two identical printed skids (front, rear). Each skid is a cross-beam w
 insert boss and a leg at each end, held by M2 × 4 screws from the frame top. A one-piece frame would
 run into the FC standoffs at y = ±17.5. The frame's old 30.5 mm FC holes are gone.
 
-**Connector choice: low profile on a standard standoff.**
-* **What sets the height:** the Pico 2 W's micro-USB is its tallest part, **3.73 mm** above the FC.
-  * Measured in the KiCad-RP-Pico 3D model (`ncarandini/KiCad-RP-Pico`, `Pico.wrl`): the original
-    Pico, same USB part. BOOTSEL is 2.08 mm, everything else ≤ 1.68 mm.
-  * So **5 mm** is the lowest standard M2 standoff that clears it, with 1.2 mm to spare; 4 mm
-    would leave 0.2 mm.
-* **The stack:** one connector system, Bitcraze's, as on the Flow deck.
+**Connector choice (rev 0.2, 28 Nov 2026): orderable 2.00 mm pair on 7 mm printed spacers.** Options and
+datasheets: [Materials/connector_options/](Materials/connector_options/README.md).
+* **What sets the height:** the Pico 2 W's micro-USB is its tallest part, **3.73 mm** above the FC
+  (KiCad-RP-Pico 3D model; BOOTSEL 2.08 mm, everything else ≤ 1.68 mm), so the gap must be over ~4 mm.
+  The connector pair sets it at 7.0 mm, 3.3 mm over the USB.
+* rev 0.1 used the Bitcraze female deck socket on 5 mm standoffs; that socket is not sold as a part.
 
 | Board | Ref | Side | Part | Height |
 |---|---|---|---|---|
-| Frame | J5 (left), J6 (right) | bottom | **Bitcraze female deck connector** 1×10 2.00 mm SMD (`Bitcraze_FemaleDeck_1x10_P2.00mm_SMD`, pads from its datasheet drawing: 0.89 × 2 mm, ±1.7 mm stagger), no holes | 2.1 mm |
-| FC | J1 (left, +y), J2 (right, −y) | top | 2.00 mm male header, through-hole (`PinHeader_1x10_P2.00mm_Vertical`): **Bitcraze short pins** (9 / 2 / 2 mm), short side soldered into the FC, long side up, trimmed to ~2.8 mm above the plastic | 2.0 mm plastic |
+| Frame | J5 (left), J6 (right) | bottom | **Sullins NPPN101BFLD-RC** 1×10 2.00 mm SMD socket (`KD_Connectors:Sullins_NPPN101BFLD_1x10_P2.00mm_SMD`, drawing 10489 layout D: 0.90 × 2.0 mm pads, ±1.6 mm stagger), no holes. Nylon body: hand-solder after the frame's reflow, plugged onto the FC headers for alignment | 4.6 mm |
+| FC | J1 (left, +y), J2 (right, −y) | top | **Würth 62001011121** 2.00 mm male header, through-hole (`PinHeader_1x10_P2.00mm_Vertical`, holes opened to Würth's 0.90 mm by `gen_pcb.py`), pin 4.0 mm above the plastic | 2.0 mm plastic |
 
-* **Mated:** 2.0 + 2.1 = 4.1 mm + 0.9 mm air on the 5 mm standoff. The pins enter the sockets about
-  1.9 mm, and nothing passes through the frame.
+* **Mated:** 2.0 + 4.6 = 6.6 mm seated (up to ~6.85 mm at the socket tolerance) on the 7.0 mm spacer: the
+  pins go about 3.6 mm into the sockets, past the 2.5 mm contact point, with ~0.4 mm of air. Nothing passes
+  through the frame.
 * **Pin budget (`B2B_SIGNALS` in `design.py`), 20 pins:** 16 signals + VSYS + 3 × GND.
   * ON1–4, PG1–4, DSHOT1–4, BOOST_EN, CHG_PG, USB_DP, USB_DM.
   * No PI_STATUS: the Pi handshake runs over USB.
@@ -174,7 +180,7 @@ cross-checked from open designs and STEP models):
 | P1, P2 | bottom | **male** 1×10 2.00 mm SMD headers (`PinHeader_1x10_P2.00mm_Vertical_SMD_Pin1Left`), pins down into the Flow deck's female connectors; rows **22.0 mm apart**, centred, pin 1 at the front | Rows: Bitcraze deck template (c8f9a2e). The Flow deck carries the Bitcraze female deck connector (20.5 × 2.0 × 2.1 mm, datasheet in bitcraze/hardware) |
 | U2, C1 | bottom | BMI088 `Bosch_LGA-16_3x4.5mm_P0.5mm` + 100 nF | see above |
 | U3, C2 | bottom | BMP388 `Bosch_LGA-10_2x2mm_P0.5mm` + 100 nF | see above |
-| J1, J2 | top | 1×10 2.00 mm male headers to the frame (Bitcraze short pins, see above) | |
+| J1, J2 | top | 1×10 2.00 mm male headers to the frame (Würth 62001011121, 0.90 mm holes, see above) | |
 | J9 | bottom | SWD, JST-SH 3, not fitted (see below) | |
 | H1–H4 | ears | M2, on the shared cover holes | same holes as frame H_CV1–4 (`check_mating.py`) |
 
@@ -188,8 +194,13 @@ cross-checked from open designs and STEP models):
     * VCC (left 1) feeds both sensors; VCOM (right 9) feeds the PMW3901's 1.8 V LDO; GND (left 10);
     * 1-wire ID memory on OW (right 8);
     * RESET / MOTION / GPIO1 not fitted.
-  * Crazyflie VCC is 2.8 V, and ours is the Pico's 3.3 V. Check the PMW3901 and VL53L1x supply
-    ranges before stage 2.
+  * Crazyflie VCC is 2.8 V, and ours is the Pico's 3.3 V. **Checked (28 Nov 2026), 3.3 V is in range:**
+    * VL53L1X (ST DS12385 rev 8): AVDD 2.6–3.5 V (abs. max 3.6 V). In its 2V8 I/O mode the SDA/SCL/XSHUT
+      high level must equal AVDD, so the deck's I2C pull-ups go to the same 3.3 V. The ST driver starts in 1V8
+      mode: the firmware must select 2V8, as the Crazyflie driver does.
+    * PMW3901MB (PixArt): VDDIO 1.8–3.6 V, I/O inputs up to 3.6 V, so 3.3 V SPI is fine. Its 1.8–2.1 V core
+      comes from the deck's TLV70218 LDO on VCOM (we feed VSYS). Recommended operating temperature 0–40 °C.
+    * Datasheets: `Materials/VL53L1X_ST_datasheet_DS12385_rev8.pdf`, `Materials/PMW3901MB-TXQT_PixArt_datasheet.pdf`.
 * **Why the deck headers are SMD:** the rows (y = ±11 mm) fall right under the Pico's edge lands
   (22.58 mm wide). Through-hole pins would come up into the Pico's pads. `gen_pcb.py` asserts that
   P1/P2 are on B.Cu with pin 1 at the front.
@@ -209,7 +220,9 @@ cross-checked from open designs and STEP models):
   * SWD goes to **J9 on the FC**: JST-SH 3 (SM03B-SRSS-TB), Raspberry Pi debug-connector style
     (SWCLK, GND, SWDIO), not fitted, on the rear bottom edge with its opening facing the edge. Its
     cable leaves backwards under the FC to the Pi's GPIO (OpenOCD) or a Raspberry Pi Debug Probe.
-  * **SW1 BOOTSEL button** (Omron B3U-1000P, 3.0 × 2.5 × 1.6 mm, top-actuated) on the FC
+  * **SW1 BOOTSEL button** (Omron/Aratas B3U-1000PM-B, 3.0 × 2.5 × 1.6 mm, top-actuated, with a locating boss:
+    footprint `SW_SPST_B3U-1000P-B`, 0.8 mm NPTH under the Pico's USB end, ~6 mm from TP1; DRC reports it as an
+    accepted `npth_inside_courtyard` warning) on the FC
     **bottom**, next to J9 at the rear edge (scad −24.6, −6.2), labelled BOOT. It shorts the Pico's
     **TP6** (BOOTSEL) to GND, the same as the Pico's own button, which is hidden against the frame
     once the FC is mounted. Press it from below (the Flow deck covers only |x| ≤ 10.5) while powering
@@ -393,8 +406,11 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 * [ ] ESC header pin functions: the XSD7A's power end (from its silkscreen) has big pads − and +
       at the corners and small round signal pads −, S between them. Map them to J1–J4 pads 1–4
       while placing the frame, once the ESC orientation under the arm is fixed.
-* [ ] Pick the header/socket pair and standoff length (6 mm planned) from real datasheets. The OpenSCAD
-      model already uses 2.0 mm frame, 6 mm standoffs, 22 mm / 2.00 mm deck rows (from KiCad).
+* [x] Header/socket pair and stack from real datasheets (rev 0.2): Würth 62001011121 + Sullins NPPN101BFLD-RC
+      on 7.0 mm printed spacers with M2 × 20 through-bolts.
+* [ ] OpenSCAD: draw the 7.0 mm printed spacer, update the stack (M2 × 20 bolt, nyloc nut, no standoff) and
+      re-run `export_scad.py` + `1S_PiZero_verify.py` (not done: the scad repo is untouched by rev 0.2).
+* [ ] Future: landing gear on **M2.5** bolts instead of M2 (user, 28 Nov 2026): H_LG1–4 holes, skid inserts, BOM.
 * [ ] The 20-pin assignment of J1/J2 ↔ J5/J6. The doc's bus fits: VSYS, 4 × ON, 4 × PG, 4 × DShot,
       BOOST_EN, CHG_PG, GND.
 * [x] Deck connector gender and height (male SMD headers on the FC into the Flow deck's female
@@ -405,6 +421,10 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 * [ ] Datasheets still to collect: see [Materials/MISSING_DATASHEETS.md](Materials/MISSING_DATASHEETS.md) (18 items, by priority).
 
 ## Regenerate
+
+Windows (KiCad 10): run the pcbnew scripts (`check_bom`, `gen_pcb`, `check_import`, `check_mating`,
+`export_scad`) with `"C:/Program Files/KiCad/10.0/bin/python.exe"`, the others with the normal Python.
+`gen_pcb.py` runs DRC through `kicad-cli` there (KiCad 8+ can't run `WriteDRCReport` outside the GUI).
 
 ```sh
 cd tools
@@ -423,5 +443,7 @@ When the OpenSCAD frame changes, export `part="pcb_outline"` to DXF, copy it to
 `Materials/extracted/1S_PiZero_PCB_outline.dxf`, update `SCAD` in `design.py`, and regenerate.
 
 Current results: see the last `gen_pcb.py` run (both boards print footprint/pad counts). `BOM OK`. `MATING OK`. DRC **0 violations, 0 unconnected,
-0 footprint errors** on both boards. `IMPORT OK`. The boards haven't been opened in the KiCad GUI (KiCad
-7.0.11 in the container). The `.kicad_pcb` files are KiCad 7 format and open in 8 and 9.
+0 footprint errors** on both boards (rev 0.2, KiCad 10.0.8 on Windows, 28 Nov 2026; one accepted warning on the
+FC: SW1's boss hole in the Pico courtyard). `IMPORT OK`. The rev 0.2 `.kicad_pcb` files are KiCad 10 format
+(rev 0.1 was KiCad 7 format from the container). `render.py` was not re-run (needs cairosvg), so `docs/*.png`
+still show rev 0.1.

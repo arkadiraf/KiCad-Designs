@@ -22,7 +22,8 @@ the symbol points at it instead of duplicating it.
 | `KD_Sensors` | **BMI088** IMU | 16 | `KD_Sensors:Bosch_LGA-16_3x4.5mm_P0.5mm` | Drone_1S FC |
 | `KD_Sensors` | **BMP390** barometer (and the obsolete BMP388, same pins) | 10 | `KD_Sensors:Bosch_LGA-10_2x2mm_P0.5mm` | Drone_1S FC |
 | `KD_Modules` | **Raspberry Pi Pico 2 W**, castellated SMD (plus the underside TP1–3 USB, TP6 BOOTSEL and SWD pads) | 47 | `KD_Modules:RPi_Pico_2_W_SMD_Castellated` | Drone_1S FC |
-| `KD_Connectors` | **Bitcraze female deck connector** 1×10 2.00 mm SMD (Crazyflie decks) | stock `Connector_Generic:Conn_01x10` | `KD_Connectors:Bitcraze_FemaleDeck_1x10_P2.00mm_SMD` | Drone_1S frame |
+| `KD_Connectors` | **Bitcraze female deck connector** 1×10 2.00 mm SMD (Crazyflie decks) | stock `Connector_Generic:Conn_01x10` | `KD_Connectors:Bitcraze_FemaleDeck_1x10_P2.00mm_SMD` | Drone_1S frame rev 0.1 |
+| `KD_Connectors` | **Sullins NPPN101BFLD-RC** 1×10 2.00 mm SMD socket, layout D (drawing 10489: 0.90 × 2.0 mm pads, ±1.6 mm stagger, 4.6 mm high) | stock `Connector_Generic:Conn_01x10` | `KD_Connectors:Sullins_NPPN101BFLD_1x10_P2.00mm_SMD` | Drone_1S frame rev 0.2 (J5/J6) |
 
 ## Using the libraries in a project
 

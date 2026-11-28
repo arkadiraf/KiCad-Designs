@@ -12,7 +12,7 @@ Output (next to this tools/ folder):
                              Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm
     KD_Sensors.pretty/       Bosch_LGA-16_3x4.5mm_P0.5mm, Bosch_LGA-10_2x2mm_P0.5mm
     KD_Modules.pretty/       RPi_Pico_2_W_SMD_Castellated
-    KD_Connectors.pretty/    Bitcraze_FemaleDeck_1x10_P2.00mm_SMD
+    KD_Connectors.pretty/    Bitcraze_FemaleDeck_1x10_P2.00mm_SMD, Sullins_NPPN101BFLD_1x10_P2.00mm_SMD
 
 Where KiCad's stock library already has a correct footprint, the symbol points at it
 (BQ25606: Package_DFN_QFN:Texas_RGE0024H..., TPS22810DBV: Package_TO_SOT_SMD:SOT-23-6).
@@ -463,6 +463,27 @@ def fp_bitcraze_female():
                      "Bitcraze Crazyflie deck female socket 2.00mm", "smd", g, pads)
 
 
+def fp_sullins_nppn():
+    """Sullins NPPN101BFLD-RC (xPxNxx1BFLD-RC, drawing 10489 rev H), 1x10 2.00 mm SMD female socket.
+    Recommended layout 'D': pads 0.90 x 2.00 mm, 2.00 mm pitch, alternating sides, 5.20 mm outer span
+    (pad centres +-1.60 mm); body 20.50 x 2.40 mm, 4.40 mm tall (4.60 +-0.25 overall), contact point
+    2.50 mm below the top. Top view: the -X end pad is on +Y, the +X end pad on -Y (layout D; the C
+    version is the mirror image, so it does NOT fit this footprint). The contacts are identical, so the
+    pad numbers (pin 1 at -X, as the Bitcraze socket) follow the mating header, not the Sullins pin 1."""
+    pads = []
+    for p in range(1, 11):
+        pads.append(smd(p, "rect", -9 + 2 * (p - 1), 1.6 if p % 2 else -1.6, 0.9, 2.0, f"snp{p}"))
+    g = [text("reference", "REF**", 0, -3.6, "F.SilkS", size=0.8, thick=0.12),
+         text("value", "Sullins NPPN101BFLD-RC", 0, 3.6, "F.Fab", size=0.6, thick=0.1),
+         rect(-10.25, -1.2, 10.25, 1.2, "F.Fab", 0.1),
+         line(-10.7, -2.85, -10.7, 2.85, "F.SilkS", 0.15),
+         line(10.7, -2.85, 10.7, 2.85, "F.SilkS", 0.15),
+         rect(-10.75, -2.9, 10.75, 2.9, "F.CrtYd", 0.05)]
+    return footprint("Sullins_NPPN101BFLD_1x10_P2.00mm_SMD",
+                     "Sullins NPPN101BFLD-RC female socket, 1x10 2.00 mm, SMD, layout D, 4.6 mm high (Sullins drawing 10489)",
+                     "Sullins socket female 2.00mm SMD NPPN BFLD", "smd", g, pads)
+
+
 
 # ===================================================================================
 # PicoBalancer additions (2026-11-27). Sources in PicoBalancer/Materials/bom_datasheets.
@@ -703,6 +724,7 @@ FOOTPRINTS = {
                    ("CEVA_LGA-28_3.8x5.2mm_P0.5mm", fp_bno086)],
     "KD_Modules": [("RPi_Pico_2_W_SMD_Castellated", fp_pico), ("RPi_Pico_Socket_2x20_P2.54mm_Vertical", fp_pico_socket)],
     "KD_Connectors": [("Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", fp_bitcraze_female),
+                      ("Sullins_NPPN101BFLD_1x10_P2.00mm_SMD", fp_sullins_nppn),
                       ("USB_C_Receptacle_GCT_USB4235_Vertical", fp_usb4235),
                       ("SolderWire_Pads_1x06_P2.00mm_Named", fp_wire_pads_6)],
     "KD_Switches": [("SW_Slide_SPDT_3pin_P2.54mm_Vertical", fp_slide_switch_3pin)],

@@ -58,8 +58,8 @@ FRAME_MPN = {
 FRAME_PLACED = [
     ("J1 J2 J3 J4", 1, "2.54 mm male header strip 1x40 (ESC seats: 28 pins, 4 + 3 per ESC)",
      ("Sullins", "PRPC040SAAN-RC", "ok", "1x40 break-away strip, cut to 4 + 3")),
-    ("J5 J6", 2, "B2B socket 1x10 2.00 mm, frame bottom",
-     ("Samtec", "SMM-110-02-S-S", "TBD", "SMT socket, needs 6 mm standoffs; current design = Bitcraze socket from Bitcraze (5 mm)")),
+    ("J5 J6", 2, "B2B socket 1x10 2.00 mm SMD, frame bottom (mates with FC J1/J2)",
+     ("Sullins", "NPPN101BFLD-RC", "ok", "4.6 mm tall, 7 mm printed spacers; nylon: hand-solder after reflow; footprint update pending")),
     ("J7", 1, "JST-SH 4, Pi USB", ("JST", "SM04B-SRSS-TB(LF)(SN)", "ok", "")),
     ("J8", 1, "JST-PH 2 vertical, Pi 5.1 V", ("JST", "B2B-PH-K-S(LF)(SN)", "ok", "")),
 ]
@@ -71,20 +71,23 @@ FC_PARTS = [
     ("U3", 1, "BMP390 barometer", ("Bosch Sensortec", "BMP390", "ok", "replaces the obsolete BMP388, same LGA-10 footprint")),
     ("C1 C2", 2, "100nF 16V", (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 50 V X7R 0603")),
     ("P1 P2", 2, "2.00 mm male 1x10 SMD vertical (to the Flow deck)",
-     ("Samtec", "TMM-110-04-L-S-SM", "verify", "-04: 1.91 mm post into the Flow deck's 2.1 mm Bitcraze sockets; check availability")),
+     ("Samtec", "TMM-110-01-T-S-SM-P-TR", "ok", "same SM footprint as -04; 3.20 mm tin post: TRIM to ~1.9 mm after soldering, else the deck hangs ~1.3 mm lower; pull off the -P pick-and-place cap")),
     ("J1 J2", 2, "2.00 mm male 1x10 THT (to the frame)",
-     ("Samtec", "TMM-110-01-L-S", "ok", "-01: 3.20 mm post, 1.8 mm into the Bitcraze socket on 5 mm standoffs (-02 for SMM on 6 mm)")),
+     ("Wurth Elektronik", "62001011121", "ok", "plastic 2.0, pin 4.0: ~3.6 mm into the Sullins socket on the 7 mm spacers")),
     ("J9", 1, "JST-SH 3 horizontal, SWD", ("JST", "SM03B-SRSS-TB(LF)(SN)", "DNP", "fit when SWD is needed")),
-    ("SW1", 1, "BOOTSEL tactile switch", ("Aratas (formerly Omron)", "B3U-1000P", "ok", "top-actuated, 3.0 x 2.5 x 1.6 mm")),
+    ("SW1", 1, "BOOTSEL tactile switch", ("Aratas (formerly Omron)", "B3U-1000PM-B", "ok", "with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole), update pending")),
 ]
 
 # Mechanical stack and printed-part hardware (from the OpenSCAD model 1S_PiZero.scad, screw lengths computed there).
 # Generic parts: Digi-Key numbers to be filled in (user). refs, qty, value, (mfr, MPN, status, note)
 MECH_PARTS = [
-    ("FC stack", 4, "M2 x 5 mm hex standoff, female-female, 4 mm AF, nylon or aluminium",
-     ("any", "M2x5 F-F standoff 4 mm hex", "TBD", "FC under the frame on the 4 cover holes; 6 mm if the Samtec SMM socket is chosen")),
-    ("FC stack", 4, "M2 x 4 mm socket head screw", ("any", "M2x4 SHCS", "TBD", "FC into the standoffs, from below")),
-    ("Cover", 4, "M2 x 8 mm socket head screw", ("any", "M2x8 SHCS", "TBD", "battery cover + frame into the standoffs")),
+    # FC stack (28 Nov 2026): one M2 x 20 through-bolt per shared hole - cover boss 4.0 + frame 2.0 + printed spacer 7.0
+    # + FC 1.6 = 14.6 mm grip, nylon-insert nut under the FC. The spacer sets the board-to-board gap: the Wurth male +
+    # Sullins socket seat at 6.6 mm (up to ~6.85 mm at tolerance), so the gap must stay >= 6.9 mm.
+    ("FC stack", 4, "3D-printed spacer 7.0 mm (print 7.0-7.2, never < 6.9), OD 5 mm, hole 2.3 mm, PETG or ASA",
+     ("any", "3D-printed spacer", "ok", "between frame and FC on the 4 cover holes; not PLA (creeps under the bolt, softens ~55 C); measure the length")),
+    ("FC stack", 4, "M2 x 20 mm screw, galvanized steel (cover + frame + spacer + FC)", ("any", "M2x20 galvanized screw", "ok", "local: 4project.co.il/product/screw-m2x20mm-galvanized; head on the cover boss, down through everything")),
+    ("FC stack", 4, "M2 nylon-insert lock nut (DIN 985)", ("any", "M2 nyloc nut DIN 985", "TBD", "under the FC; removing it frees the FC (and loosens the cover)")),
     ("Gear", 4, "M2 x 4 mm socket head screw", ("any", "M2x4 SHCS", "TBD", "landing-gear skids, from the frame top")),
     ("Gear, camera", 6, "M2 brass heat-set insert, 3.6 mm OD x 3.0 mm", ("any", "M2 heat-set insert 3.6x3.0", "TBD", "4 skid bosses + 2 camera blocks")),
     ("Pi", 4, "M2.5 x 5 mm socket head screw", ("any", "M2.5x5 SHCS", "TBD", "Pi Zero 2 W into the cover posts")),
@@ -96,8 +99,7 @@ MECH_PARTS = [
 # Cables and their mating housings / contacts (frame and FC connectors). Crimp parts or pre-crimped leads.
 CABLE_PARTS = [
     ("J7 cable", 1, "JST SH 4-pin housing (to frame J7, Pi USB)", ("JST", "SHR-04V-S-B", "ok", "frame end; Pi end soldered to the Pi Zero 2 W USB test pads")),
-    ("J9 cable", 1, "JST SH 3-pin housing (to FC J9, SWD, optional)", ("JST", "SHR-03V-S-B", "ok", "or the JST-SH 3-pin cable that comes with the Raspberry Pi Debug Probe")),
-    ("J7 J9 cables", 7, "JST SH crimp contact 28-32 AWG (4 + 3)", ("JST", "SSH-003T-P0.2-H", "ok", "or pre-crimped SH leads (28 AWG, ~100 mm)")),
+    ("J7 cable", 4, "JST SH crimp contact 28-32 AWG", ("JST", "SSH-003T-P0.2-H", "ok", "or pre-crimped SH leads (28 AWG, ~100 mm)")),
     ("J8 cable", 1, "JST PH 2-pin housing (to frame J8, Pi 5.1 V)", ("JST", "PHR-2", "ok", "frame end; Pi end to GPIO pins 4 (5 V) / 6 (GND), soldered or a 1x2 2.54 mm housing")),
     ("J8 cable", 2, "JST PH crimp contact 24-30 AWG", ("JST", "SPH-002T-P0.5S", "ok", "24-26 AWG for up to 2.5 A; or pre-crimped PH leads")),
     ("Wire", 1, "silicone wire 26 AWG, red + black, ~0.5 m each (J8) and 28-30 AWG for J7", ("any", "silicone hookup wire", "TBD", "")),
@@ -141,7 +143,11 @@ DIGIKEY = {
     "GRM31CR61A226KE19L": ("", "not found at Digi-Key - replaced by Samsung CL31B226KPHNFNE"),
     "CL31B226KPHNFNE": ("1276-3145-1-ND", "active (user, Nov 2026)"),
     "PRPC040SAAN-RC": ("S1011EC-40-ND", "bulk"),
-    "SMM-110-02-S-S": ("", "not listed (Digi-Key stocks the -LC clip version); Samtec direct / Mouser"),
+    "SMM-110-02-S-S": ("612-SMM-110-02-S-S-ND", "not used: replaced by Sullins NPPN101BFLD-RC"),
+    "NPPN101BFLD-RC": ("S5902-10-ND", "user, Nov 2026"),
+    "62001011121": ("732-62001011121-ND", "user, Nov 2026"),
+    "A03SR03SR30K51B": ("455-3708-ND", "not used: the Raspberry Pi Debug Probe's own SH-3 cable is used for J9"),
+    "B3U-1000PM-B": ("39-B3U-1000PM-BCT-ND", "in stock at digikey.co.il (user, Nov 2026)"),
     "SM04B-SRSS-TB(LF)(SN)": ("455-SM04B-SRSS-TBCT-ND", ""),
     "B2B-PH-K-S(LF)(SN)": ("455-1704-ND", "bulk"),
     "SC1633": ("2648-SC1633CT-ND", ""),
@@ -149,8 +155,10 @@ DIGIKEY = {
     "BMP388": ("828-1079-1-ND", "OBSOLETE - replaced by BMP390"),
     "BMP390": ("828-BMP390CT-ND", "active (user, Nov 2026)"),
     "GRM188R71H104KA93D": ("", "end of life at distributors - pick an active 100 nF 0603"),
-    "TMM-110-04-L-S-SM": ("", "Samtec direct / Mouser; -04 is a non-standard length at Samtec - confirm"),
-    "TMM-110-01-L-S": ("", "not listed in this variant; Samtec direct / Mouser, or a listed variant"),
+    "TMM-110-04-L-S-SM": ("", "not used: non-standard length, hard to get - replaced by TMM-110-01-G-S-SM (trimmed)"),
+    "TMM-110-01-G-S-SM": ("612-TMM-110-01-G-S-SM-ND", "not used: gold version out of stock"),
+    "TMM-110-01-T-S-SM-P-TR": ("612-TMM-110-01-T-S-SM-P-CT-ND", "cut tape (user, Nov 2026)"),
+    "TMM-110-01-L-S": ("SAM15328-ND", "not used: post too short for the Sullins socket"),
     "SM03B-SRSS-TB(LF)(SN)": ("455-SM03B-SRSS-TBCT-ND", ""),
     "B3U-1000P": ("SW1020CT-ND", ""),
 }
@@ -195,6 +203,18 @@ DATASHEETS = {
          "CONFIRMED (F-226): 2.00 mm pitch, 0.5 mm posts, plastic 1.50 mm, 1.97 mm wide; lead style -01: post 3.20, tail "
          "3.50 (A 8.20); -02: 3.70 / 3.00. On 5 mm standoffs with the 2.1 mm Bitcraze socket: 1.4 mm free, post 1.8 mm in; "
          "tail 1.9 mm below the 1.6 mm FC. With SMM-110-02 on 6 mm: use -02 (2.88 mm in, 0.85 mm past the contact point)."),
+    ],
+    "TMM-110-01-T-S-SM-P-TR": [
+        ("TMM-1xx-xx-SM_Samtec_SM_drawing.pdf",
+         "CONFIRMED (F-226): -T matte tin, -P pick-and-place pad, -TR tape; same SM body and foot pattern as -04 = KiCad "
+         "PinHeader_1x10_P2.00mm_Vertical_SMD_Pin1Left; -01 post 3.20 mm: trim to ~1.9 mm for the Flow deck's 2.1 mm "
+         "socket. Tin post into the deck's gold contacts: fine for the few mating cycles here."),
+    ],
+    "TMM-110-01-G-S-SM": [
+        ("TMM-1xx-xx-SM_Samtec_SM_drawing.pdf",
+         "CONFIRMED (F-226): same SM body and foot pattern as -04 (plastic 1.50 at 1.27 above the board, 4.83 mm foot span) "
+         "= KiCad PinHeader_1x10_P2.00mm_Vertical_SMD_Pin1Left; -01 post 3.20 mm. The Flow deck socket is 2.1 mm: trim the "
+         "posts to ~1.9 mm (as -04) so the deck seats against the plastic; untrimmed the deck sits ~1.3 mm lower."),
     ],
     "TMM-110-04-L-S-SM": [
         ("TMM-1xx-xx-SM_Samtec_SM_drawing.pdf",
@@ -296,6 +316,22 @@ DATASHEETS = {
          "CONFIRMED (rev 1.7): table 52 pinout identical to the BMP388 (1 VDDIO, 2 SCK, 3/8/9 VSS, 4 SDI, 5 SDO, 6 CSB, 7 INT, "
          "10 VDD); LGA-10 2.0 x 2.0 x 0.75 mm, bottom-view pads 0.275 x 0.25 (sides, 1.525 / 1.000 mm) and 0.25 x 0.275 "
          "(ends, 0.5 mm) = KD_Sensors:Bosch_LGA-10 footprint: drop-in for the obsolete BMP388."),
+    ],
+    "62001011121": [
+        ("62001011121_Wurth_datasheet.pdf",
+         "CONFIRMED (rev 003.001, 2024-04-04): 2.00 mm, 0.5 mm sq gold, plastic 2.0, pin 4.0 above it, tail 2.7, hole 0.9 "
+         "(KiCad PinHeader_1x10_P2.00mm 0.8 drill also fits the 0.71 mm diagonal), 2 A, 50 cycles."),
+    ],
+    "NPPN101BFLD-RC": [
+        ("NPPN101BFLD-RC_Sullins_drawing_10489.pdf",
+         "CONFIRMED (dwg 10489 rev H): SMD 2.00 mm female, body 4.40 (4.60 +-0.25 overall), contact point 2.50 below the "
+         "top, 2.40 wide, pads 0.90 x 2.0 staggered at 5.20 outer span (D = pin-1 row per the D layout), 2 A, mates 0.5 sq "
+         "posts. N = nylon 6T, wave / manual soldering only. With 62001011121 on 7 mm: ~3.6 mm in, 0.4 mm air."),
+    ],
+    "B3U-1000PM-B": [
+        ("B3U-1000P_Omron-Aratas_datasheet.pdf",
+         "CONFIRMED: same switch and pads as B3U-1000P, with locating boss (PM = 1,000 pack). Needs KiCad "
+         "SW_SPST_B3U-1000P-B (0.8 mm NPTH at the centre)."),
     ],
     "SMM-110-02-S-S": [("../samtec_SMM_2mm_socket_strip.pdf", "CONFIRMED: 3.68 mm SMT height, 2.00 mm pitch, 0.5 mm sq posts")],
 }

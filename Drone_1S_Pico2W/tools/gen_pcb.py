@@ -13,6 +13,7 @@ report in ../build/<board>_drc.txt.
 import json
 import math
 import os
+import subprocess
 import sys
 
 import pcbnew
@@ -26,8 +27,10 @@ from design import (FC, FRAME, SHARED_LIBS, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
 BUILD = os.path.join(ROOT, "build")
-KFP = "/usr/share/kicad/footprints"
+KFP = next(p for p in ("C:/Program Files/KiCad/10.0/share/kicad/footprints", "/usr/share/kicad/footprints")
+           if os.path.isdir(p))
 
+KICAD_CLI = "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe"
 mm = pcbnew.FromMM
 
 
@@ -69,7 +72,11 @@ def write_project(path, power_patterns=()):
                                {"diameter": 0.8, "drill": 0.4}],
             "rule_severities": {"silk_overlap": "ignore", "silk_over_copper": "warning",
                                 "lib_footprint_issues": "ignore",
-                                "lib_footprint_mismatch": "ignore"},
+                                "lib_footprint_mismatch": "ignore",
+                                # FC SW1 (B3U-1000PM-B) boss hole sits under the Pico's courtyard: an unplated
+                                # 0.8 mm hole under the module's bare underside, ~6 mm from TP1 - reported as a
+                                # warning (listed by finish()), not an error.
+                                "npth_inside_courtyard": "warning"},
         }},
         "meta": {"filename": os.path.basename(path), "version": 1},
         "net_settings": {
@@ -215,20 +222,23 @@ def capsule(p, q, r, n=24):
     return pts
 
 
+# KiCad 7 needs a POLYGON_MODE argument on the polygon booleans; KiCad 8+ dropped it.
+_PM = (pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE,) if hasattr(pcbnew.SHAPE_POLY_SET, "PM_STRICTLY_SIMPLE") else ()
+
+
 def fc_outline_pts():
     """Minimum FC outline (scad points, closed polygon), see design.FC."""
     x0, x1, by = FC["band"]
     mx, my = FC["middle"]
     shape = poly_set([(x0, -by), (x1, -by), (x1, by), (x0, by)])
-    shape.BooleanAdd(poly_set([(-mx, -my), (mx, -my), (mx, my), (-mx, my)]), pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE)
+    shape.BooleanAdd(poly_set([(-mx, -my), (mx, -my), (mx, my), (-mx, my)]), *_PM)
     rx, ry = FC["ear_root"]
     for hx, hy in FC["holes"]:
         root = (math.copysign(rx, hx), math.copysign(ry, hy))
-        shape.BooleanAdd(poly_set(capsule((hx, hy), root, FC["ear_r"])), pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE)
+        shape.BooleanAdd(poly_set(capsule((hx, hy), root, FC["ear_r"])), *_PM)
     nw, nd = FC["notch"]
     pico_end = FC["pico_c"][0] + FC["pico_size"][0] / 2
-    shape.BooleanSubtract(poly_set([(pico_end - nd, -nw / 2), (pico_end + 10, -nw / 2), (pico_end + 10, nw / 2), (pico_end - nd, nw / 2)]),
-                          pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE)
+    shape.BooleanSubtract(poly_set([(pico_end - nd, -nw / 2), (pico_end + 10, -nw / 2), (pico_end + 10, nw / 2), (pico_end - nd, nw / 2)]), *_PM)
     shape = shape.Fillet(mm(FC["fillet"]), mm(0.01))
     assert shape.OutlineCount() == 1 and shape.HoleCount(0) == 0
     o = shape.Outline(0)
@@ -253,6 +263,15 @@ def new_fp(board, ref, value, pos, name):
     return fp
 
 
+# KiCad 7 footprint items keep a footprint-relative copy (SetLocalCoord, FP_SHAPE); KiCad 8+ derive it.
+_FP_SHAPE = getattr(pcbnew, "FP_SHAPE", pcbnew.PCB_SHAPE)
+
+
+def _local(item):
+    if hasattr(item, "SetLocalCoord"):
+        item.SetLocalCoord()
+
+
 def add_pad(fp, num, pos, kind, size, drill=0.0, layers=None, shape_=pcbnew.PAD_SHAPE_CIRCLE):
     p = pcbnew.PAD(fp)
     p.SetNumber(str(num))
@@ -267,29 +286,29 @@ def add_pad(fp, num, pos, kind, size, drill=0.0, layers=None, shape_=pcbnew.PAD_
     p.SetLayerSet(layers)
     fp.Add(p)
     p.SetPosition(pos)
-    p.SetLocalCoord()          # KiCad 7: store pos0 (footprint-relative) from the absolute position
+    _local(p)                  # KiCad 7: store pos0 (footprint-relative) from the absolute position
     return p
 
 
 def fp_circle(fp, c, r, layer, w=0.05):
-    s = pcbnew.FP_SHAPE(fp, pcbnew.SHAPE_T_CIRCLE)
+    s = _FP_SHAPE(fp, pcbnew.SHAPE_T_CIRCLE)
     s.SetLayer(layer)
     s.SetWidth(mm(w))
     fp.Add(s)
     s.SetCenter(c)
     s.SetEnd(pcbnew.VECTOR2I(c.x + mm(r), c.y))
-    s.SetLocalCoord()
+    _local(s)
 
 
 def fp_poly(fp, pts, layer, w=0.05):
     for i in range(len(pts)):
-        s = pcbnew.FP_SHAPE(fp, pcbnew.SHAPE_T_SEGMENT)
+        s = _FP_SHAPE(fp, pcbnew.SHAPE_T_SEGMENT)
         s.SetLayer(layer)
         s.SetWidth(mm(w))
         fp.Add(s)
         s.SetStart(pts[i - 1])
         s.SetEnd(pts[i])
-        s.SetLocalCoord()
+        _local(s)
 
 
 def new_board(path, title, thickness, comment):
@@ -313,10 +332,19 @@ def finish(board, path, name):
     pcbnew.SaveBoard(path, board)
     board = pcbnew.LoadBoard(path)
     rpt = os.path.join(BUILD, f"{name}_drc.txt")
-    pcbnew.WriteDRCReport(board, rpt, pcbnew.EDA_UNITS_MILLIMETRES, True)
+    if os.path.isfile(KICAD_CLI):      # KiCad 8+: WriteDRCReport() needs the GUI, so use kicad-cli
+        subprocess.run([KICAD_CLI, "pcb", "drc", "--format", "report", "--units", "mm", "-o", rpt, path],
+                       check=True, capture_output=True)
+    else:                              # KiCad 7 in the container
+        pcbnew.WriteDRCReport(board, rpt, pcbnew.EDA_UNITS_MILLIMETRES, True)
     txt = open(rpt).read()
     import re
     counts = {k: int(v) for v, k in re.findall(r"\*\* Found (\d+) (DRC violations|unconnected pads|Footprint errors)", txt)}
+    warns = re.findall(r"^\[(\w+)\]: (.*)\n\s+[^\n]*; warning", txt, re.M)
+    if warns:                          # warnings are listed, and only errors count against the gate
+        counts["DRC violations"] -= len(warns)
+        for rule, msg in warns:
+            print(f"  DRC warning (accepted): {rule}: {msg}")
     bb = board.GetBoardEdgesBoundingBox()
     print(f"{name}: {len(board.GetFootprints())} footprints, "
           f"{sum(len(f.Pads()) for f in board.GetFootprints())} pads, "
@@ -388,7 +416,7 @@ def build_frame():
             continue
         ax, ay = abs(h["x"]), abs(h["y"])
         if math.hypot(ax - SCAD["crad_hole"][0], ay - SCAD["crad_hole"][1]) < 0.1:
-            pre, val = "H_CV", "Cover + FC standoff M2"
+            pre, val = "H_CV", "Cover + FC M2x20 bolt"
         elif math.hypot(ax - SCAD["gear_hole"][0], ay - SCAD["gear_hole"][1]) < 0.1:
             pre, val = "H_LG", "Landing gear M2"
         else:
@@ -412,9 +440,10 @@ def build_frame():
     fp_poly(fp, rect_s(0, 0, 2 * TAB_PAD_X + TAB_PAD_SIZE[0] + 0.5, SCAD["bat_d"] + 0.5), pcbnew.F_CrtYd)
 
     # --- J5 / J6 female sockets on the BOTTOM: the FC module's J1 / J2 plug in ---
+    # Sullins NPPN101BFLD-RC (SMD, 4.6 mm): nylon body, hand-soldered after the frame's reflow.
     for ref, sy in (("J5", 1), ("J6", -1)):
-        fp = place_b2b(board, "KD_Connectors", "Bitcraze_FemaleDeck_1x10_P2.00mm_SMD", ref,
-                       "Bitcraze female deck connector 1x10 2.00mm (FC " + ("J1" if sy > 0 else "J2") + ")", sy, bottom=True)
+        fp = place_b2b(board, *B2B["socket_fp"], ref,
+                       "Sullins NPPN101BFLD-RC 1x10 2.00mm socket (FC " + ("J1" if sy > 0 else "J2") + ")", sy, bottom=True)
         fp.Value().SetVisible(False)
 
     # --- connectors to the Pi Zero 2 W on the frame top ---
@@ -450,7 +479,7 @@ def build_frame():
     text(board, "Pi Zero 2 W (on the battery cover, above the cell)", VS(0, SCAD["pi_w"] / 2 - 2.5), top, 1.0)
     text(board, "18650 cell on top, tabs soldered to BT1", VS(0, -5), top, 1.0)
     poly(board, [VS(x, y) for x, y in fc_outline_pts()], bot, 0.15)
-    text(board, f"FC module below ({B2B['standoff']:g} mm M2 standoffs on H_CV1-4), plugs into J5/J6", VS(0, -23), bot, 1.0)
+    text(board, f"FC module below ({B2B['standoff']:g} mm printed spacers + M2x20 bolts on H_CV1-4), plugs into J5/J6", VS(0, -23), bot, 1.0)
     pcx, pcy = FC["pico_c"]
     poly(board, rect_s(pcx, pcy, *FC["pico_size"]), bot, 0.1)
     text(board, "Pico 2 W below (~4 mm tall): only low parts here", VS(pcx, pcy - 3), bot, 0.8)
@@ -492,7 +521,7 @@ def build_fc():
     for n, (hx, hy) in enumerate(FC["holes"], 1):
         fp = load_fp("MountingHole", "MountingHole_2.2mm_M2")
         fp.SetReference(f"H{n}")
-        fp.SetValue("M2 standoff to frame")
+        fp.SetValue("M2x20 bolt + 7 mm spacer to frame")
         fp.SetPosition(VS(hx, hy))
         fp.Reference().SetLayer(pcbnew.F_Fab)
         board.Add(fp)
@@ -543,12 +572,15 @@ def build_fc():
         assert all(p.IsOnLayer(pcbnew.B_Cu) for p in fp.Pads())
 
     # --- J1 / J2 male headers on TOP: plug up into the frame's J5 / J6 ---
+    # Wurth 62001011121: its datasheet asks for 0.90 mm holes (the stock footprint has 0.8 mm).
     for ref, sy in (("J1", 1), ("J2", -1)):
         fp = place_b2b(board, "Connector_PinHeader_2.00mm", "PinHeader_1x10_P2.00mm_Vertical", ref,
-                       "Header 1x10 2.00mm male (to frame " + ("J5" if sy > 0 else "J6") + ")", sy, bottom=False)
+                       "Wurth 62001011121 header 1x10 2.00mm male (to frame " + ("J5" if sy > 0 else "J6") + ")", sy, bottom=False)
+        for p in fp.Pads():
+            p.SetDrillSize(pcbnew.VECTOR2I(mm(B2B["male_hole"]), mm(B2B["male_hole"])))
         fp.Value().SetVisible(False)
         fp.Reference().SetLayer(pcbnew.F_Fab)      # no room for it on the trimmed outline
-    text(board, f"FC hangs on the 4 cover screws on {B2B['standoff']:g} mm M2 standoffs; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
+    text(board, f"FC hangs on 4 M2x20 bolts through {B2B['standoff']:g} mm printed spacers; J1/J2 plug into the frame", VS(0, -19.5), top, 0.6)
 
     # --- J9 SWD (DNP) on the BOTTOM at the rear edge, opening towards the edge (-x) ---
     ref, fpn, val, (x, y) = FC["swd"]
@@ -585,7 +617,7 @@ def build_fc():
     fp.Reference().SetPosition(VS(x, y + 1.9))      # Fab ref above the body, the BOOT silk below it
     fp.Reference().SetTextSize(pcbnew.VECTOR2I(mm(0.6), mm(0.6)))
     for g in fp.GraphicalItems():                    # the footprint's own ${REFERENCE} Fab text sits on BOOT
-        if isinstance(g, pcbnew.FP_TEXT) and g.GetText() == "${REFERENCE}":
+        if isinstance(g, getattr(pcbnew, "FP_TEXT", pcbnew.PCB_TEXT)) and g.GetText() == "${REFERENCE}":
             g.SetVisible(False)
     fp.Value().SetVisible(False)
     assert all(p.IsOnLayer(pcbnew.B_Cu) for p in fp.Pads())

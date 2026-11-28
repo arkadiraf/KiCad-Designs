@@ -1,4 +1,4 @@
-# What is still missing (updated 27 Nov 2026)
+# What is still missing (updated 28 Nov 2026)
 
 Status of part verification: [bom_datasheets/README.md](bom_datasheets/README.md). Excluding the 19 stock
 passives and LEDs, 18 parts are verified against manufacturer documents and 2 partly; 6 have no document yet
@@ -14,21 +14,22 @@ Parts that still need a Digi-Key number: [../fabrication/BOM_to_source.md](../fa
 | 3 | JST **SHR-04V-S-B / SHR-03V-S-B, SSH-003T-P0.2-H** | SH housing and contact pages (the SH catalog received covers the headers) | wire gauge, crimp tool |
 | 4 | JST **PHR-2, SPH-002T-P0.5S** | PH housing and contact pages | wire gauge (24–26 AWG for 2.5 A), crimp tool |
 | 5 | **DYS XSD7A** ESC | pad drawing (photos give the pad functions) | exact ESC pin map onto J1–J4 |
-| 6 | Hardware (standoffs, screws, inserts) | the chosen Digi-Key parts' drawings | standoff length / hex size, insert size vs the printed bosses |
+| 6 | Hardware (standoffs, screws, inserts) | the chosen Digi-Key parts' drawings | FC standoffs now **M2 × 7 mm** F-F; hex size, insert size vs the printed bosses |
+
 
 ## Open decisions
 
-- [ ] **FC socket:** Bitcraze female deck socket on 5 mm standoffs (current design, FC J1/J2 = TMM-110-01-L-S) or
-      Samtec SMM-110-02-S-S on 6 mm (then J1/J2 = TMM-110-02-L-S).
+- [x] **FC socket (28 Nov):** Sullins NPPN101BFLD-RC on the frame + Würth 62001011121 on the FC, 7 mm standoffs
+      (`connector_options/README.md`). KiCad footprints still to update.
 - [ ] **BQ25606 SYS capacitance:** about 41 µF on SYS vs ≤ 20 µF for the charger's loop. Move the boost input to BAT
       (recommended) or keep it on SYS and test stability.
 - [ ] **TPS22997 PG pull-ups (R15–R18):** on the FC, Pico internal pull-ups, or 3V3 added to the header.
 - [ ] **FC additions from the Bolt:** 1 µH + 4.7 µF sensor-supply filter and 100 Ω series resistors on the DShot lines.
-- [ ] **TMM-110-04-L-S-SM availability** (non-standard length at Samtec) for P1/P2.
+- [x] **P1/P2:** TMM-110-04 not available; TMM-110-01-T-S-SM-P-TR, posts trimmed to ~1.9 mm.
 
 ## Received and checked
 
 BQ25606, TPS22810, TPS22997 + RYZ0010A drawing, TPS61235P, BMI088, BMP390, Pico 2 W (datasheet, photo), Pico 2,
 USB4105 (spec + SnapMagic footprint), Würth 74438357010, Semitec 103AT, APEM MA12R/TR, Omron/Aratas B3U, JST SH and
-PH catalogs, Samtec SMM and TMM (TH, SM), Sullins 10483, Murata MLCC catalog, Crazyflie Bolt 1.1 schematic and
+PH catalogs, Samtec SMM and TMM (TH, SM), Sullins 10483 and 10489 (NPPN socket), Würth 62001011121, Murata MLCC catalog, PixArt PMW3901MB-TXQT and ST VL53L1X (DS12385 rev 8) - Flow deck at 3.3 V checked, Crazyflie Bolt 1.1 schematic and
 datasheet, Flow deck v2 schematic, Pi Zero 2 W brief, XSD7A images. Not used: JST SR/SZ catalog (IDC series).
