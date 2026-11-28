@@ -9,6 +9,7 @@ One 60 × 200 × 1.6 mm PCB for a two-wheel balancing robot:
 
 **Design document:** [docs/PicoBalancer_Hardware_Design.pdf](docs/PicoBalancer_Hardware_Design.pdf), a PDF export of the shared
 design doc (block diagram, circuits, pin map, mechanics, parts list, open decisions).
+**PCB order:** [fabrication/PicoBalancer_OSHPark.zip](fabrication/PicoBalancer_OSHPark.zip) (OSH Park 2-layer). See [Fabrication](#fabrication-osh-park-stage-4).
 **BOM:**
 * [fabrication/BOM.md](fabrication/BOM.md): every line.
 * [fabrication/BOM_DigiKey.csv](fabrication/BOM_DigiKey.csv): distributor upload. Digi-Key or Mouser, whichever has stock.
@@ -18,7 +19,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 **Datasheets and verification:** [Materials/bom_datasheets/README.md](Materials/bom_datasheets/README.md).
 **Order check:** `python tools/verify_order.py fabrication/DigiKey_order_2026-11-27T093456.xlsx 5` compares the Digi-Key cart with the BOM. Result for the 27 Nov cart (093456): ORDER OK for 5 boards. The Pico WH comes from Mouser / Piitel. Two cart lines are Pico_Alvik_Adapter parts.
 
-## Status: stage 2 (rev 0.1)
+## Status: stage 4, ready to order (rev 0.1)
 
 | Stage | Content | State |
 |---|---|---|
@@ -26,7 +27,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 | 1 | Decisions closed (motor, cells, TS fixed, UVLO option, placement); follow-up: BAT fuse | done |
 | 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, Pico socket, 1042, USB4235, slide switch, 1812L, wire pads), schematic | **done** |
 | 3 | Placement, silkscreen, routing (2 layers): DRC 0 violations, 0 unconnected | **done** |
-| 4 | DRC, fab outputs | |
+| 4 | Final review, OSH Park fab outputs (Gerbers, drill, top stencil, positions) | **done** |
 
 ![stage 0 guides](docs/board_stage0.png)
 
@@ -157,7 +158,7 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 
 ## Routing (stage 3)
 
-Two layers, 1.6 mm, all parts on top. DRC (KiCad 10.0.8) shows 0 violations, 0 unconnected items and 0 schematic-parity issues. Copper: [top](docs/cu_f.png), [bottom](docs/cu_b.png).
+Two layers, 1.6 mm, all parts on top. DRC (KiCad 10.0.8) shows 0 violations and 0 unconnected items. The schematic-parity warnings are cosmetic (see Fabrication). Copper: [top](docs/cu_f.png), [bottom](docs/cu_b.png).
 
 * **Hand-routed in `tools/routes.py`** (power first, section by section):
   * **USB-C:** VBUS loop and a 1.2 mm lane down the channel. D+ steps across the row gap, D− crosses on the bottom.
@@ -174,6 +175,40 @@ Two layers, 1.6 mm, all parts on top. DRC (KiCad 10.0.8) shows 0 violations, 0 u
 * **GND:** a pour on both layers, plus stitching vias at the caps and pads.
 * **Pico W antenna:** copper keep-out on both layers (rule area).
 
+## Fabrication (OSH Park, stage 4)
+
+**Upload [fabrication/PicoBalancer_OSHPark.zip](fabrication/PicoBalancer_OSHPark.zip) at oshpark.com, not the `.kicad_pcb`.** OSH Park processes `.kicad_pcb` uploads with KiCad 9.x, and this board is saved in KiCad 10 format.
+
+The zip holds RS-274X Gerbers with Protel names (`.GTL .GBL .GTS .GBS .GTO .GBO .GKO`) and one Excellon drill file `.XLN`. The drill file is in inches, decimal, absolute origin. The J5 plated slots are written as G85, which OSH Park reads as drill slots. Zones are filled in the file, which matters because OSH Park does not re-fill them.
+
+**Board check against the OSH Park 2-layer specs** (docs.oshpark.com, 28 Nov 2026). DRC was re-run with OSH Park's minimums: 0 violations.
+
+| Item | OSH Park | PicoBalancer | OK |
+|---|---|---|---|
+| Layers, thickness, copper | 2, 1.6 mm (63 mil), 1 oz | 2, 1.6 mm | ✓ |
+| Trace width / spacing | 0.152 / 0.152 mm (6 / 6 mil) | min 0.20 mm track, 0.20 mm router clearance | ✓ |
+| Drill | min 0.254 mm (10 mil) | min 0.30 mm (vias 0.6 / 0.3 mm and 0.8 / 0.4 mm) | ✓ |
+| Annular ring | min 0.127 mm (5 mil) | vias 0.15 mm, pads ≥ 0.25 mm | ✓ |
+| Slots | ≥ 0.508 mm wide, copper under the whole plated slot | J5 shell slots 0.6 × 0.85 mm inside plated pads | ✓ |
+| Copper to edge | 0.381 mm (15 mil) | 0.5 mm rule | ✓ |
+| Hole to hole | 0.127 mm recommended | ≥ 0.25 mm | ✓ |
+| Mask web | 0.10 mm (4 mil) | no mask-bridge DRC errors | ✓ |
+| Silkscreen | 0.127 mm recommended, 0.076 mm minimum | text strokes ≥ 0.15 mm; footprint outlines 0.12 mm (KiCad standard) | ✓ |
+| Outline | Edge.Cuts only, closed | 60 × 200 mm rectangle, 4 lines, nothing else on the layer | ✓ |
+| Finish, mask | ENIG, purple, both sides | good for stencil and reflow | ✓ |
+
+Notes:
+* **NPTH:** the 8 M2.5 holes (2.65 mm), the holder pegs (3.45 / 2.39 mm) and the J5 pegs are tagged non-plated in the drill file. OSH Park's docs don't say how they treat NPTH. If they plate them anyway, the holes lose about 0.05 mm, and none of them has copper around it.
+* **Cost:** 60 × 200 mm = 18.6 sq in. Standard service is $5 / sq in, which gives about **$93 for 3 boards**, shipping in 9–12 days. Super Swift is $10 / sq in (about $186), shipping within 5 business days.
+* **Stencil:** [fabrication/PicoBalancer_stencil_top.zip](fabrication/PicoBalancer_stencil_top.zip) holds F.Paste plus the outline. All parts are on top. Order it separately, e.g. from OSH Stencils.
+* **Assembly aids:** [positions CSV](fabrication/PicoBalancer_positions.csv) (91 parts, DNP excluded), [assembly PDF](fabrication/docs/PicoBalancer_assembly_top.pdf), [top](fabrication/docs/PicoBalancer_pcb_top.pdf) and [bottom](fabrication/docs/PicoBalancer_pcb_bottom.pdf) PDFs.
+* **Schematic-parity warnings** (209, none are errors):
+  * Board net names lack the schematic's `/` prefix (`CELL1` vs `/CELL1`).
+  * H1–H8 mounting holes have no symbols.
+  * TP1 / TP2 have mismatched "exclude from BOM" flags.
+  * None of this changes the copper. Don't run "Update PCB from schematic" on this generated board.
+* **Before ordering:** check the holder and USB-C footprints in a 1:1 printout of the top PDF, and look at OSH Park's preview after uploading (the J5 slots must show).
+
 ## Regenerate
 
 ```sh
@@ -188,6 +223,7 @@ python check_netlist.py ../build/net.net     # prints NETLIST OK
 python -u router.py                                              # build/routes.json (a few minutes)
 "C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py finish  # imports the routes, GND pours, fills
 "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" pcb drc --output ../build/drc.txt ../PicoBalancer.kicad_pcb
+cd .. && bash tools/export_fab.sh     # fabrication/: OSH Park zip, top stencil, positions, PCB PDFs
 ```
 
 Current results:
