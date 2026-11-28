@@ -159,15 +159,17 @@ BLOCK_TITLES = [
     ("BOOST 5V1", (-22.0, 45.5), 1.2, False),
     ("MOTOR L", (-20.5, 68.3), 1.2, False),
     ("MOTOR R", (20.5, 68.3), 1.2, False),
-    ("IMU", (2.0, 84.8), 1.2, False),
+    ("IMU", (-3.2, 84.6), 1.2, False),
     ("POWER", (20.25, 19.6), 1.2, False),
     # SW1 direction (NKK Series AS: actuator at the terminal-1 end = LEFT position = 2-1 connected; pin 1 -> BAT = ON):
     # slide toward pin 1 (up, toward the cells) = ON, toward pin 3 (down) = OFF
     ("ON", (20.25, 21.8), 1.2, True),
     ("OFF", (20.25, 34.9), 1.2, True),
-    ("Pico W / Pico 2 W", (0.0, 48.0), 2.0, True, 90),   # under the module, between the socket rows (user)
+    ("Pico W / Pico 2 W", (0.0, 48.0), 2.0, True, 90),
+    ("BOOT", (5.5, 98.35), 0.8, False),                 # under TP1 (BNO086 BOOTN)
+    ("GND", (8.6, 98.35), 0.8, False),                  # under TP2   # under the module, between the socket rows (user)
 ]
-SILK_LABELS = {"TP1": "TP1 BOOT", "TP2": "TP2 GND"}    # custom silk labels (user: mark TP2 as GND)
+SILK_LABELS = {"TP1": "", "TP2": ""}     # test pads: fixed BOOT / GND titles under them    # custom silk labels (user: mark TP2 as GND)
 
 
 def short_value(ref, val):
@@ -243,6 +245,12 @@ def silk_pass(board):
             continue
         passive = re.match(r"[RC]\d", ref) is not None or ref in SILK_LABELS
         fref = fp.Reference()
+        if ref in SILK_LABELS and not SILK_LABELS[ref]:   # labelled by a fixed title instead (BLOCK_TITLES)
+            fref.SetLayer(pcbnew.F_Fab)
+            fref.SetTextSize(pcbnew.VECTOR2I(MM(0.5), MM(0.5)))
+            fref.SetTextThickness(MM(0.08))
+            fref.SetPosition(fp.GetPosition())
+            continue
         if passive:
             fref.SetLayer(pcbnew.F_Fab)
             fref.SetTextSize(pcbnew.VECTOR2I(MM(0.5), MM(0.5)))
@@ -383,6 +391,156 @@ def antenna_keepout(board):
     text(board, "ANTENNA KEEP-OUT", (x0 + x1) / 2, (y0 + y1) / 2, pcbnew.Cmts_User, 1.0)
 
 
+def add_routes(board):
+    """Tracks and vias from routes.py (hand routing, board coordinates)."""
+    import importlib
+    import routes
+    importlib.reload(routes)
+    lay = {"F": pcbnew.F_Cu, "B": pcbnew.B_Cu}
+    missing = set()
+    for net, layer, w, pts in routes.TRACKS:
+        ni = board.FindNet(net)
+        if ni is None:
+            missing.add(net)
+            continue
+        for a, b in zip(pts, pts[1:]):
+            t = pcbnew.PCB_TRACK(board)
+            t.SetStart(pt(*a))
+            t.SetEnd(pt(*b))
+            t.SetWidth(MM(w))
+            t.SetLayer(lay[layer])
+            t.SetNet(ni)
+            board.Add(t)
+    for net, x, y, d, drill in routes.VIAS:
+        ni = board.FindNet(net)
+        if ni is None:
+            missing.add(net)
+            continue
+        v = pcbnew.PCB_VIA(board)
+        v.SetPosition(pt(x, y))
+        v.SetWidth(MM(d))
+        v.SetDrill(MM(drill))
+        v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
+        v.SetNet(ni)
+        board.Add(v)
+    if missing:
+        raise SystemExit(f"routes.py: unknown nets {sorted(missing)}")
+    return len(routes.TRACKS), len(routes.VIAS)
+
+
+POWER_NETS = {"BAT", "VBUS", "SYS", "PMID", "5V1", "VSW", "VSYS", "CELL1", "CELL2", "CELL1_F", "CELL2_F", "CHG_SW",
+              "BOOST_SW", "M1_OUT1", "M1_OUT2", "M2_OUT1", "M2_OUT2", "GND"}
+BUILD = os.path.join(ROOT, "build")
+
+
+def _bbox(item):
+    b = item.GetBoundingBox()
+    return [pcbnew.ToMM(b.GetLeft()), pcbnew.ToMM(b.GetTop()), pcbnew.ToMM(b.GetRight()), pcbnew.ToMM(b.GetBottom())]
+
+
+def export_geom(board):
+    """build/geometry.json for router.py: outline, pads, keep-outs, existing (hand-routed) tracks and vias, nets."""
+    cu = {pcbnew.F_Cu: "F", pcbnew.B_Cu: "B"}
+    pads = []
+    for fp in board.GetFootprints():
+        for pd in fp.Pads():
+            pads.append({"ref": fp.GetReference(), "pin": pd.GetNumber(), "net": pd.GetNetname(),
+                         "layers": [n for l, n in cu.items() if pd.IsOnLayer(l)], "bbox": _bbox(pd)})
+    keepouts = []
+    for z in board.Zones():
+        if z.GetIsRuleArea():
+            ol = z.Outline().Outline(0)
+            keepouts.append({"layers": [n for l, n in cu.items() if z.IsOnLayer(l)],
+                             "pts": [(pcbnew.ToMM(ol.CPoint(i).x), pcbnew.ToMM(ol.CPoint(i).y))
+                                     for i in range(ol.PointCount())]})
+    tracks, vias = [], []
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            p = t.GetPosition()
+            vias.append({"net": t.GetNetname(), "x": pcbnew.ToMM(p.x), "y": pcbnew.ToMM(p.y), "d": pcbnew.ToMM(t.GetWidth(pcbnew.F_Cu))})
+        else:
+            a, b = t.GetStart(), t.GetEnd()
+            tracks.append({"net": t.GetNetname(), "layer": cu[t.GetLayer()], "x1": pcbnew.ToMM(a.x), "y1": pcbnew.ToMM(a.y),
+                           "x2": pcbnew.ToMM(b.x), "y2": pcbnew.ToMM(b.y), "w": pcbnew.ToMM(t.GetWidth())})
+    x0, y0 = to_kicad(-BOARD_W / 2, -BOARD_H / 2)
+    x1, y1 = to_kicad(BOARD_W / 2, BOARD_H / 2)
+    nets = {n: {"pins": c, "power": n in POWER_NETS} for n, c in build_nets().items()}
+    os.makedirs(BUILD, exist_ok=True)
+    json.dump({"outline": [(x0, y0), (x1, y0), (x1, y1), (x0, y1)], "pads": pads, "shapes": [], "keepouts": keepouts,
+               "tracks": tracks, "vias": vias, "nets": nets}, open(os.path.join(BUILD, "geometry.json"), "w"))
+    print(f"geometry: {len(pads)} pads, {len(tracks)} tracks, {len(vias)} vias, {len(keepouts)} keep-outs")
+
+
+def import_routes(board):
+    data = json.load(open(os.path.join(BUILD, "routes.json")))
+    lay = {"F": pcbnew.F_Cu, "B": pcbnew.B_Cu}
+    for t in data["tracks"]:
+        tr = pcbnew.PCB_TRACK(board)
+        tr.SetStart(pcbnew.VECTOR2I(MM(t["x1"]), MM(t["y1"])))
+        tr.SetEnd(pcbnew.VECTOR2I(MM(t["x2"]), MM(t["y2"])))
+        tr.SetWidth(MM(t["w"]))
+        tr.SetLayer(lay[t["layer"]])
+        tr.SetNet(board.FindNet(t["net"]))
+        board.Add(tr)
+    for v in data["vias"]:
+        via = pcbnew.PCB_VIA(board)
+        via.SetPosition(pcbnew.VECTOR2I(MM(v["x"]), MM(v["y"])))
+        via.SetWidth(MM(v["d"]))
+        via.SetDrill(MM(v["drill"]))
+        via.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
+        via.SetNet(board.FindNet(v["net"]))
+        board.Add(via)
+    # the router works on pad bounding boxes: a track end inside a round pad's box but outside its copper is
+    # extended to the pad centre (same layer, same net)
+    lay_of = {pcbnew.F_Cu: "F", pcbnew.B_Cu: "B"}
+    pads = [(pd, _bbox(pd)) for fp in board.GetFootprints() for pd in fp.Pads() if pd.GetNetname()]
+    fixed = 0
+    for t in data["tracks"]:
+        for x, y in ((t["x1"], t["y1"]), (t["x2"], t["y2"])):
+            for pd, (x0, y0, x1, y1) in pads:
+                if pd.GetNetname() != t["net"] or not (x0 <= x <= x1 and y0 <= y <= y1):
+                    continue
+                if not pd.IsOnLayer(lay[t["layer"]]):
+                    continue
+                if pd.HitTest(pcbnew.VECTOR2I(MM(x), MM(y))):
+                    break
+                c = pd.GetPosition()
+                tr = pcbnew.PCB_TRACK(board)
+                tr.SetStart(pcbnew.VECTOR2I(MM(x), MM(y)))
+                tr.SetEnd(c)
+                tr.SetWidth(MM(min(t["w"], 0.25)))
+                tr.SetLayer(lay[t["layer"]])
+                tr.SetNet(board.FindNet(t["net"]))
+                board.Add(tr)
+                fixed += 1
+                break
+    print(f"router: {len(data['tracks'])} segments, {len(data['vias'])} vias; failed {data['failed']}; "
+          f"{fixed} ends extended to pad centres")
+
+
+def gnd_pours(board):
+    """GND pour on both copper layers over the whole board (0.25 mm clearance, thermal reliefs on pads)."""
+    x0, y0 = to_kicad(-BOARD_W / 2, -BOARD_H / 2)
+    x1, y1 = to_kicad(BOARD_W / 2, BOARD_H / 2)
+    gnd = board.FindNet("GND")
+    for layer in (pcbnew.F_Cu, pcbnew.B_Cu):
+        z = pcbnew.ZONE(board)
+        z.SetLayer(layer)
+        z.SetNet(gnd)
+        z.SetLocalClearance(MM(0.25))
+        z.SetMinThickness(MM(0.25))
+        z.SetThermalReliefGap(MM(0.3))
+        z.SetThermalReliefSpokeWidth(MM(0.4))
+        z.SetPadConnection(pcbnew.ZONE_CONNECTION_THERMAL)
+        z.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
+        ol = z.Outline()
+        ol.NewOutline()
+        for x, y in ((x0, y0), (x1, y0), (x1, y1), (x0, y1)):
+            ol.Append(pcbnew.VECTOR2I(MM(x), MM(y)))
+        board.Add(z)
+    pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+
+
 def main():
     write_hole_fp()
     board = pcbnew.BOARD()
@@ -420,8 +578,15 @@ def main():
     t_title.SetBold(True)                                                          # user: bold
     n_parts = place_parts(board)
     antenna_keepout(board)
+    n_tr, n_via = add_routes(board)
+    print(f"routes: {n_tr} tracks, {n_via} vias")
     n_lab, n_marks, silk_failed = silk_pass(board)
     print(f"silk: {n_lab} labels, {n_marks} polarity / pin-1 marks; not placed cleanly: {silk_failed or 'none'}")
+    if "geom" in sys.argv:
+        export_geom(board)
+    if "finish" in sys.argv:
+        import_routes(board)
+        gnd_pours(board)
     board.Save(PCB)
     def table(name, libs, ext):
         rows = [f'  (lib (name "{n}")(type "KiCad")(uri "${{KIPRJMOD}}/../Libraries/{n}{ext}")(options "")(descr ""))'

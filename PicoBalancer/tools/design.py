@@ -110,8 +110,8 @@ PICO_SOCKET_PITCH = 17.78              # 2 x 1x20, 2.54 mm, Pico W / Pico 2 W
 BNO086_PINS = {
     3: ("VDD", "3V3, 100 nF"), 28: ("VDDIO", "3V3, 100 nF"), 2: ("GND", "GND"), 25: ("GNDIO", "GND"),
     10: ("CLKSEL0", "GND (crystal)"), 27: ("XIN32", "Y1 + 22 pF"), 26: ("CLKSEL1/XOUT32", "Y1 + 22 pF"), 9: ("CAP", "100 nF"),
-    17: ("H_SA0/MOSI", "SPI1 MOSI GP15"), 20: ("H_SDA/MISO/TX", "SPI1 MISO GP12"), 19: ("H_SCL/SCLK/RX", "SPI1 SCK GP14"),
-    18: ("H_CS", "SPI1 CS GP13, 10 k pull-up"), 14: ("H_INT", "IMU_INT GP11"), 11: ("RST", "IMU_RST GP10, 10 k pull-up"),
+    17: ("H_SA0/MOSI", "SPI1 MOSI GP11"), 20: ("H_SDA/MISO/TX", "SPI1 MISO GP12"), 19: ("H_SCL/SCLK/RX", "SPI1 SCK GP14"),
+    18: ("H_CS", "SPI1 CS GP13, 10 k pull-up"), 14: ("H_INT", "IMU_INT GP15"), 11: ("RST", "IMU_RST GP10, 10 k pull-up"),
     6: ("PS0/WAKE", "IMU_WAKE GP22, 10 k pull-up"), 5: ("PS1", "10 k pull-up (SPI)"), 4: ("BOOT", "10 k pull-up, TP1"),
     16: ("S_SDA", "4.7 k pull-up, unused"), 15: ("S_SCL", "4.7 k pull-up, unused"),
 }
@@ -125,8 +125,9 @@ PINMAP = {
     4: "CHG_STAT", 5: "CHG_PG",                        # left, top end
     6: "ENC1_A", 7: "ENC1_B",                          # left encoder (PIO)
     8: "M1_IN1", 9: "M1_IN2",                          # left motor, PWM slice 4 A/B
-    10: "IMU_RST", 11: "IMU_INT",                      # left, bottom end
-    12: "SPI1_MISO", 13: "SPI1_CS", 14: "SPI1_SCK", 15: "SPI1_MOSI",   # BNO086 on SPI1, bottom-left: nearest the IMU
+    10: "IMU_RST", 11: "SPI1_MOSI",                    # GP11 = SPI1 TX (RP2040 / RP2350): swapped with IMU_INT
+    12: "SPI1_MISO", 13: "SPI1_CS", 14: "SPI1_SCK", 15: "IMU_INT",     # 2026-11-28 (user) so the four SPI lines reach
+                                                       # the Pico pins in order, on top, without crossing
     16: "ENC2_A", 17: "ENC2_B",                        # right encoder, bottom-right: nearest J8
     18: "SPARE", 19: "USER_LED",                       # right: GP18 spare, D4 user LED
     20: "M2_IN1", 21: "M2_IN2",                        # right motor, PWM slice 2 A/B
@@ -173,7 +174,7 @@ BOM = [
     # ILIM = 0.5 V / (100 uA/A x RISET) = 5000 / R -> 4.3 k = 1.16 A: two stalled motors draw 2.33 A, under the
     # 2.49 A boost CC limit, so 5V1 holds; Pololu advises <= 25 % of stall (~0.35 A) continuous - firmware limits that.
     ("R8 R9", "4.3k", "Device:R", _R, "MP6550 ISET: current limit 1.16 A per motor (both stalled 2.33 A < boost 2.49 A)"),
-    ("C12 C13", "100pF 50V", "Device:C", _C, "MP6550 VISEN filter (<= 500 pF)"),
+    ("C12 C13", "100pF 50V", "Device:C", _C, "MP6550 VISEN filter (<= 500 pF), placed at the Pico ADC pins GP26 / GP27"),
     ("R10", "100k", "Device:R", _R, "MOTOR_EN (both nSLEEP_HB) pull-down"),
     # Motor + encoder wiring (user 2026-11-27): the JST connectors J3 / J4 are dropped (not in the BOM); the motor cable
     # ends are soldered straight to 2 mm pads, named on silk, in the Pololu 4761 encoder order (pad n = encoder pin n).
@@ -425,9 +426,11 @@ def build_nets():
         add(f"{m}_V3P3", c33, 1), add("GND", c33, 2)
         add(f"{m}_ISET", riset, 1), add("GND", riset, 2)
         add(f"{m}_ISENSE", cvis, 1), add("GND", cvis, 2)
-        # wire pads, Pololu 4761 order: 1 GND, 2 B, 3 A, 4 VCC (3V3), 5 M2, 6 M1
+        # wire pads, Pololu 4761 order: 1 GND, 2 B, 3 A, 4 VCC (3V3), 5 M2, 6 M1. OUT1 -> M2 pad and OUT2 -> M1 pad
+        # (user 2026-11-28): OUT1 / OUT2 sit on opposite sides of the MP6550, so this order lets both outputs run
+        # straight down to the pads without crossing; firmware inverts the direction (or swaps IN1 / IN2).
         add("GND", jw, 1), add(f"ENC{k}_B", jw, 2), add(f"ENC{k}_A", jw, 3), add("3V3", jw, 4)
-        add(f"{m}_OUT2", jw, 5), add(f"{m}_OUT1", jw, 6)
+        add(f"{m}_OUT1", jw, 5), add(f"{m}_OUT2", jw, 6)
     add("MOTOR_EN", "R10", 1), add("GND", "R10", 2)
     # --- 5.1 V boost ---
     add("BAT", "U5", 3), add("BOOST_SW", "U5", 2), add("BOOST_EN", "U5", 7)
@@ -518,45 +521,48 @@ _P = {
     # CELLx runs from the top pad down to its fuse (F1 / F2) under the holder (wide trace, both layers at routing).
     "BT1": (BT_POS["BT1"][0], BT_POS["BT1"][1], 180), "BT2": (BT_POS["BT2"][0], BT_POS["BT2"][1], 180),
     # USB-C at the top edge, CC resistors and VBUS cap beside it (channel x +-8.9 between the holder courtyards)
-    "J5": (0.0, -93.0, 0), "C20": (-7.5, -93.0, 90), "R13": (7.1, -95.0, 90), "R14": (7.1, -91.4, 90),
-    # charger below the cover pillar (y > -56)
+    "J5": (0.0, -93.0, 0), "C20": (4.3, -44.6, 270), "R13": (-3.0, -89.3, 270), "R14": (1.8, -89.3, 270),
+    # charger below the cover pillar (y > -56), stage-3 routing layout: U6 rotated 180 so its SW / BTST / REGN / PMID /
+    # VBUS row faces down; L1 (rotated) SW pad right under the SW pins, then the BTST, REGN and PMID caps in pin order,
+    # the VBUS cap at the VBUS / VAC corner, SYS caps on the left, the BAT cap at the top-left corner
     "R15": (-6.0, -29.0, 90), "R16": (-3.0, -29.0, 90), "R17": (0.0, -29.0, 90), "R18": (3.0, -29.0, 90),
     "R19": (6.0, -29.0, 90),
-    "U6": (0.0, -47.0, 180), "C21": (4.7, -41.4, 90), "C22": (7.3, -41.4, 90), "C26": (2.8, -41.4, 90),
-    "C25": (-6.6, -44.0, 90), "C23": (-4.0, -48.0, 90), "C24": (-6.6, -48.0, 90),
-    "L1": (-3.5, -38.5, 0), "C27": (1.0, -41.4, 90), "R36": (0.0, -20.0, 90),
+    "U6": (0.0, -47.0, 180), "C21": (3.0, -40.9, 270), "C22": (5.0, -40.9, 270), "C26": (0.6, -39.8, 270),
+    "C25": (-4.0, -50.8, 0), "C23": (-5.6, -44.0, 180), "C24": (-5.6, -46.6, 180),
+    "L1": (-2.79, -38.4, 180), "C27": (-0.55, -42.8, 270), "R36": (0.0, -20.0, 90),
     "D1": (-6.0, -20.0, 90), "R20": (-3.0, -20.0, 90), "TH1": (5.0, -21.3, 0),
-    # per-cell fuse + reverse-polarity FETs, below the holder + ends
-    "F1": (-14.0, -1.5, 90), "Q1": (-14.0, 6.0, 0), "Q3": (-9.0, 6.0, 0),
-    "R28": (-9.5, 2.0, 0), "R30": (-9.5, 10.0, 0), "R32": (-13.5, 10.5, 0),
-    "F2": (14.0, -1.5, 90), "Q2": (14.0, 6.0, 0), "Q4": (9.0, 6.0, 0),
-    "R29": (9.5, 2.0, 0), "R31": (9.5, 10.0, 0), "R33": (13.5, 10.5, 0),
+    # per-cell fuse + reverse-polarity FETs below the holders' - ends (stage-3 layout): fuse cell side up toward the CELL+
+    # feed, FET drain under the fuse, sources toward the centre on one BAT bus; gate parts below the bus
+    "F1": (-14.0, -1.5, 270), "Q1": (-14.0, 6.0, 180), "Q3": (-9.5, 10.5, 0),
+    "R28": (-10.6, 2.8, 0), "R30": (-9.5, 13.4, 0), "R32": (-14.5, 11.5, 0),
+    "F2": (14.0, -1.5, 270), "Q2": (14.0, 6.0, 0), "Q4": (9.5, 11.3, 0),
+    "R29": (11.0, 8.75, 180), "R31": (13.0, 13.9, 0), "R33": (13.5, 11.0, 0),
     # Pico on its sockets, micro-USB end up; 6 mm higher than the review (user): antenna end 8 mm from the IMU
     "U1": (0.0, 52.5, 0),
     # left column: UART header, MOTOR_EN pull-down, boost
     "R10": (-14.5, 45.0, 0),
-    "U5": (-20.0, 56.0, 0), "L2": (-20.0, 64.0, 0), "C16": (-26.5, 50.0, 0), "C17": (-26.5, 54.0, 0),
-    "C18": (-26.5, 58.0, 0), "C14": (-14.5, 52.0, 0), "C15": (-14.5, 56.0, 0), "R11": (-14.5, 59.5, 0),
-    "R12": (-20.0, 52.0, 0), "C19": (-20.0, 50.0, 0),
+    "U5": (-21.5, 56.0, 180), "L2": (-16.4, 56.3, 270), "C16": (-21.4, 59.0, 0), "C17": (-21.4, 61.4, 0),
+    "C18": (-21.4, 63.8, 0), "C14": (-15.7, 52.6, 0), "C15": (-15.7, 50.2, 0), "R11": (-14.5, 59.5, 0),
+    "R12": (-19.1, 52.9, 0), "C19": (-19.1, 51.3, 0),
     # right column: slide switch at the micro-USB height, TPS22810 path, VBAT sense, LEDs
     "SW1": (20.25, 28.3, 0), "R34": (15.2, 27, 90), "R21": (15.2, 31.5, 90), "R22": (25.5, 27, 90),
-    "R23": (25.5, 31.5, 90), "U7": (20.25, 39.5, 0), "C28": (15.5, 39.5, 90), "C29": (25.0, 39.5, 90),
-    "D2": (20.25, 44.5, 0), "R24": (20.25, 47, 0), "R26": (15.5, 50.5, 90), "R27": (15.5, 54.5, 90),
+    "R23": (25.5, 31.5, 90), "U7": (20.25, 39.5, 0), "C28": (15.5, 39.5, 270), "C29": (25.0, 39.5, 90),
+    "D2": (20.25, 44.5, 0), "R24": (20.25, 47.0, 180), "R26": (15.5, 50.5, 90), "R27": (15.5, 54.5, 90),
     "C30": (18.5, 54.5, 90), "D3": (24.5, 50, 90), "R25": (24.5, 54, 90), "D4": (20.25, 62.5, 0),
     "R35": (16.0, 62.5, 0),
     # motor drivers beside the Pico's lower end, wire pads and vertical connectors at the bottom edge
-    "U3": (-20.0, 76.0, 0), "C6": (-24.0, 76.0, 90), "C8": (-26.5, 76.0, 90), "C10": (-16.0, 76.0, 90),
-    "R8": (-20.0, 80.0, 0), "C12": (-20.0, 72.3, 0),
-    "U4": (20.0, 76.0, 0), "C7": (24.0, 76.0, 90), "C9": (26.5, 76.0, 90), "C11": (16.0, 76.0, 90),
-    "R9": (20.0, 80.0, 0), "C13": (20.0, 72.3, 0),
+    "U3": (-20.0, 76.0, 0), "C6": (-16.4, 73.8, 90), "C8": (-19.75, 79.15, 270), "C10": (-22.45, 78.5, 270),
+    "R8": (-18.2, 79.2, 270), "C12": (11.6, 51.9, 90),
+    "U4": (20.0, 76.0, 0), "C7": (24.6, 73.8, 90), "C9": (20.25, 79.15, 270), "C11": (17.55, 78.5, 270),
+    "R9": (21.8, 79.2, 270), "C13": (11.6, 48.0, 90),
     # wire pads near the bottom corners (user): pad bottoms 2.5 mm from the edge, outer pad 4.25 mm from the bolt centre
     # (> the 3.75 mm head keep-out); the motor cables come in over the bottom edge
     "J7": (-16.0, 96.0, 0), "J8": (16.0, 96.0, 0),
     # IMU at the centre bottom
-    "U2": (0.0, 89.0, 0), "Y1": (5.0, 89.0, 90), "C1": (3.0, 93.6, 90), "C2": (6.0, 93.6, 90),
-    "C3": (-3.0, 93.6, 90), "C4": (-6.0, 93.6, 90), "C5": (0.0, 93.6, 90),
-    "R1": (-6.0, 82.0, 90), "R2": (-4.0, 82.0, 90), "R3": (-2.0, 82.0, 90), "R4": (0.0, 82.0, 90), "R7": (2.0, 82.0, 90),
-    "R5": (4.0, 82.0, 90), "R6": (6.0, 82.0, 90), "TP1": (-6.5, 87.0, 0), "TP2": (-10.5, 87.0, 0),
+    "U2": (0.0, 89.0, 180), "Y1": (-4.1, 90.0, 270), "C1": (-7.1, 91.6, 180), "C2": (-7.1, 88.4, 180),
+    "C3": (-0.6, 93.45, 270), "C4": (-2.15, 93.45, 270), "C5": (4.1, 90.6, 0),
+    "R1": (4.6, 88.75, 180), "R2": (2.3, 96.9, 0), "R3": (4.6, 92.45, 180), "R4": (-5.0, 66.5, 180), "R7": (4.6, 94.3, 180),
+    "R5": (4.6, 84.9, 180), "R6": (4.6, 86.75, 180), "TP1": (5.5, 96.3, 0), "TP2": (8.6, 96.3, 0),
 }
 PLACEMENT = _P
 

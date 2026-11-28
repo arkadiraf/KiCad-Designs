@@ -12,7 +12,7 @@ import os
 import sys
 import urllib.request
 
-URL = os.environ.get("FUSION_MCP_URL", "http://127.0.0.1:60594/mcp")   # the port changes when Fusion restarts
+URL = os.environ.get("FUSION_MCP_URL", "http://127.0.0.1:64528/mcp")   # the port changes when Fusion restarts
 
 
 def post(body, sid=None):

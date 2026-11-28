@@ -25,7 +25,7 @@ design doc (block diagram, circuits, pin map, mechanics, parts list, open decisi
 | 0 | Folder, datasheets, outline + holes from the DXF (checked against Fusion), placement guides, BOM, design doc | **done** |
 | 1 | Decisions closed (motor, cells, TS fixed, UVLO option, placement); follow-up: BAT fuse | done |
 | 2 | Netlist in `design.py`, KD symbols/footprints (BNO086, MP6550, Pico socket, 1042, USB4235, slide switch, 1812L, wire pads), schematic | **done** |
-| 3 | Placement (first pass done: 94 parts, DRC clean), silkscreen for hand assembly, 3D render; routing next | in progress |
+| 3 | Placement, silkscreen, routing (2 layers): DRC 0 violations, 0 unconnected | **done** |
 | 4 | DRC, fab outputs | |
 
 ![stage 0 guides](docs/board_stage0.png)
@@ -91,7 +91,7 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 * **Charger temperature left out:** TS is held in its normal window by R19 10 k (TH1 not fitted), so charging never stops for temperature.
 * **Charging and sleep:** the robot is never driven while charging. It is left switched off to charge slowly. If the power is left on, firmware drops MOTOR_EN and BOOST_EN, sleeps the IMU and sends the Pico dormant. The TPS22810 UVLO is the last backstop: **3.30 V on / 2.70 V off by default** (R21 = 156 k, R22 = 100 k, R23 = 1.27 M; your choice for plain cells). The internal 2.54 / 2.41 V needs R21 = 0 Ω and R22 / R23 left off. Firmware sleeps well above it.
 * **Placement:** boost on the left beside the Pico, above the left driver. Slide switch centred between the Pico and the right board edge, at the micro-USB height, with the Pico power path (TPS22810, D2, power LED) below it.
-* **Pin map v2** (`design.PINMAP`, placement-matched): BNO086 on SPI1 (GP12–GP15) with RST GP10, INT GP11, WAKE GP22. Left motor M1 on GP8/9 with encoder GP6/7; right motor M2 on GP20/21 with encoder GP16/17. MOTOR_EN GP2, BOOST_EN GP3, CHG STAT/PG GP4/5, user LED GP19 (no button), ADC GP26–28. SPI wiring follows the SparkFun breakout v10 (`design.BNO086_PINS`).
+* **Pin map v2** (`design.PINMAP`, placement-matched): BNO086 on SPI1 (MISO GP12, CS GP13, SCK GP14, MOSI GP11) with RST GP10, INT GP15, WAKE GP22. GP11 and GP15 were swapped on 28 Nov so all four SPI lines reach the Pico in order on the top layer. GP11 is SPI1 TX on both the RP2040 and the RP2350, so firmware sets MOSI = GP11 and INT = GP15. Left motor M1 on GP8/9 with encoder GP6/7; right motor M2 on GP20/21 with encoder GP16/17. MOTOR_EN GP2, BOOST_EN GP3, CHG STAT/PG GP4/5, user LED GP19 (no button), ADC GP26–28. SPI wiring follows the SparkFun breakout v10 (`design.BNO086_PINS`).
 * **Slide switch:** NKK AS12AP (non-shorting, 360-2121-ND), the only switch ordered, on the TPS22810 EN/UVLO pin, signal only. Its 0.6 mm pins go into 0.9 mm holes.
   * **Slide up (toward the cells) = ON**, marked ON / OFF on the silkscreen. NKK Series AS: the actuator at the terminal-1 end connects 2-1, and pin 1 goes to BAT through R34.
   * R34 (1 k) stays, so a shorting switch would also work. It adds 0.6 % to the divider top, which shifts the turn-on threshold from 3.30 to about 3.32 V.
@@ -155,6 +155,25 @@ python fusion_mcp.py view_top.py && python screenshot.py ../../docs/fusion_revie
 * **JST SH motor connectors (J3 / J4):** vertical BM06B-SRSS-G-TB (Mouser 306-6BSRSSGTBLPP), with footprint `Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical`. Pins 1–6 follow the same order as J7 / J8, and MP goes to GND. They take the Pololu 4765 cable without cutting it. Dropped on V01 in favour of soldered wires. Any already bought are spare.
 * **UART0 debug header (J6):** 1×4, 2.54 mm: GND, GP0 TX, GP1 RX, 3V3. Dropped on V01. GP0 / GP1 are spare.
 
+## Routing (stage 3)
+
+Two layers, 1.6 mm, all parts on top. DRC (KiCad 10.0.8) shows 0 violations, 0 unconnected items and 0 schematic-parity issues. Copper: [top](docs/cu_f.png), [bottom](docs/cu_b.png).
+
+* **Hand-routed in `tools/routes.py`** (power first, section by section):
+  * **USB-C:** VBUS loop and a 1.2 mm lane down the channel. D+ steps across the row gap, D− crosses on the bottom.
+  * **Charger:** a tight SW → L1 loop, caps fanned out in pin order, 0.3 mm thermal vias under U6. VSET has no copper.
+  * **Cells:** CELL+ 2 mm on both layers, the fuse into the FET drain, then one 1.2 mm BAT bus.
+  * **Boost:** the output loop runs straight across C16–C18, and the FB tie goes through a via.
+  * **Motor drivers:**
+    * 5V1 at 1 mm. The right driver is fed on the bottom along the board edge.
+    * OUT1 → M2 pad and OUT2 → M1 pad, so neither crosses. Firmware inverts the motor direction.
+    * The VISEN filter caps C12 / C13 sit at the Pico ADC pins.
+  * **Pico power path:** VSYS reaches pin 39 on the bottom.
+  * **IMU SPI:** all four lines on the top, crossing-free and with no vias, outside the antenna keep-out. MOSI moved to GP11 for this, and INT to GP15.
+* **Everything else:** `tools/router.py` (2-layer A* on a 0.2 mm grid). It treats the hand-routed copper as existing and joins the groups of each net that are still apart.
+* **GND:** a pour on both layers, plus stitching vias at the caps and pads.
+* **Pico W antenna:** copper keep-out on both layers (rule area).
+
 ## Regenerate
 
 ```sh
@@ -165,7 +184,9 @@ python gen_schematic.py       # PicoBalancer.kicad_sch from build_nets()
 "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" sch export netlist -o ../build/net.net ../PicoBalancer.kicad_sch
 python check_netlist.py ../build/net.net     # prints NETLIST OK
 "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" sch erc -o ../build/erc.rpt ../PicoBalancer.kicad_sch
-"C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py     # PicoBalancer.kicad_pcb, lib tables, prints IMPORT OK
+"C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py geom    # placed board + hand routes, build/geometry.json
+python -u router.py                                              # build/routes.json (a few minutes)
+"C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py finish  # imports the routes, GND pours, fills
 "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" pcb drc --output ../build/drc.txt ../PicoBalancer.kicad_pcb
 ```
 

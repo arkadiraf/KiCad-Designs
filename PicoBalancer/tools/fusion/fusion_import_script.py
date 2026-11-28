@@ -1,6 +1,6 @@
 
 import adsk.core, adsk.fusion, json
-DATA = json.loads('{"step": "C:/WorkSpace_Projects/KiCad-Designs/PicoBalancer/build/PicoBalancer.step", "colors": {"pico": [0, 135, 75], "metal": [185, 185, 190], "conn": [235, 228, 210], "switch": [40, 40, 40], "white": [245, 245, 245]}, "extras": [["J5", 0.0, -93.0, 8.94, 3.16, 6.5, "conn", 0], ["U1 Pico W", 0.0, 52.5, 21.0, 51.0, 1.0, "pico", 8.5], ["U1 micro-USB", 0.0, 28.3, 7.5, 5.5, 2.7, "metal", 9.5], ["SW1", 20.25, 28.3, 5.4, 9.8, 9.1, "switch", 0], ["SW1 actuator", 20.25, 28.3, 2.4, 2.4, 2.5, "white", 9.1]]}')
+DATA = json.loads('{"step": "C:/WorkSpace_Projects/KiCad-Designs/PicoBalancer/build/PicoBalancer.step", "colors": {"pico": [0, 135, 75], "metal": [185, 185, 190], "conn": [235, 228, 210], "switch": [40, 40, 40], "white": [245, 245, 245]}, "pico_step": "C:/WorkSpace_Projects/KiCad-Designs/PicoBalancer/build/PicoW.stp", "pico": {"x": 0.0, "y": 52.5, "z0": 8.5}, "extras": [["J5", 0.0, -93.0, 8.94, 3.16, 6.5, "conn", 0], ["SW1", 20.25, 28.3, 5.4, 9.8, 9.1, "switch", 0], ["SW1 actuator", 20.25, 28.3, 2.4, 2.4, 2.5, "white", 9.1]]}')
 TOP = -0.39            # PCB top face, cm
 def run(context):
     app = adsk.core.Application.get()
@@ -9,7 +9,7 @@ def run(context):
     log = []
     for i in range(root.occurrences.count - 1, -1, -1):
         o = root.occurrences.item(i)
-        if o.component.name.startswith('PCB_Review') or o.component.name.startswith('PCB_KiCad'):
+        if o.component.name.startswith('PCB_Review') or o.component.name.startswith('PCB_KiCad') or o.component.name.startswith('PCB_Pico'):
             nm = o.name; o.deleteMe(); log.append('deleted ' + nm)
     # 1. KiCad board (STEP)
     m = adsk.core.Matrix3D.create()
@@ -25,6 +25,38 @@ def run(context):
     bb = occ.boundingBox
     log.append('PCB_KiCad bbox mm x[%.2f, %.2f] y[%.2f, %.2f] z[%.2f, %.2f]' % (
         bb.minPoint.x*10, bb.maxPoint.x*10, bb.minPoint.y*10, bb.maxPoint.y*10, bb.minPoint.z*10, bb.maxPoint.z*10))
+    # 1b. official Pico W model on the sockets
+    pocc = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
+    pcomp = pocc.component
+    pcomp.name = 'PCB_Pico_W'
+    popts = im.createSTEPImportOptions(DATA['pico_step'])
+    popts.isViewFit = False
+    im.importToTarget(popts, pcomp)
+    brd = usb = None
+    for o in pcomp.allOccurrences:
+        n = o.component.name
+        if usb is None and 'FCI' in n: usb = o.boundingBox
+        if brd is None and ('Dielectric' in n or '.brd' in n): brd = o.boundingBox
+    if brd is None: brd = pocc.boundingBox
+    cx = (brd.minPoint.x + brd.maxPoint.x) / 2; cy = (brd.minPoint.y + brd.maxPoint.y) / 2
+    bot = brd.minPoint.z
+    flip = usb is not None and (usb.minPoint.y + usb.maxPoint.y) / 2 < cy     # USB must point to +y (board top)
+    P = DATA['pico']
+    tx, ty, tz = P['x'] / 10.0, (121.0 - P['y']) / 10.0, TOP + P['z0'] / 10.0
+    m = adsk.core.Matrix3D.create()
+    if flip:
+        m.setToRotation(3.141592653589793, adsk.core.Vector3D.create(0, 0, 1), adsk.core.Point3D.create(0, 0, 0))
+        m.translation = adsk.core.Vector3D.create(tx + cx, ty + cy, tz - bot)
+    else:
+        m.translation = adsk.core.Vector3D.create(tx - cx, ty - cy, tz - bot)
+    pocc.transform2 = m
+    if des.designType == adsk.fusion.DesignTypes.ParametricDesignType:
+        try: des.snapshots.add()
+        except Exception: pass
+    bb = pocc.boundingBox
+    log.append('Pico W: brd %s usb %s flip %s; bbox mm x[%.2f, %.2f] y[%.2f, %.2f] z[%.2f, %.2f]' % (
+        brd is not None, usb is not None, flip, bb.minPoint.x*10, bb.maxPoint.x*10, bb.minPoint.y*10, bb.maxPoint.y*10,
+        bb.minPoint.z*10, bb.maxPoint.z*10))
     # 2. blocks for parts without a KiCad model
     tbm = adsk.fusion.TemporaryBRepManager.get()
     eocc = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())

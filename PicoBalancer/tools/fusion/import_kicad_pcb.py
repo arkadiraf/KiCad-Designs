@@ -9,7 +9,10 @@ What the Fusion script does:
 * deletes the old "PCB_Review" (stage 0b blocks) and any earlier "PCB_KiCad*" occurrence;
 * imports build/PicoBalancer.step (KiCad board, pads, silkscreen, all 3D models except the holders BT1 / BT2 -
   the Fusion holders stay) into a new component "PCB_KiCad" at the old PCB position;
-* adds "PCB_KiCad_Extras": blocks for parts without a KiCad 3D model (Pico module + micro-USB, USB4235, slide switch).
+* imports the official Raspberry Pi Pico W STEP (build/PicoW.stp, from datasheets.raspberrypi.com/picow/PicoW-step.zip,
+  downloaded 2026-11-28 on user request) as "PCB_Pico_W", seated on the sockets (board bottom 8.5 mm above the PCB),
+  micro-USB towards the board top edge (the Pico 2 W has the same outline);
+* adds "PCB_KiCad_Extras": blocks for parts without a KiCad 3D model (USB4235, slide switch).
 Placement: STEP exported with origin at the board centre (x right, y up, board bottom z = 0).
 Fusion: x_f = x, y_f = 121 + y_step, z_f = -5.5 + z (PCB bottom face at -5.5 mm, top at -3.9 mm).
 """
@@ -25,7 +28,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PRJ = os.path.dirname(os.path.dirname(HERE))
 STEP = os.path.join(PRJ, "build", "PicoBalancer.step")
 KICAD_CLI = "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe"
-EXTRA_REFS = ("U1 Pico W", "U1 micro-USB", "J5", "SW1", "SW1 actuator")
+EXTRA_REFS = ("J5", "SW1", "SW1 actuator")
+PICO_STEP = os.path.join(PRJ, "build", "PicoW.stp")
+PICO = {"x": design.PLACEMENT["U1"][0], "y": design.PLACEMENT["U1"][1], "z0": 8.5}   # board mm, Pico bottom above PCB top
 COLORS = {"pico": (0, 135, 75), "metal": (185, 185, 190), "conn": (235, 228, 210), "switch": (40, 40, 40),
           "white": (245, 245, 245)}
 
@@ -34,11 +39,11 @@ def export_step():
     refs = ",".join(r for r in design.PLACEMENT if not r.startswith("BT"))
     ox, oy = design.ORIGIN_X, design.ORIGIN_Y
     subprocess.run([KICAD_CLI, "pcb", "export", "step", "-o", STEP, "--user-origin", f"{ox}x{oy}mm",
-                    "--component-filter", refs, "--include-pads", "--include-silkscreen", "--no-dnp",
+                    "--component-filter", refs, "--include-pads", "--include-tracks", "--include-silkscreen", "--no-dnp",
                     "--subst-models", os.path.join(PRJ, f"{design.PROJECT}.kicad_pcb")], check=True)
 
 
-data = {"step": STEP.replace("\\", "/"), "colors": COLORS,
+data = {"step": STEP.replace("\\", "/"), "colors": COLORS, "pico_step": PICO_STEP.replace("\\", "/"), "pico": PICO,
         "extras": [list(p) for p in design.REVIEW_PARTS if p[0] in EXTRA_REFS]}
 
 SCRIPT = r'''
@@ -52,7 +57,7 @@ def run(context):
     log = []
     for i in range(root.occurrences.count - 1, -1, -1):
         o = root.occurrences.item(i)
-        if o.component.name.startswith('PCB_Review') or o.component.name.startswith('PCB_KiCad'):
+        if o.component.name.startswith('PCB_Review') or o.component.name.startswith('PCB_KiCad') or o.component.name.startswith('PCB_Pico'):
             nm = o.name; o.deleteMe(); log.append('deleted ' + nm)
     # 1. KiCad board (STEP)
     m = adsk.core.Matrix3D.create()
@@ -68,6 +73,38 @@ def run(context):
     bb = occ.boundingBox
     log.append('PCB_KiCad bbox mm x[%.2f, %.2f] y[%.2f, %.2f] z[%.2f, %.2f]' % (
         bb.minPoint.x*10, bb.maxPoint.x*10, bb.minPoint.y*10, bb.maxPoint.y*10, bb.minPoint.z*10, bb.maxPoint.z*10))
+    # 1b. official Pico W model on the sockets
+    pocc = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
+    pcomp = pocc.component
+    pcomp.name = 'PCB_Pico_W'
+    popts = im.createSTEPImportOptions(DATA['pico_step'])
+    popts.isViewFit = False
+    im.importToTarget(popts, pcomp)
+    brd = usb = None
+    for o in pcomp.allOccurrences:
+        n = o.component.name
+        if usb is None and 'FCI' in n: usb = o.boundingBox
+        if brd is None and ('Dielectric' in n or '.brd' in n): brd = o.boundingBox
+    if brd is None: brd = pocc.boundingBox
+    cx = (brd.minPoint.x + brd.maxPoint.x) / 2; cy = (brd.minPoint.y + brd.maxPoint.y) / 2
+    bot = brd.minPoint.z
+    flip = usb is not None and (usb.minPoint.y + usb.maxPoint.y) / 2 < cy     # USB must point to +y (board top)
+    P = DATA['pico']
+    tx, ty, tz = P['x'] / 10.0, (121.0 - P['y']) / 10.0, TOP + P['z0'] / 10.0
+    m = adsk.core.Matrix3D.create()
+    if flip:
+        m.setToRotation(3.141592653589793, adsk.core.Vector3D.create(0, 0, 1), adsk.core.Point3D.create(0, 0, 0))
+        m.translation = adsk.core.Vector3D.create(tx + cx, ty + cy, tz - bot)
+    else:
+        m.translation = adsk.core.Vector3D.create(tx - cx, ty - cy, tz - bot)
+    pocc.transform2 = m
+    if des.designType == adsk.fusion.DesignTypes.ParametricDesignType:
+        try: des.snapshots.add()
+        except Exception: pass
+    bb = pocc.boundingBox
+    log.append('Pico W: brd %s usb %s flip %s; bbox mm x[%.2f, %.2f] y[%.2f, %.2f] z[%.2f, %.2f]' % (
+        brd is not None, usb is not None, flip, bb.minPoint.x*10, bb.maxPoint.x*10, bb.minPoint.y*10, bb.maxPoint.y*10,
+        bb.minPoint.z*10, bb.maxPoint.z*10))
     # 2. blocks for parts without a KiCad model
     tbm = adsk.fusion.TemporaryBRepManager.get()
     eocc = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
