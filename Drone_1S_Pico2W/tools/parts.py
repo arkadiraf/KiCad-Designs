@@ -29,25 +29,25 @@ FRAME_MPN = {
     "R6": (YAGEO, "RC0603FR-0730K9L", "ok", "BQ25606 datasheet 9.3.5"),
     "TH1": ("Semitec", "103AT-2", "ok", "10 k +-1 %, B 3435 K +-1 %, radial 2.54 mm"),
     "C1": ("Samsung", "CL10B105KA8NNNC", "verify", "1 uF 25 V X7R 0603"),
-    "C2 C23": (MURATA, "GRM21BR61C106KE15L", "ok", "10 uF 16 V X5R 0805"),
-    "C3 C4": (MURATA, "GRM21BR61C106KE15L", "ok", "16 V part on the 10 V lines: less DC-bias loss"),
-    "C5": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
+    "C2 C23": (MURATA, "GRM21BR61E106KA73L", "ok", "10 uF 25 V X5R 0805 (user 2026-11-28, in stock at Digi-Key)"),
+    "C3 C4": (MURATA, "GRM21BR61E106KA73L", "ok", "25 V part on the 4.4 V line: less DC-bias loss"),
+    "C5": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
     "C6": (MURATA, "GRM188R61A475KE15D", "ok", "4.7 uF 10 V X5R 0603"),
     "C7": (MURATA, "GRM188R71H473KA61D", "ok", "47 nF 50 V X7R 0603"),
     "D1": ("Lite-On", "LTST-C171KRKT", "verify", "red 0805 (LEDs are 0805 in this repo)"),
     "R7": (YAGEO, "RC0603FR-072K2L", "ok", ""),
-    "U2": (TI, "TPS22810DBVR", "ok", "SOT-23-6 (DBV)"),
+    "U2": (TI, "TPS22810DBVT", "ok", "SOT-23-6 (DBV); DBVT = small reel of the same part (user 2026-11-28, in stock)"),
     "SW1": ("Nidec Components", "CUS-12TB", "ok", "user 2026-11-28 (APEM MA12R/TR obsolete); PCM12 land pattern"),
     "C8 C9": (MURATA, "GRM188R71C105KA12D", "ok", "1 uF 16 V X7R 0603"),
     "R8 R9 R10": (YAGEO, "RC0603FR-07156KL / -07100KL / -071M27L", "DNP", "UVLO divider option (internal lockout used)"),
     "D2": ("onsemi", "MBR120VLSFT1G", "ok", "VSYS back-feed Schottky, SOD-123FL (as PicoBalancer D2)"),
-    "U3 U4 U5 U6": (TI, "TPS22997RYZR", "ok", ""),
-    "C10 C11 C12 C13": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
-    "C14 C15 C16 C17": (MURATA, "GRM188R71H332KA01D", "ok", "3.3 nF 50 V X7R 0603 (stock book; >= 30 V needed)"),
+    "U3 U4 U5 U6": (TI, "TPS22998RYZR", "ok", "TPS22997RYZR out of stock (user 2026-11-28); same RYZ footprint, pins 4/6 differ, no PG"),
+    "C10 C11 C12 C13": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
+    "R15 R16 R17 R18": (YAGEO, "RC0603JR-070RL", "ok", "0R 0603, CT strap (stock book)"),
     "R11 R12 R13 R14": (YAGEO, "RC0603FR-07100KL", "ok", ""),
-    "U7": (TI, "TPS61235PRWLT", "ok", "also sold as the larger reel TPS61235PRWLR"),
+    "U7": (TI, "TPS61235PRWLR", "ok", "R reel variant ordered (same part as RWLT; as PicoBalancer)"),
     "L2": ("Wurth Elektronik", "74438357010", "ok", "same part as L1; TPS61235P wants 0.7-1.3 uH effective"),
-    "C18 C19": (MURATA, "GRM21BR61C106KE15L", "ok", ""),
+    "C18 C19": (MURATA, "GRM21BR61E106KA73L", "ok", ""),
     "C20 C21 C22": ("Samsung", "CL31B226KPHNFNE", "ok", "22 uF 10 V X7R 1206 (user pick, Digi-Key 1276-3145-1-ND)"),
     "R19": (YAGEO, "RC0603FR-07100KL", "ok", ""),
     "R20": (YAGEO, "RC0603FR-0749K9L", "ok", "CC 2.49 A (E24 fallback 51k = 2.44 A)"),
@@ -60,13 +60,13 @@ FRAME_PLACED = [
      ("Sullins", "PRPC040SAAN-RC", "ok", "1x40 break-away strip, cut to 4 + 3")),
     ("J5 J6", 2, "B2B socket 1x10 2.00 mm SMD, frame bottom (mates with FC J1/J2)",
      ("Sullins", "NPPN101BFLD-RC", "ok", "4.6 mm tall, 7 mm printed spacers; nylon: hand-solder after reflow; footprint update pending")),
-    ("J7", 1, "JST-SH 4 vertical (top entry), Pi USB", ("JST", "BM04B-SRSS-TB(LF)(SN)", "ok", "frame top, under the Pi's USB port")),
+    ("J7", 1, "JST-SH 4 vertical (top entry), Pi USB", ("JST", "BM04B-SRSS-TBT(LF)(SN)", "ok", "frame top, under the Pi's USB port; TBT = TB + pick-and-place cap (peel off), BM04B-SRSS-TB not available")),
     ("J8", 1, "JST-PH 2 vertical, Pi 5.1 V", ("JST", "B2B-PH-K-S(LF)(SN)", "ok", "")),
 ]
 
 # FC module: refs, qty, value, (mfr, MPN, status, note)
 FC_PARTS = [
-    ("U1", 1, "Raspberry Pi Pico 2 W", ("Raspberry Pi", "SC1633", "verify", "Pico 2 W without headers")),
+    ("U1", 1, "Raspberry Pi Pico 2 W", ("Raspberry Pi", "SC1633", "ok", "Pico 2 W without headers; ordered from Mouser (user 2026-11-28), not Digi-Key")),
     ("U2", 1, "BMI088 IMU", ("Bosch Sensortec", "BMI088", "ok", "pin 2 (NC) to GND per Bosch")),
     ("U3", 1, "BMP390 barometer", ("Bosch Sensortec", "BMP390", "ok", "replaces the obsolete BMP388, same LGA-10 footprint")),
     ("C1 C2", 2, "100nF 16V", (MURATA, "GRM188R71H104KA93D", "ok", "100 nF 50 V X7R 0603")),
@@ -77,7 +77,7 @@ FC_PARTS = [
     ("J9", 1, "JST-SH 3 horizontal, SWD", ("JST", "SM03B-SRSS-TB(LF)(SN)", "DNP", "fit when SWD is needed")),
     ("SW1", 1, "BOOTSEL tactile switch", ("Aratas (formerly Omron)", "B3U-1000PM-B", "ok", "with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole)")),
     # added at routing (stage 2/3, 2026-11-28): sensor supply filter, pull-ups, DShot series resistors
-    ("L1", 1, "1uH 0603 (sensor supply filter, 3V3 -> 3V3_SENS)", ("TDK", "MLZ1608N1R0LT000", "verify", "as the Crazyflie Bolt 1.1 (MLZ1608); a few mA load - any 1 uH 0603 with Idc >= 100 mA fits; Digi-Key PN to find")),
+    ("L1", 1, "1uH 0603 (sensor supply filter, 3V3 -> 3V3_SENS)", ("TDK", "MLZ1608N1R0LT000", "ok", "as the Crazyflie Bolt 1.1 (MLZ1608); 700 mA rated (Digi-Key lists Isat 140 mA) for a few mA load")),
     ("C3", 1, "4.7uF 10V 0603 (3V3_SENS bulk)", (MURATA, "GRM188R61A475KAAJD", "ok", "stock book")),
     ("R1 R2", 2, "4.7k 0603 (I2C pull-ups)", (YAGEO, "RC0603FR-074K7L", "ok", "stock book")),
     ("R3 R4 R5 R6", 4, "100R 0603 (DShot series)", (YAGEO, "RC0603FR-07100RL", "ok", "stock book")),
@@ -113,11 +113,16 @@ MECH_PARTS = [
 
 # Cables and their mating housings / contacts (frame and FC connectors). Crimp parts or pre-crimped leads.
 CABLE_PARTS = [
-    ("J7 cable", 1, "JST SH 4-pin housing (to frame J7, Pi USB)", ("JST", "SHR-04V-S-B", "ok", "frame end; Pi end soldered to the Pi Zero 2 W USB test pads")),
-    ("J7 cable", 4, "JST SH crimp contact 28-32 AWG", ("JST", "SSH-003T-P0.2-H", "ok", "or pre-crimped SH leads (28 AWG, ~100 mm)")),
-    ("J8 cable", 1, "JST PH 2-pin housing (to frame J8, Pi 5.1 V)", ("JST", "PHR-2", "ok", "frame end; Pi end to GPIO pins 4 (5 V) / 6 (GND), soldered or a 1x2 2.54 mm housing")),
-    ("J8 cable", 2, "JST PH crimp contact 24-30 AWG", ("JST", "SPH-002T-P0.5S", "ok", "24-26 AWG for up to 2.5 A; or pre-crimped PH leads")),
-    ("Wire", 1, "silicone wire 26 AWG, red + black, ~0.5 m each (J8) and 28-30 AWG for J7", ("any", "silicone hookup wire", "TBD", "")),
+    # 2026-11-28 (user): pre-wired leads from the local supplier instead of housings + crimp contacts (SH crimping needs
+    # JST's tool; SHR-04V-S-B was not at Digi-Key). Frame end plugs into J7 / J8, the free end is soldered at the Pi.
+    ("J7 cable", 1, "JST SH-style 4-pin female, single-ended, 12 cm leads (to frame J7, Pi USB)",
+     ("4project (Pololu 5520)", "4P-7209 / POL-5520", "ok",
+      "local: 4project.co.il/product/jst-sh-style-cable-4pin-single-ended-female-12cm; Pi end soldered to the Pi Zero 2 W "
+      "USB test pads (GND, D-, D+, GND); 'SH-style' clone - check the fit in J7 on the first build")),
+    ("J8 cable", 1, "JST PH 2-pin female with wires (to frame J8, Pi 5.1 V)",
+     ("4project", "4P-682", "ok",
+      "local: 4project.co.il/product/jst-ph-2pin-connector-with-wires; Pi end to GPIO pin 4 (5 V) / 6 (GND); "
+      "check the wire gauge (>= 26 AWG for the Pi Zero 2 W's ~1 A, peaks higher) and match the red lead to J8's + pin (set in the frame netlist)")),
 ]
 
 
@@ -138,13 +143,15 @@ DIGIKEY = {
     "RC0603FR-07226RL": ("311-226HRCT-ND", ""),
     "RC0603FR-07150RL": ("311-150HRCT-ND", ""),
     "103AT-2": ("4316-103AT-2-ND", "bulk"),
-    "GRM21BR61C106KE15L": ("490-3886-1-ND", ""),
+    "GRM21BR61C106KE15L": ("490-3886-1-ND", "replaced by GRM21BR61E106KA73L (25 V)"),
+    "GRM21BR61E106KA73L": ("490-5523-1-ND", "user, Nov 2026 (digikey.co.il)"),
     "GRM188R61A475KE15D": ("490-10477-1-ND", "OBSOLETE - Digi-Key upgrade: GRM188R61A475KAAJD (490-14373-1-ND)"),
     "GRM188R71H473KA61D": ("", "not found at Digi-Key under this MPN - pick an active 47 nF 0603"),
     "LTST-C191KRKT": ("160-1447-1-ND", "0603 - replaced by the 0805 LTST-C171KRKT"),
     "LTST-C171KRKT": ("160-1427-1-ND", "Digi-Key PN from memory - confirm"),
     "RC0603FR-072K2L": ("311-2.20KHRCT-ND", ""),
-    "TPS22810DBVR": ("296-45297-1-ND", ""),
+    "TPS22810DBVR": ("296-45297-1-ND", "large reel - the frame orders TPS22810DBVT"),
+    "TPS22810DBVT": ("296-45304-1-ND", "user, Nov 2026 (digikey.co.il)"),
     "PCM12SMTR": ("401-2016-1-ND", "LAST-TIME BUY - replaced by Nidec CUS-12TB"),
     "MA12RTR": ("", "OBSOLETE - replaced by Nidec CUS-12TB"),
     "CUS-12TB": ("563-1102-1-ND", "active, 12 weeks lead time (user, Nov 2026)"),
@@ -152,10 +159,10 @@ DIGIKEY = {
     "RC0603FR-07156KL": ("311-156KHRCT-ND", ""),
     "RC0603FR-07100KL": ("311-100KHRCT-ND", ""),
     "RC0603FR-071M27L": ("311-1.27MHRCT-ND", ""),
-    "TPS22997RYZR": ("296-TPS22997RYZRCT-ND", ""),
     "GRM188R71H103KA01D": ("", "end of life at distributors - replaced by 3.3 nF 50 V (stock)"),
     "RC0603FR-0747KL": ("311-47.0KHRCT-ND", ""),
-    "TPS61235PRWLT": ("296-44628-1-ND", ""),
+    "TPS61235PRWLT": ("296-44628-1-ND", "the frame orders TPS61235PRWLR"),
+    "TPS61235PRWLR": ("296-47376-1-ND", "R reel variant (user cart, Nov 2026)"),
     "GRM31CR61A226KE19L": ("", "not found at Digi-Key - replaced by Samsung CL31B226KPHNFNE"),
     "CL31B226KPHNFNE": ("1276-3145-1-ND", "active (user, Nov 2026)"),
     "PRPC040SAAN-RC": ("S1011EC-40-ND", "bulk"),
@@ -166,8 +173,16 @@ DIGIKEY = {
     "A03SR03SR30K51B": ("455-3708-ND", "not used: the Raspberry Pi Debug Probe's own SH-3 cable is used for J9"),
     "B3U-1000PM-B": ("39-B3U-1000PM-BCT-ND", "in stock at digikey.co.il (user, Nov 2026)"),
     "SM04B-SRSS-TB(LF)(SN)": ("455-SM04B-SRSS-TBCT-ND", ""),
-    "BM04B-SRSS-TB(LF)(SN)": ("455-BM04B-SRSS-TBCT-ND", ""),
+    "BM04B-SRSS-TB(LF)(SN)": ("455-BM04B-SRSS-TBCT-ND", "not available (user, Nov 2026) - BM04B-SRSS-TBT ordered"),
+    "BM04B-SRSS-TBT(LF)(SN)": ("455-BM04B-SRSS-TBTCT-ND", ""),
+    "MLZ1608N1R0LT000": ("445-6753-1-ND", "cut tape"),
+    "TPS22998RYZR": ("296-TPS22998RYZRCT-ND", "user cart, Nov 2026"),
+    "TPS22997RYZR": ("296-TPS22997RYZRCT-ND", "OUT OF STOCK (user, Nov 2026) - replaced by TPS22998RYZR"),
     "B2B-PH-K-S(LF)(SN)": ("455-1704-ND", "bulk"),
+    "SHR-04V-S-B": ("455-1379-ND", "out of stock at Digi-Key (25 wk, Nov 2026): SHR-04V-S (455-1394-ND) mates the same header"),
+    "SSH-003T-P0.2-H": ("455-2963-1-ND", "cut tape"),
+    "PHR-2": ("455-1165-ND", ""),
+    "SPH-002T-P0.5S": ("455-1127-1-ND", "cut tape"),
     "SC1633": ("2648-SC1633CT-ND", ""),
     "BMI088": ("828-1082-1-ND", ""),
     "BMP388": ("828-1079-1-ND", "OBSOLETE - replaced by BMP390"),
@@ -193,6 +208,16 @@ DATASHEETS = {
          "-25..+70 C. PCB pads 0.8 x 1.7 mm at +-1.7 mm (2.6 inner / 4.2 outer) = KiCad SW_SPST_B3U-1000P centres "
          "(KiCad pads 0.9 mm wide). BOOTSEL current is below the 1 mA rating minimum - normal for a logic button."),
     ],
+    "TPS22998RYZR": [
+        ("TPS22998RYZR_TI_datasheet.pdf",
+         "CONFIRMED (SLVSG05A): RYZ pinout 1 VBIAS, 2-4 VIN, 5 GND, 6-8 VOUT, 9 CT, 10 ON (no PG, no QOD pin; QOD fixed "
+         "50 Ohm). VIN 0.2-5.5 V, VBIAS 2.2-5.5 V, 10 A; RON 4 mOhm typ, 6 max (VBIAS 5 V) / 7 max (VBIAS 3.3 V); ON "
+         "VIH 0.765-1.035 V, VIL 0.595-0.805 V; CT tri-state: tRISE at VIN 3.3 V = 0.15 ms open / 1.23 ms VBIAS / 2.48 ms "
+         "GND; TSD 130-180 C (150 typ), 20 C hysteresis. Package = TPS22997 RYZ0010A (same land pattern)."),
+    ],
+    "BM04B-SRSS-TBT(LF)(SN)": [
+        ("JST_SH_series_catalog.pdf", "BM04B-SRSS-TB with a pick-and-place suction cap (JST TBT suffix); same footprint."),
+    ],
     "BM04B-SRSS-TB(LF)(SN)": [
         ("JST_SH_series_catalog.pdf",
          "SH 1.0 mm top-entry (BM type), same family / housing SHR-04V-S-B as SM04B. Footprint = KiCad stock "
@@ -211,6 +236,11 @@ DATASHEETS = {
         ("JST_PH_series_catalog.pdf",
          "CONFIRMED: PH 2.0 mm, 2 A, 100 V, -40..+105 C; through-hole top entry: holes 0.7 +0.1/-0 mm at 2.0 mm = KiCad "
          "JST_PH_B2B-PH-K (0.75 mm drill) and the frame's DXF holes (0.75 mm); JST suggests the larger end (0.8) for FR4."),
+    ],
+    "GRM21BR61E106KA73L": [
+        ("(no Murata page for this MPN in the repo yet)",
+         "10 uF +-10 %, 25 Vdc, X5R, 0805 (Digi-Key listing 490-5523-1-ND). Thickness and DC-bias curve to confirm "
+         "from the Murata page; same 0805 land pattern."),
     ],
     "GRM21BR61C106KE15L": [
         ("GRM21BR61C106KE15L_Murata_catalog_page.pdf",
@@ -281,6 +311,10 @@ DATASHEETS = {
          "KiCad SW_SPDT_PCM12 pad positions (terminals -2.25/+0.75/+2.25 mm, bosses +-1.5 mm, shell tabs) and = "
          "BetzDrive apem-MA12RTR.kicad_mod. Common = middle terminal (pad 2 = SW_SPDT pin B). Use: EN/UVLO signal at "
          "<= 4.2 V, uA - within rating in current; the 4 VDC figure is a switching rating. Actuator side to the frame edge."),
+    ],
+    "TPS22810DBVT": [
+        ("TPS22810DBVR_TI_datasheet.pdf",
+         "Same device and DBV package as TPS22810DBVR (T = 250-piece reel, R = 3000): everything confirmed for DBVR applies."),
     ],
     "TPS22810DBVR": [
         ("TPS22810DBVR_TI_datasheet.pdf",

@@ -320,9 +320,9 @@ FRAME_PLACE = {
     "C20": (17.4, 14.6, 0, "B"), "C21": (17.4, 17.0, 0, "B"), "C22": (17.4, 19.4, 0, "B"),   # output 3 x 22 uF
     "R19": (12.6, 19.0, 0, "B"), "R20": (12.6, 20.7, 0, "B"),
 }
-# per ESC header Jk: (TPS22997, VIN cap, CT cap, ON pull-down)
-FRAME_MOTOR_BLOCKS = {"J1": ("U3", "C10", "C14", "R11"), "J2": ("U4", "C11", "C15", "R12"),
-                      "J3": ("U5", "C12", "C16", "R13"), "J4": ("U6", "C13", "C17", "R14")}
+# per ESC header Jk: (TPS22998, VIN cap, CT strap 0R, ON pull-down)
+FRAME_MOTOR_BLOCKS = {"J1": ("U3", "C10", "R15", "R11"), "J2": ("U4", "C11", "R16", "R12"),
+                      "J3": ("U5", "C12", "R17", "R13"), "J4": ("U6", "C13", "R18", "R14")}
 
 FRAME_BOM = [
     # --- charger: BQ25606 from USB-C ---
@@ -348,9 +348,9 @@ FRAME_BOM = [
     # Datasheet pin table: 1 uF on VBUS close to the IC, 10 uF on PMID; 10.2.2.2: ~22 uF input for 3 A charging
     # -> 2 x 10 uF on PMID (the input capacitor of the buck, placed first in the layout order).
     ("C1", "1uF 25V", "Device:C", _C, "VBUS, close to pin 24 (VBUS up to 13.5 V)"),
-    ("C2 C23", "10uF 16V", "Device:C", _C08, "PMID, buck input (~22 uF total for 3 A)"),
-    ("C3 C4", "10uF 16V", "Device:C", _C08, "SYS"),
-    ("C5", "10uF 16V", "Device:C", _C08, "BAT"),
+    ("C2 C23", "10uF 25V", "Device:C", _C08, "PMID, buck input (~22 uF total for 3 A)"),
+    ("C3 C4", "10uF 25V", "Device:C", _C08, "SYS"),
+    ("C5", "10uF 25V", "Device:C", _C08, "BAT"),
     ("C6", "4.7uF 10V", "Device:C", _C, "REGN"),
     ("C7", "47nF 16V", "Device:C", _C, "BTST bootstrap"),
     ("D1", "LED red 0805", "Device:LED", "LED_SMD:LED_0805_2012Metric", "STAT charge indicator (optional), from SYS as TI's diagram"),
@@ -373,16 +373,20 @@ FRAME_BOM = [
     # TPS22810 output. Costs ~0.3 V at the Pico (its buck-boost runs down to 1.8 V); GPIO29 reads VSYS after D2.
     ("D2", "Schottky 20V 1A (MBR120VLSFT1G)", "Device:D_Schottky", "Diode_SMD:D_SOD-123F",
      "TPS22810 VOUT -> VSYS, blocks back-feed from the Pico's own USB"),
-    # --- motor switches: 4 x TPS22997 ---
-    ("U3 U4 U5 U6", "TPS22997", "KD_Power:TPS22997", "KD_Power:Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm",
-     "per-ESC high-side switch, ~7.5 A"),
-    ("C10 C11 C12 C13", "10uF 16V", "Device:C", _C08, "TPS22997 VIN, at the pins"),
-    # TPS22997 datasheet (SLVSGT0) 8.3.2: tR = (0.1302 VIN + 0.0063) CT + 27.8 VIN + 30.5 us -> 3.3 nF at 4.2 V
-    # = ~2.0 ms (inrush ~40 mA into ~20 uF of ESC capacitance). CT pin reaches 15 V: capacitor rated >= 30 V.
-    ("C14 C15 C16 C17", "3.3nF 50V", "Device:C", _C, "CT soft-start ~2 ms (>= 30 V rating, datasheet)"),
+    # --- motor switches: 4 x TPS22998 (2026-11-28, user: TPS22997RYZR out of stock) ---
+    # TPS22998 (SLVSG05A) in the same RYZ0010A package, but pin 4 = VIN (TPS22997: PG) and pin 6 = VOUT (TPS22997: QOD):
+    # 1 VBIAS, 2-4 VIN, 5 GND, 6-8 VOUT, 9 CT, 10 ON. No power good; fixed 50 Ohm QOD; ON VIH 0.9 V typ (1.035 max),
+    # VIL 0.7 V; RON 7 mOhm max at VBIAS 3.3 V (0.39 W at 7.5 A); TSD 150 C typ. KD_Power needs a TPS22998 symbol
+    # (or the TPS22997 one with pins 4 / 6 renamed) before the frame netlist.
+    ("U3 U4 U5 U6", "TPS22998", "KD_Power:TPS22997", "KD_Power:Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm",
+     "per-ESC high-side switch, ~7.5 A (TPS22998: symbol to update, pins 4 VIN / 6 VOUT)"),
+    ("C10 C11 C12 C13", "10uF 25V", "Device:C", _C08, "TPS22998 VIN, at the pins"),
+    # CT is a tri-state strap on the TPS22998: GND = slowest (tRISE 2.48 ms at VIN 3.3 V, 3.70 ms at 5 V), VBIAS
+    # = 1.23 ms at 3.3 V, open = 0.15 ms. R15-R18 0R to GND (the old CT-capacitor pads): fitted = slow soft start.
+    ("R15 R16 R17 R18", "0R", "Device:R", _R, "CT strap to GND: slowest rise ~2.5 ms (DNP = fast)"),
     ("R11 R12 R13 R14", "100k", "Device:R", _R, "ON pull-downs: Pico off = motors off"),
-    # PG (2026-11-28): the four TPS22997 PG outputs are tied into one MOTOR_PG line (open drain, wired-AND) to J6;
-    # its 47k pull-up R7 is on the FC (3V3 is not on the header), so the frame has no PG resistors.
+    # PG: the TPS22998 has none, so the frame leaves J6 pin 7 (MOTOR_PG) unconnected; the FC's 47k pull-up R7 holds it
+    # high (reads "good" always) - no FC change. A faulted ESC is found by switching the ON lines one at a time.
     # --- optional 5.1 V boost for the Pi Zero ---
     ("U7", "TPS61235P", "KD_Power:TPS61235P", "KD_Power:Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm", "5.1 V boost, true disconnect"),
     # TPS61235P datasheet SLVSCK4A: FB (6) to VOUT on the fixed 5.1 V part; INACT (8) to AGND (unused); EN (7)
@@ -391,7 +395,7 @@ FRAME_BOM = [
     ("L2", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030",
      "boost inductor (peak ~5.3 A at 2.5 A out, 3.0 V in)"),
     # Boost input on BAT, not SYS (user 2026-11-28, as PicoBalancer): BQ25606 SLUSCK6C wants <= 20 uF on SYS.
-    ("C18 C19", "10uF 16V", "Device:C", _C08, "boost input, on BAT"),
+    ("C18 C19", "10uF 25V", "Device:C", _C08, "boost input, on BAT"),
     ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C12, "boost output"),
     ("R19", "100k", "Device:R", _R, "BOOST_EN pull-down: Pico off = Pi off"),
     # IOUT_CC = 1.244 V / RCC x 100000 -> 49.9 k = 2.49 A (E24 51 k = 2.44 A); 10 nF in parallel (datasheet).

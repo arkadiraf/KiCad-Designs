@@ -28,8 +28,12 @@ yet checked for stock).
 **FC order sheet:** [fabrication/BOM_FC.xlsx](fabrication/BOM_FC.xlsx), the flight-controller parts plus the frame's mating
 sockets J5/J6, the FC standoffs and the SWD cable, for 5 modules (`export_bom.py`). Connector selection and the
 options not taken: [Materials/connector_options/](Materials/connector_options/README.md).
+**Frame order sheet:** [fabrication/BOM_Frame.xlsx](fabrication/BOM_Frame.xlsx), for 3 frames (OSH Park ships in
+threes; `FRAME_ORDER_BOARDS` in `export_bom.py`): sheet *Order* (every frame line: electrical parts, ESC seats, J5/J6,
+J7/J8, cable housings and crimps, frame hardware, with source), *Digi-Key cart* (one line per Digi-Key PN, quantities
+summed, no spares) and *Stock* (sample-book values). J5/J6 also appear in the FC sheet: order them once.
 **Stock parts** (0603 resistors and capacitors from the sample book, 0805 LEDs): [fabrication/BOM_stock.md](fabrication/BOM_stock.md)
-(16 values, with E24 fallbacks for the E96 values); they are left out of the Digi-Key CSV.
+(22 values, with E24 fallbacks for the E96 values); they are left out of the Digi-Key CSV.
 **Frame BOM review** (shared libraries, PicoBalancer lessons, decisions of 28 Nov): [Materials/FRAME_BOM_REVIEW.md](Materials/FRAME_BOM_REVIEW.md).
 **Still to source** (cables, standoffs, screws, inserts, Samtec parts): [fabrication/BOM_to_source.md](fabrication/BOM_to_source.md).
 
@@ -266,9 +270,9 @@ doc. Items marked TO CHECK need the TI datasheet.
 | SW1 | SPDT slide (Nidec CUS-12TB, 563-1102-1-ND; PCM12 land pattern) | `SW_SPDT_PCM12` | power switch on EN/UVLO (signal only) |
 | C8 C9 | 1uF 10V | `C_0603_1608Metric` | TPS22810 VIN / VOUT |
 | R8 R9 R10 | 156k / 100k / 1.27M (DNP option) | `R_0603_1608Metric` | 3.30 / 2.70 V UVLO divider option, NOT fitted: the internal 2.54 / 2.41 V lockout is used (28 Nov) |
-| U3 U4 U5 U6 | TPS22997 | `Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm` | per-ESC high-side switch, ~7.5 A |
+| U3 U4 U5 U6 | TPS22998 (was TPS22997, out of stock) | `Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm` | per-ESC high-side switch, ~7.5 A |
 | C10 C11 C12 C13 | 10uF 10V | `C_0805_2012Metric` | TPS22997 VIN, at the pins |
-| C14 C15 C16 C17 | CT soft-start, TO CHECK (few ms) | `C_0603_1608Metric` | limits inrush into the ESC capacitors |
+| R15 R16 R17 R18 | 0R CT strap to GND (TPS22998: slowest rise ~2.5 ms) | `R_0603_1608Metric` | limits inrush into the ESC capacitors |
 | R11 R12 R13 R14 | 100k | `R_0603_1608Metric` | ON pull-downs: Pico off = motors off |
 | ~~R15-R18~~ | - | - | removed (28 Nov): the four PG outputs tie into MOTOR_PG, pull-up R7 on the FC |
 | D2 | Schottky MBR120VLSFT1G | `D_SOD-123F` | TPS22810 VOUT -> VSYS, blocks back-feed from the Pico's USB (28 Nov) |

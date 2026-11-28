@@ -3,27 +3,23 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Texas Instruments,BQ25606RGER,296-47743-1-ND,Frame U1,"BQ25606 (Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm); 1S 3 A standalone charger, power path",ok,
 2,Wurth Elektronik,74438357010,732-11197-1-ND,"Frame L1, Frame L2","1uH, Isat 6.2 A (Wurth 74438357010) (L_Wuerth_MAPI-4030); charger buck inductor",ok,"WE-MAPI 4030, 1 uH, Isat 6.2 A, 3.1 mm tall; replaces XAL4020-102MEC (in stock); in stock (user, Nov 2026)"
 1,Semitec,103AT-2,4316-103AT-2-ND,Frame TH1,10k NTC 103AT-2 (PinHeader_1x02_P2.54mm_Vertical); cell temperature for the BQ25606 TS pin (0-60 C window with R5/R6),ok,"10 k +-1 %, B 3435 K +-1 %, radial 2.54 mm; bulk"
-11,Murata,GRM21BR61C106KE15L,490-3886-1-ND,"Frame C2 C23, Frame C3 C4, Frame C5, Frame C10 C11 C12 C13, Frame C18 C19","10uF 16V (C_0805_2012Metric); PMID, buck input (~22 uF total for 3 A)",ok,10 uF 16 V X5R 0805
-1,Texas Instruments,TPS22810DBVR,296-45297-1-ND,Frame U2,"TPS22810DBV (SOT-23-6); Pico VSYS switch, internal 2.54 / 2.41 V UVLO",ok,SOT-23-6 (DBV)
+11,Murata,GRM21BR61E106KA73L,490-5523-1-ND,"Frame C2 C23, Frame C3 C4, Frame C5, Frame C10 C11 C12 C13, Frame C18 C19","10uF 25V (C_0805_2012Metric); PMID, buck input (~22 uF total for 3 A)",ok,"10 uF 25 V X5R 0805 (user 2026-11-28, in stock at Digi-Key); user, Nov 2026 (digikey.co.il)"
+1,Texas Instruments,TPS22810DBVT,296-45304-1-ND,Frame U2,"TPS22810DBV (SOT-23-6); Pico VSYS switch, internal 2.54 / 2.41 V UVLO",ok,"SOT-23-6 (DBV); DBVT = small reel of the same part (user 2026-11-28, in stock); user, Nov 2026 (digikey.co.il)"
 1,Nidec Components,CUS-12TB,563-1102-1-ND,Frame SW1,SPDT slide (Nidec CUS-12TB) (SW_SPDT_PCM12); power switch on EN/UVLO (signal only),ok,"user 2026-11-28 (APEM MA12R/TR obsolete); PCM12 land pattern; active, 12 weeks lead time (user, Nov 2026)"
 1,onsemi,MBR120VLSFT1G,MBR120VLSFT1GOSCT-ND,Frame D2,"Schottky 20V 1A (MBR120VLSFT1G) (D_SOD-123F); TPS22810 VOUT -> VSYS, blocks back-feed from the Pico's own USB",ok,"VSYS back-feed Schottky, SOD-123FL (as PicoBalancer D2); Digi-Key PN as PicoBalancer"
-4,Texas Instruments,TPS22997RYZR,296-TPS22997RYZRCT-ND,Frame U3 U4 U5 U6,"TPS22997 (Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm); per-ESC high-side switch, ~7.5 A",ok,
-1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",ok,also sold as the larger reel TPS61235PRWLR
+4,Texas Instruments,TPS22998RYZR,296-TPS22998RYZRCT-ND,Frame U3 U4 U5 U6,"TPS22998 (Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm); per-ESC high-side switch, ~7.5 A (TPS22998: symbol to update, pins 4 VIN / 6 VOUT)",ok,"TPS22997RYZR out of stock (user 2026-11-28); same RYZ footprint, pins 4/6 differ, no PG; user cart, Nov 2026"
+1,Texas Instruments,TPS61235PRWLR,296-47376-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",ok,"R reel variant ordered (same part as RWLT; as PicoBalancer); R reel variant (user cart, Nov 2026)"
 3,Samsung,CL31B226KPHNFNE,1276-3145-1-ND,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,ok,"22 uF 10 V X7R 1206 (user pick, Digi-Key 1276-3145-1-ND); active (user, Nov 2026)"
 1,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,Frame J1 J2 J3 J4,"2.54 mm male header strip 1x40 (ESC seats: 28 pins, 4 + 3 per ESC)",ok,"1x40 break-away strip, cut to 4 + 3; bulk"
 4,Sullins,NPPN101BFLD-RC,S5902-10-ND,"Frame J5 J6, Qwiic deck J1 J2","B2B socket 1x10 2.00 mm SMD, frame bottom (mates with FC J1/J2)",ok,"4.6 mm tall, 7 mm printed spacers; nylon: hand-solder after reflow; footprint update pending; user, Nov 2026"
-1,JST,BM04B-SRSS-TB(LF)(SN),455-BM04B-SRSS-TBCT-ND,Frame J7,"JST-SH 4 vertical (top entry), Pi USB",ok,"frame top, under the Pi's USB port"
+1,JST,BM04B-SRSS-TBT(LF)(SN),455-BM04B-SRSS-TBTCT-ND,Frame J7,"JST-SH 4 vertical (top entry), Pi USB",ok,"frame top, under the Pi's USB port; TBT = TB + pick-and-place cap (peel off), BM04B-SRSS-TB not available"
 1,JST,B2B-PH-K-S(LF)(SN),455-1704-ND,Frame J8,"JST-PH 2 vertical, Pi 5.1 V",ok,bulk
-1,Raspberry Pi,SC1633,2648-SC1633CT-ND,FC U1,Raspberry Pi Pico 2 W,verify,Pico 2 W without headers
+1,Raspberry Pi,SC1633,2648-SC1633CT-ND,FC U1,Raspberry Pi Pico 2 W,ok,"Pico 2 W without headers; ordered from Mouser (user 2026-11-28), not Digi-Key"
 1,Bosch Sensortec,BMI088,828-1082-1-ND,FC U2,BMI088 IMU,ok,pin 2 (NC) to GND per Bosch
 1,Bosch Sensortec,BMP390,828-BMP390CT-ND,FC U3,BMP390 barometer,ok,"replaces the obsolete BMP388, same LGA-10 footprint; active (user, Nov 2026)"
 2,Samtec,TMM-110-01-T-S-SM-P-TR,612-TMM-110-01-T-S-SM-P-CT-ND,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),ok,"same SM footprint as -04; 3.20 mm tin post: TRIM to ~1.9 mm after soldering, else the deck hangs ~1.3 mm lower; pull off the -P pick-and-place cap; cut tape (user, Nov 2026)"
 2,Wurth Elektronik,62001011121,732-62001011121-ND,FC J1 J2,2.00 mm male 1x10 THT (to the frame),ok,"plastic 2.0, pin 4.0: ~3.6 mm into the Sullins socket on the 7 mm spacers; user, Nov 2026"
 0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
 1,Aratas (formerly Omron),B3U-1000PM-B,39-B3U-1000PM-BCT-ND,FC SW1,BOOTSEL tactile switch,ok,"with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole); in stock at digikey.co.il (user, Nov 2026)"
-1,TDK,MLZ1608N1R0LT000,,FC L1,"1uH 0603 (sensor supply filter, 3V3 -> 3V3_SENS)",verify,as the Crazyflie Bolt 1.1 (MLZ1608); a few mA load - any 1 uH 0603 with Idc >= 100 mA fits; Digi-Key PN to find
+1,TDK,MLZ1608N1R0LT000,445-6753-1-ND,FC L1,"1uH 0603 (sensor supply filter, 3V3 -> 3V3_SENS)",ok,as the Crazyflie Bolt 1.1 (MLZ1608); 700 mA rated (Digi-Key lists Isat 140 mA) for a few mA load; cut tape
 1,JST,SM04B-SRSS-TB(LF)(SN),455-SM04B-SRSS-TBCT-ND,Qwiic deck J3,"Qwiic: JST SH 4-pin right-angle (GND, 3V3, SDA, SCL)",ok,"bottom, rear edge"
-1,JST,SHR-04V-S-B,,Cable J7 cable,"JST SH 4-pin housing (to frame J7, Pi USB)",ok,frame end; Pi end soldered to the Pi Zero 2 W USB test pads
-4,JST,SSH-003T-P0.2-H,,Cable J7 cable,JST SH crimp contact 28-32 AWG,ok,"or pre-crimped SH leads (28 AWG, ~100 mm)"
-1,JST,PHR-2,,Cable J8 cable,"JST PH 2-pin housing (to frame J8, Pi 5.1 V)",ok,"frame end; Pi end to GPIO pins 4 (5 V) / 6 (GND), soldered or a 1x2 2.54 mm housing"
-2,JST,SPH-002T-P0.5S,,Cable J8 cable,JST PH crimp contact 24-30 AWG,ok,24-26 AWG for up to 2.5 A; or pre-crimped PH leads

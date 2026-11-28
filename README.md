@@ -9,6 +9,13 @@ KiCad Design Projects
 
 | [Libraries](Libraries/) | Shared KiCad symbols and footprints for reuse across designs (KD_Power: BQ25606, TPS22997, TPS22810DBV, TPS61235P; KD_Sensors: BMI088, BMP388; KD_Modules: Pico 2 W; KD_Connectors: Bitcraze deck socket; KD_Mechanical: NPTH mounting holes) |
 
+## Ordering (all projects)
+
+One Digi-Key order covers every board: `python Orders/combined_order.py <cart.xlsx> [boards=5]` reads each project's
+`fabrication/BOM_DigiKey.csv` (and the Pico_Alvik_Adapter parts list), multiplies by the board count and checks the
+cart export, writing `Combined_DigiKey_order.xlsx` next to it (need per project, cart quantity, OK / EXTRA / SHORT /
+MISSING / not in any BOM, lines to add, parts bought elsewhere). Order of 28 Nov 2026 (5 of each board, Pico 2 W / Pico W from Mouser): [Orders/2026-11-28/](Orders/2026-11-28/).
+
 ## Design rules (all projects)
 
 * **Passives:** chip resistors and capacitors are **0603**. Bulk capacitors (10 µF and up, or where the
