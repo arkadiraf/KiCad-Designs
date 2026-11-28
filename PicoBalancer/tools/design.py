@@ -190,7 +190,7 @@ BOM = [
     ("C14 C15", "10uF 16V", "Device:C", _C08, "boost input, on BAT (user 2026-11-27)"),
     ("C16 C17 C18", "22uF 10V", "Device:C", _C12, "boost output, >= 20 uF effective at 5.1 V"),
     ("R11", "100k", "Device:R", _R, "BOOST_EN pull-down"),
-    ("R12", "49.9k", "Device:R", _R, "boost CC limit 2.49 A"),
+    ("R12", "51k", "Device:R", _R, "boost CC limit 2.44 A (E24; 49.9k = 2.49 A)"),
     ("C19", "10nF 16V", "Device:C", _C, "CC pin, parallel to R12"),
     # --- charger: BQ25606 + vertical USB-C (values from Drone_1S_Pico2W, checked against SLUSCK6C) ---
     ("J5", "USB-C receptacle vertical (GCT USB4235-03-C)", "Connector:USB_C_Receptacle_USB2.0_16P",
@@ -199,13 +199,13 @@ BOM = [
      "Package_DFN_QFN:Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm", "1S 3 A charger, power path (thermal vias 0.3 mm added at routing: the stock _ThermalVias variant uses 0.2 mm drills)"),
     ("L1", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "charger buck inductor"),
     ("R13 R14", "5.1k", "Device:R", _R, "USB-C CC1 / CC2 pull-downs"),
-    ("R15", "226", "Device:R", _R, "ICHG 3.0 A (1.5 A per cell)"),
+    ("R15", "240", "Device:R", _R, "ICHG 2.82 A (1.41 A per cell; E24, 226 = 3.0 A)"),
     ("R16", "150", "Device:R", _R, "ILIM 3.19 A"),
-    ("R17", "5.23k", "Device:R", _R, "TS divider top (0-60 C)"),
-    ("R18", "30.9k", "Device:R", _R, "TS divider bottom"),
+    ("R17", "5.1k", "Device:R", _R, "TS divider top (E24; 2-61 C with an NTC)"),
+    ("R18", "30k", "Device:R", _R, "TS divider bottom (E24)"),
     ("TH1", "10k NTC 103AT-2", "Device:Thermistor_NTC", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
      "cell temperature (DNP: charger temperature left out, user 2026-11-27)"),
-    # TS fixed (no NTC): bottom = R18 30.9k || R19 10k = 7.55k, top R17 5.23k -> TS = 0.591 x REGN, inside the BQ25606
+    # TS fixed (no NTC): bottom = R18 30k || R19 10k = 7.5k, top R17 5.1k -> TS = 0.595 x REGN (E24 values from the sample book (user 2026-11-28)), inside the BQ25606
     # normal window (between its 10 C and 45 C thresholds) -> charging always allowed, no temperature cut-off.
     ("R19", "10k", "Device:R", _R, "fixed TS resistor in place of TH1 (charger temperature left out)"),
     ("C20", "1uF 25V", "Device:C", _C, "VBUS"),
@@ -231,9 +231,10 @@ BOM = [
     ("R34", "1k", "Device:R", _R, "slide switch BAT leg (AS12AP is non-shorting; R34 kept so a shorting switch also works)"),
     ("C28 C29", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
     # UVLO by population (user 2026-11-27, both options on the board). Slide switch common -> R21 -> EN/UVLO:
-    #   DEFAULT (user 2026-11-27) R21 = 156k (switch -> EN), R22 = 100k (EN -> GND), R23 = 1.27M (VOUT -> EN, hysteresis):
-    #            3.30 V on / 2.70 V off (checked on Drone_1S_Pico2W against SLVSDH0C). Switch off = EN to GND either way.
-    ("R21", "156k", "Device:R", _R, "UVLO divider top, slide switch -> EN (3.30 / 2.70 V; 0R = internal 2.54 / 2.41 V)"),
+    #   DEFAULT (user 2026-11-27) R21 = 150k (switch -> EN), R22 = 100k (EN -> GND), R23 = 1.27M (VOUT -> EN, hysteresis):
+    #            3.22 V on / 2.65 V off (EN 1.23 V rising / 1.13 V falling, SLVSDH0C; 156k gave 3.30 / 2.70 V - E24 150k
+    #            from the sample book, user 2026-11-28). Switch off = EN to GND either way.
+    ("R21", "150k", "Device:R", _R, "UVLO divider top, slide switch -> EN (3.22 / 2.65 V; 0R = internal 2.54 / 2.41 V)"),
     ("R22", "100k", "Device:R", _R, "UVLO divider bottom, EN -> GND"),
     ("R23", "1.27M", "Device:R", _R, "UVLO hysteresis, VOUT -> EN"),
     # Pico datasheet "Powering Pico": external supply into VSYS through a Schottky, so the Pico's own USB

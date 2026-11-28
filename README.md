@@ -15,6 +15,8 @@ One Digi-Key order covers every board: `python Orders/combined_order.py <cart.xl
 `fabrication/BOM_DigiKey.csv` (and the Pico_Alvik_Adapter parts list), multiplies by the board count and checks the
 cart export, writing `Combined_DigiKey_order.xlsx` next to it (need per project, cart quantity, OK / EXTRA / SHORT /
 MISSING / not in any BOM, lines to add, parts bought elsewhere). Order of 28 Nov 2026 (5 of each board, Pico 2 W / Pico W from Mouser): [Orders/2026-11-28/](Orders/2026-11-28/).
+Stock passives (0603 R / C sample book, 0805 LEDs) for all boards: `python Orders/stock_passives.py [boards=5]` ->
+`Stock_passives.xlsx` (checklist with a Have column) and `Stock_passives.md`.
 
 ## Design rules (all projects)
 

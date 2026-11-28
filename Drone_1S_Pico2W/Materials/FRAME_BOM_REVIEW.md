@@ -23,17 +23,17 @@ the options not taken (cell FETs, PPTC, NKK switches, PMEG6020ER) stay in PicoBa
 | USB-C | J10 | GCT USB4105-GF-A | stock / stock `USB_C_..._USB4105` | yes (spec rev A3) | ok |
 | Charger | U1 | BQ25606RGER | KD_Power / stock RGE0024H | yes | ok |
 | | L1 | Wurth 74438357010 1 uH | stock / `L_Wuerth_MAPI-4030` | yes | ok |
-| | R1-R6, C1-C7, D1, R7 | CC 5.1k, ICHG 226R, ILIM 150R, TS 5.23k / 30.9k, caps, STAT LED | stock | stock parts | C1 / D1 MPN to confirm; C7 47 nF MPN not at Digi-Key |
+| | R1-R6, C1-C7, D1, R7 | CC 5.1k, ICHG 240R (E24), ILIM 150R, TS 5.1k / 30k (E24, 2-61 C), caps, STAT LED | stock | stock parts | C1 / D1 MPN to confirm; C7 47 nF MPN not at Digi-Key |
 | | TH1 | Semitec 103AT-2 NTC | stock | yes | see decision 3 |
 | Pico switch | U2 | TPS22810DBVT (296-45304-1-ND; = DBVR, small reel) | KD_Power / SOT-23-6 | yes | ok |
 | | SW1 | Nidec CUS-12TB slide | stock `Switch:SW_SPDT` / `SW_SPDT_PCM12` | yes (Nidec CUS catalog) | ok: catalog pad layout = PCM12 (APEM MA12R/TR obsolete) |
-| | R8-R10 | UVLO divider 156k / 100k / 1.27M | stock | stock | DNP: internal 2.54 / 2.41 V lockout (decision 2) |
+| | R8-R10 | UVLO divider 150k / 100k / 1.27M (3.22 / 2.65 V) | stock | stock | DNP: internal 2.54 / 2.41 V lockout (decision 2) |
 | | D2 | onsemi MBR120VLSFT1G Schottky | stock / `D_SOD-123F` | yes | **new** (decision 4) |
 | Motor switches | U3-U6 | **TPS22998RYZR** (TPS22997RYZR out of stock, 28 Nov) | KD_Power RYZ0010A footprint; **symbol to add** (pin 4 VIN, 6 VOUT, no PG) | yes (SLVSG05A) | same footprint; MOTOR_PG not driven (J6 pin 7 open) |
 | | C10-C13, R15-R18, R11-R14 | VIN 10 uF, CT strap 0R to GND (slowest rise ~2.5 ms), ON 100k pull-downs | stock | stock | ok |
 | | ~~R15-R18~~ | PG pull-ups | - | - | **removed** (28 Nov): the four PG outputs are tied into MOTOR_PG, pull-up R7 on the FC |
 | Boost | U7 | TPS61235PRWLT | KD_Power / KD_Power RWL | yes | ok |
-| | L2, C18-C22, R19, R20, C24 | 1 uH, 2 x 10 uF in, 3 x 22 uF out, EN 100k, CC 49.9k + 10 nF | stock | Samsung CL31B226 DC-bias curve missing | input moved to BAT (decision 1) |
+| | L2, C18-C22, R19, R20, C24 | 1 uH, 2 x 10 uF in, 3 x 22 uF out, EN 100k, CC 51k (E24, 2.44 A) + 10 nF | stock | Samsung CL31B226 DC-bias curve missing | input moved to BAT (decision 1) |
 | Connectors | J1-J4 | Sullins PRPC040SAAN-RC 2.54 mm strip (ESC seats) | stock | **missing** (drawing) | ok |
 | | J5 J6 | Sullins NPPN101BFLD-RC | KD_Connectors | yes | ok; **J6 pinout changed** at FC routing (B2B_J2) |
 | | J7 | JST BM04B-SRSS-TB vertical (Pi USB), 455-BM04B-SRSS-TBCT-ND | stock `JST_SH_BM04B..._Vertical` | JST SH catalog | ok; land pattern to confirm against the catalog BM drawing |

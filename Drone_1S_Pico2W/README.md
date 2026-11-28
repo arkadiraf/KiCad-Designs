@@ -254,7 +254,7 @@ doc. Items marked TO CHECK need the TI datasheet.
 | U1 | BQ25606 | `Texas_RGE0024H_VQFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm_ThermalVias` | 1S 3 A standalone charger, power path |
 | L1 | 1uH, Isat >= 3.6 A (Coilcraft XAL4020-102) | `L_Coilcraft_XAL4020-XXX` | charger buck inductor |
 | R1 R2 | 5.1k | `R_0603_1608Metric` | USB-C CC1 / CC2 pull-downs (sink) |
-| R3 | 226 | `R_0603_1608Metric` | ICHG: 3.0 A charge current (doc) |
+| R3 | 240 | `R_0603_1608Metric` | ICHG: 2.82 A charge current (E24; 226 = 3.0 A) |
 | R4 | 150 | `R_0603_1608Metric` | ILIM: 3.2 A input limit (doc) |
 | R5 R6 | TS divider, TO CHECK | `R_0603_1608Metric` | TS bias for the 103AT NTC (REGN divider per datasheet) |
 | TH1 | 10k NTC 103AT-2 | `SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm` | cell temperature, wire-leaded NTC taped to the 18650 |
@@ -269,7 +269,7 @@ doc. Items marked TO CHECK need the TI datasheet.
 | U2 | TPS22810DBV | `SOT-23-6` | Pico VSYS switch, 2.54 V UVLO |
 | SW1 | SPDT slide (Nidec CUS-12TB, 563-1102-1-ND; PCM12 land pattern) | `SW_SPDT_PCM12` | power switch on EN/UVLO (signal only) |
 | C8 C9 | 1uF 10V | `C_0603_1608Metric` | TPS22810 VIN / VOUT |
-| R8 R9 R10 | 156k / 100k / 1.27M (DNP option) | `R_0603_1608Metric` | 3.30 / 2.70 V UVLO divider option, NOT fitted: the internal 2.54 / 2.41 V lockout is used (28 Nov) |
+| R8 R9 R10 | 150k / 100k / 1.27M (DNP option) | `R_0603_1608Metric` | 3.22 / 2.65 V UVLO divider option, NOT fitted: the internal 2.54 / 2.41 V lockout is used (28 Nov) |
 | U3 U4 U5 U6 | TPS22998 (was TPS22997, out of stock) | `Texas_RYZ0010A_WQFN-HR-10_2x1.5mm_P0.5mm` | per-ESC high-side switch, ~7.5 A |
 | C10 C11 C12 C13 | 10uF 10V | `C_0805_2012Metric` | TPS22997 VIN, at the pins |
 | R15 R16 R17 R18 | 0R CT strap to GND (TPS22998: slowest rise ~2.5 ms) | `R_0603_1608Metric` | limits inrush into the ESC capacitors |
@@ -437,7 +437,7 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
     time to land (user 28 Nov)
     (datasheet: 2.00–2.62 V rising, 125 mV hysteresis). An SPDT slide switch ties EN/UVLO to VIN (on) or GND
     (off, < 1 µA shutdown) and only carries the signal. QOD tied to VOUT, CT left open. Option: the
-    R8/R9/R10 divider moves the thresholds to 3.30 V on / 2.70 V off (checked); the switch then feeds the
+    R8/R9/R10 divider (150 k / 100 k / 1.27 M) moves the thresholds to 3.22 V on / 2.65 V off (checked); the switch then feeds the
     divider top instead of EN.
   * **B, motors:** one TPS22997 per ESC, high side, about 7.5 A each.
     * ON comes from a Pico GPIO, with a 100 k pull-down: Pico off means motors off.
@@ -445,12 +445,13 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
     * CT 3.3 nF (≥ 30 V rating) → about 2 ms rise at 4.2 V (SLVSGT0 eq. 1). QOD tied to VOUT. VBIAS on BAT.
 * **Charger:** BQ25606 from USB-C (checked against the TI datasheet SLUSCK6C, `Materials/bom_datasheets/`).
   * 5.1 k pull-downs on CC.
-  * R_ICHG 226 Ω → 3.0 A (677 A·Ω / 226 Ω). R_ILIM 150 Ω → 3.19 A, used only when the adapter reads as
+  * R_ICHG 240 Ω → 2.82 A (677 A·Ω / 240 Ω; E24 from the sample book, 28 Nov - 226 Ω would give 3.0 A). R_ILIM 150 Ω → 3.19 A, used only when the adapter reads as
     "unknown" on D+/D− (a USB host port gets 0.5 A, a DCP 2.4 A).
   * VSET floats (4.208 V). CE to GND (charging on). **OTG (pin 6) to GND**: it must not float. **VAC (pin 1)
     shorted to VBUS.**
-  * TS: 103AT-2 NTC (10 k ±1 %, B 3435 K, radial 2.54 mm leads, footprint 2.54 mm / 1.0 mm drill) with RT1 5.23 kΩ
-    (REGN → TS) and RT2 30.9 kΩ (TS → GND): charging between about 0 and 60 °C, JEITA steps near 11 and 45 °C.
+  * TS: 103AT-2 NTC (10 k ±1 %, B 3435 K, radial 2.54 mm leads, footprint 2.54 mm / 1.0 mm drill) with RT1 5.1 kΩ
+    (REGN → TS) and RT2 30 kΩ (TS → GND), E24 from the sample book (datasheet example 5.23 k / 30.9 k): charging
+    between about 2 and 61 °C, JEITA steps near 12 and 45 °C.
   * 1 µH inductor: Würth WE-MAPI 74438357010 (4.1 × 4.1 × 3.1 mm, Isat 6.2 A). Capacitors: VBUS 1 µF, PMID 2 × 10 µF, SYS 20 µF, BAT 10 µF, REGN 4.7 µF, BTST 47 nF.
   * **Open:** the internal loop compensation wants ≤ 20 µF on SYS. The TPS22810 input (1 µF) and the boost
     input (2 × 10 µF) also sit on SYS, about 41 µF in total.
@@ -458,7 +459,7 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 * **Boost (optional):** TPS61235P, 5.1 V for the Pi Zero, enabled by a Pico GPIO (100 k pull-down). Input on BAT, not
   SYS (user 28 Nov, as PicoBalancer: the BQ25606 wants <= 20 uF on SYS).
   * Checked against SLVSCK4A: FB to VOUT, INACT to AGND, L 1 µH (Würth), CO ≥ 20 µF effective (3 × 22 µF 1206),
-    CC current limit R20 49.9 kΩ = 2.49 A with C24 10 nF in parallel. CC mode is meant for resistive loads, so the
+    CC current limit R20 51 kΩ = 2.44 A (E24; 49.9 k = 2.49 A) with C24 10 nF in parallel. CC mode is meant for resistive loads, so the
     2.5 A limit acts as a fault limit above the Pi's draw.
   * Pico ↔ Pi link: the doc had a JST-SH 4 UART with PI_STATUS. Superseded: the Pi talks to the
     Pico over USB (J7), with no PI_STATUS line.
@@ -472,7 +473,7 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 
 * [ ] Measure full-throttle current per motor (2520 props). It must stay under the XSD7A's 7 A.
 * [ ] Reverse-polarity protection on the ESC power leads.
-* [ ] Internal 2.54 V lockout vs the 2.70 / 3.30 V divider (R1 156 k, R2 100 k, R3 1.27 M).
+* [x] Internal 2.54 V lockout chosen (28 Nov); the DNP divider option is now 150 k / 100 k / 1.27 M = 3.22 / 2.65 V.
 * [ ] Worst-case thresholds against datasheet min/max.
 * [ ] Check the TPS22997 WQFN-HR land pattern for hand assembly.
 
@@ -485,7 +486,11 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
       on 7.0 mm printed spacers with M2 × 20 through-bolts.
 * [ ] OpenSCAD: draw the 7.0 mm printed spacer, update the stack (M2 × 20 bolt, nyloc nut, no standoff) and
       re-run `export_scad.py` + `1S_PiZero_verify.py` (not done: the scad repo is untouched by the 28 Nov update).
-* [ ] Future: landing gear on **M2.5** bolts instead of M2 (user, 28 Nov 2026): H_LG1–4 holes, skid inserts, BOM.
+* [x] Landing gear on **M2.5** bolts (user, 28 Nov 2026): H_LG1–4 are 2.7 mm (OpenSCAD `gear_hole_d`, DXF re-exported),
+      skids take the M2.5 insert (4.0 x 4.0 mm, 7 mm boss), M2.5 x 5 screws; checked: 2.7 mm of board to the edge, 4.4 mm
+      from the head to the nearest pad, head 0.8 mm off the cover rail (no washer wider than 5 mm); 1S_PiZero_verify
+      ALL MATCH. Still open: the gear redesign itself (rear beam vs the charger), and 1S_PiZero_bom.py, which fails on
+      `pcb_t = kc_frame_t` (pre-existing), so the scad BOM file still shows M2.
 * [ ] **Frame rear tab** (user, 28 Nov 2026): the frame grows a tab behind its rear edge (x −50…−40, |y| ≤ 11,
       `FRAME_USB_TAB` in `design.py`) carrying, on the bottom, the USB-C J10 (off-centre, y −4.9) and the slide
       switch SW1 beside it (y +5.6, knob ~1 mm past the rear edge), both opening backwards at the cell's ground end

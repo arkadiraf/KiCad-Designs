@@ -277,7 +277,7 @@ def build():
     note("\n".join(rows), 470, 300, 1.27)
     note("Operating modes: the robot is not driven while charging (switch off). If power is left on, firmware drops\n"
          "MOTOR_EN and BOOST_EN, puts the BNO086 to sleep and sends the Pico dormant. TPS22810 UVLO is the backstop.\n"
-         "UVLO default: R21 156k + R22 100k + R23 1.27M = 3.30 / 2.70 V (R21 0R, R22 / R23 off = internal 2.54 / 2.41 V).\n"
+         "UVLO default: R21 150k + R22 100k + R23 1.27M = 3.22 / 2.65 V (R21 0R, R22 / R23 off = internal 2.54 / 2.41 V).\n"
          "DNP: TH1, R24.  Design doc: docs/PicoBalancer_Hardware_Design.pdf", 20, 395, 1.5)
 
 

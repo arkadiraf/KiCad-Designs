@@ -59,7 +59,7 @@ SCAD = dict(
     pin_hole=1.0,
     center_l=80.0, center_w=44.0,
     crad_hole=(24.0, 9.45 + 6.0 + 2.05), crad_hole_d=2.2,   # rail_in + rail_w + 2.05 (cover + FC standoffs)
-    gear_hole=(35.0, 18.5),                                 # landing-gear skids, own M2 holes
+    gear_hole=(35.0, 18.5), gear_hole_d=2.7,                # landing-gear skids, own M2.5 holes (2026-11-28)
     ph_hole=0.8,
     bat_d=18.4, bat_len=65.2, tab_pad=3.0,
     pi_l=65.0, pi_w=30.0, pi_hole_x=58.0, pi_hole_y=23.0,
@@ -81,8 +81,8 @@ FRAME = dict(
 # are polygons, so the fitted diameter is snapped to the nearest of these.
 HOLE_CLASSES = {
     4.0: "motor_shaft",     # clearance for the shaft end and clip (NPTH)
-    2.2: "m2",              # motor M2 screws and cover/gear M2 screws (NPTH)
-    2.7: "fc_mount",        # old Bolt M2.5 pattern (removed from the scad; none expected)
+    2.2: "m2",              # motor M2 screws and cover / FC M2 bolts (NPTH)
+    2.7: "m25",             # landing-gear M2.5 screws (NPTH; scad gear_hole_d, 2026-11-28 - were M2)
     1.0: "esc_pin",         # ESC header pins (plated, electrical)
     0.75: "jst_ph",         # JST PH pins of J8, Pi 5.1 V (JST ePH drill)
 }
@@ -334,12 +334,12 @@ FRAME_BOM = [
     # 4.1 x 4.1 x 3.1 mm max; land pattern 1 of its datasheet = KiCad L_Wuerth_MAPI-4030. No vias/traces under it.
     ("L1", "1uH, Isat 6.2 A (Wurth 74438357010)", "Device:L", "Inductor_SMD:L_Wuerth_MAPI-4030", "charger buck inductor"),
     ("R1 R2", "5.1k", "Device:R", _R, "USB-C CC1 / CC2 pull-downs (sink)"),
-    ("R3", "226", "Device:R", _R, "ICHG: 3.0 A charge current (doc)"),
+    ("R3", "240", "Device:R", _R, "ICHG: 677/240 = 2.82 A charge current (E24; 226 = 3.0 A)"),
     ("R4", "150", "Device:R", _R, "ILIM: 3.2 A input limit (doc)"),
-    # BQ25606 datasheet SLUSCK6C 9.3.5: 0-60 C window for the 103AT-2: RT1 5.23 k REGN->TS, RT2 30.9 k TS->GND
-    # (the application diagram shows 30.1 k; the worked example gives 30.9 k - used here).
-    ("R5", "5.23k", "Device:R", _R, "TS divider top, REGN -> TS (0-60 C window)"),
-    ("R6", "30.9k", "Device:R", _R, "TS divider bottom, TS -> GND"),
+    # BQ25606 datasheet SLUSCK6C 9.3.5: 0-60 C window for the 103AT-2: RT1 5.23 k REGN->TS, RT2 30.9 k TS->GND.
+    # E24 values from the sample book (user 2026-11-28): 5.1 k / 30 k -> T1 2.0 C, T2 11.9 C, T3 45.4 C, T5 60.8 C (B 3435, typ thresholds 73.3 / 68 / 44.7 / 34.2 %).
+    ("R5", "5.1k", "Device:R", _R, "TS divider top, REGN -> TS (2-61 C window)"),
+    ("R6", "30k", "Device:R", _R, "TS divider bottom, TS -> GND"),
     # Semitec 103AT-2 (AT series datasheet p.12-13): 10.0 k +-1 % at 25 C, B25/85 3435 K +-1 %, radial resin
     # body 3.7 x 2.4 x 4.0 mm max, 0.5 mm square tin-plated leads (0.71 mm diagonal) at 2.54 mm, 17 mm long.
     # -> 2.54 mm pitch, 1.0 mm drill. Stands next to the cell, bead bent onto it and taped.
@@ -366,8 +366,8 @@ FRAME_BOM = [
     # (EN signal only, uA), -20..+70 C. Actuator side faces the frame edge.
     ("SW1", "SPDT slide (Nidec CUS-12TB)", "Switch:SW_SPDT", "Button_Switch_SMD:SW_SPDT_PCM12", "power switch on EN/UVLO (signal only)"),
     ("C8 C9", "1uF 16V", "Device:C", _C, "TPS22810 VIN / VOUT"),
-    ("R8 R9 R10", "156k / 100k / 1.27M (DNP option)", "Device:R", _R,
-     "external 3.30 / 2.70 V UVLO divider - NOT fitted: the internal 2.54 / 2.41 V lockout is the choice (user 2026-11-28)"),
+    ("R8 R9 R10", "150k / 100k / 1.27M (DNP option)", "Device:R", _R,
+     "external 3.22 / 2.65 V UVLO divider (E24 150k) - NOT fitted: the internal 2.54 / 2.41 V lockout is the choice (user 2026-11-28)"),
     # Back-feed Schottky (user 2026-11-28, as PicoBalancer D2): TPS22810 VOUT -> D2 -> VSYS (to the FC). With the Pico's
     # own micro-USB plugged in on the bench, VBUS -> the Pico's Schottky -> VSYS would otherwise back-feed the
     # TPS22810 output. Costs ~0.3 V at the Pico (its buck-boost runs down to 1.8 V); GPIO29 reads VSYS after D2.
@@ -398,8 +398,8 @@ FRAME_BOM = [
     ("C18 C19", "10uF 25V", "Device:C", _C08, "boost input, on BAT"),
     ("C20 C21 C22", "22uF 10V (TO CHECK)", "Device:C", _C12, "boost output"),
     ("R19", "100k", "Device:R", _R, "BOOST_EN pull-down: Pico off = Pi off"),
-    # IOUT_CC = 1.244 V / RCC x 100000 -> 49.9 k = 2.49 A (E24 51 k = 2.44 A); 10 nF in parallel (datasheet).
+    # IOUT_CC = 1.244 V / RCC x 100000 -> 49.9 k = 2.49 A; E24 values from the sample book (user 2026-11-28): 51 k = 2.44 A; 10 nF in parallel (datasheet).
     # CC mode suits resistive / power-managed loads: 2.5 A is a fault limit above the Pi Zero 2 W's draw.
-    ("R20", "49.9k", "Device:R", _R, "boost CC (output current limit) 2.49 A"),
+    ("R20", "51k", "Device:R", _R, "boost CC (output current limit) 2.44 A"),
     ("C24", "10nF 16V", "Device:C", _C, "CC pin, in parallel with R20 (datasheet: 10 nF)"),
 ]

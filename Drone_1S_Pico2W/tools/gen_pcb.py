@@ -582,17 +582,17 @@ def build_frame():
     for h in holes:
         if h["kind"] == "m2" and min(math.hypot(h["x"] - mx, h["y"] - my) for mx, my in MOTORS) < 6:
             continue          # motor screw, already in the motor footprint
-        if h["kind"] != "m2":
+        if h["kind"] not in ("m2", "m25"):
             continue
         ax, ay = abs(h["x"]), abs(h["y"])
-        if math.hypot(ax - SCAD["crad_hole"][0], ay - SCAD["crad_hole"][1]) < 0.1:
-            pre, val = "H_CV", "Cover + FC M2x20 bolt"
-        elif math.hypot(ax - SCAD["gear_hole"][0], ay - SCAD["gear_hole"][1]) < 0.1:
-            pre, val = "H_LG", "Landing gear M2"
+        if h["kind"] == "m2" and math.hypot(ax - SCAD["crad_hole"][0], ay - SCAD["crad_hole"][1]) < 0.1:
+            pre, val, mh = "H_CV", "Cover + FC M2x20 bolt", "MountingHole_2.2mm_M2"
+        elif h["kind"] == "m25" and math.hypot(ax - SCAD["gear_hole"][0], ay - SCAD["gear_hole"][1]) < 0.1:
+            pre, val, mh = "H_LG", "Landing gear M2.5", "MountingHole_2.7mm_M2.5"
         else:
-            raise AssertionError(f"unexpected M2 hole {h}")
+            raise AssertionError(f"unexpected mounting hole {h}")
         cnt[pre] = cnt.get(pre, 0) + 1
-        fp = load_fp("MountingHole", "MountingHole_2.2mm_M2")
+        fp = load_fp("MountingHole", mh)
         fp.SetReference(f"{pre}{cnt[pre]}")
         fp.SetValue(val)
         fp.SetPosition(VS(h["x"], h["y"]))
