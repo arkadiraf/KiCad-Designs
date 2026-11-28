@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# FC module fabrication outputs (kicad-cli, KiCad 10). Run from anywhere: bash tools/export_fab_fc.sh
+# FC / Qwiic deck fabrication outputs (kicad-cli, KiCad 10). Run from anywhere: bash tools/export_fab_fc.sh [fc|deck]
 # Template: PicoBalancer/tools/export_fab.sh.
 #
 # OSH Park 2-layer (docs.oshpark.com): prototype at 1.6 mm (later 0.8 mm "2 layer thin" - same Gerbers).
@@ -19,10 +19,12 @@ zipdir() {   # zipdir out.zip dir  (flat zip of the files in dir)
 out, d = sys.argv[1], sys.argv[2]
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
     for f in sorted(os.listdir(d)): z.write(os.path.join(d, f), f)' "$1" "$2"; }
-P=Drone_1S_FC
-B=FC/$P.kicad_pcb
-F=fabrication/fc
-O="$F/production_oshpark"; ST="$F/stencil_top"; SB="$F/stencil_bottom"; D="$F/docs"; T="build/fab_fc_tmp"
+case "${1:-fc}" in
+  fc)   P=Drone_1S_FC;        B=FC/$P.kicad_pcb;        F=fabrication/fc ;;
+  deck) P=Drone_1S_QwiicDeck; B=QwiicDeck/$P.kicad_pcb; F=fabrication/qwiic_deck ;;
+  *) echo "usage: $0 [fc|deck]"; exit 1 ;;
+esac
+O="$F/production_oshpark"; ST="$F/stencil_top"; SB="$F/stencil_bottom"; D="$F/docs"; T="build/fab_${1:-fc}_tmp"
 rm -rf "$O" "$ST" "$SB" "$T" "$F/${P}_OSHPark.zip" "$F/${P}_stencil_top.zip" "$F/${P}_stencil_bottom.zip"
 mkdir -p "$O" "$ST" "$SB" "$D" "$T"
 
@@ -61,6 +63,6 @@ kicad-cli pcb export pdf --layers "F.Fab,F.Silkscreen,Edge.Cuts" -o "$D/${P}_ass
 kicad-cli pcb export pdf --layers "B.Fab,B.Silkscreen,Edge.Cuts" --mirror -o "$D/${P}_assembly_bottom.pdf" "$B" >/dev/null 2>&1 || true
 kicad-cli pcb export pdf --layers "F.Cu,F.Silkscreen,F.Mask,Edge.Cuts" -o "$D/${P}_pcb_top.pdf" "$B" >/dev/null
 kicad-cli pcb export pdf --layers "B.Cu,B.Silkscreen,B.Mask,Edge.Cuts" --mirror -o "$D/${P}_pcb_bottom.pdf" "$B" >/dev/null
-kicad-cli sch export pdf -o "$D/${P}_schematic.pdf" "FC/$P.kicad_sch" >/dev/null
+kicad-cli sch export pdf -o "$D/${P}_schematic.pdf" "${B%.kicad_pcb}.kicad_sch" >/dev/null
 rm -rf "$T"
 ls -la "$F"/*.zip "$O" "$ST" "$SB"

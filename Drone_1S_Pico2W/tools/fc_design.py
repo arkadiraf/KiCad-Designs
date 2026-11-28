@@ -153,6 +153,34 @@ def build_nets():
 
 POWER_NETS = {"VSYS", "3V3", "GND"}
 
+# schematic layout for gen_schematic.py
+SCH = dict(
+    root="fc-root-sheet",
+    out=("FC", PROJECT),
+    title="1S Pico 2 W drone - flight controller module",
+    comment="Pico 2 W + BMI088 + BMP390 + Flow deck v2 headers + board-to-board headers to the frame",
+    blocks=[
+        ("MCU: Raspberry Pi Pico 2 W, castellated on the FC top (USB / BOOTSEL / SWD from its underside pads)",
+         20, 30, 150, ["U1", "SW1", "J9"]),
+        ("IMU: BMI088 on SPI0 (PS = GND), INT1 -> IMU_INT_ACC, INT3 -> IMU_INT_GYR. Ref: Crazyflie Bolt 1.1",
+         190, 30, 170, ["U2", "C1"]),
+        ("Barometer: BMP390 on I2C0, address 0x77 (SDO high), CSB high", 370, 30, 120, ["U3", "C2"]),
+        ("Sensor supply: 3V3 -> L1 1 uH -> 3V3_SENS + C3 4.7 uF (Bolt); I2C pull-ups; MOTOR_PG pull-up",
+         190, 150, 200, ["L1", "C3", "R1", "R2", "R7"]),
+        ("DShot: 100 R series at the Pico (Bolt)", 400, 150, 160, ["R3", "R4", "R5", "R6"]),
+        ("Board-to-board: J1 (+y) / J2 (-y), Wurth 62001011121 into the frame's Sullins J5 / J6", 20, 250, 220, ["J1", "J2"]),
+        ("Flow deck v2: P1 (left) / P2 (right), Crazyflie deck pinout, pin 1 at the front", 260, 250, 220, ["P1", "P2"]),
+    ],
+    flags=("GND", "VSYS", "3V3_SENS"),
+    notes=[
+        ("Power flags: GND and VSYS enter on J1 (from the frame); 3V3_SENS is fed through L1", 500.38, 312.42, 1.27),
+        ("MOTOR_PG: the frame ties the four TPS22997 PG outputs together (wired-AND); 47k pull-up R7 here." + chr(10) +
+         "3V3_SENS: BMI088 + BMP390 supply through L1 / C3 against motor noise (Crazyflie Bolt 1.1)." + chr(10) +
+         "VBUS (Pico pin 40) is unused: the Pico runs from VSYS; USB D+/D- go to the frame (Pi Zero host)." + chr(10) +
+         "DNP: J9 (SWD).  Design doc: docs/Toothpick_Drone_Hardware_Design_1S_Pico2W.pdf", 20, 395, 1.5),
+    ],
+)
+
 
 if __name__ == "__main__":
     n = build_nets()

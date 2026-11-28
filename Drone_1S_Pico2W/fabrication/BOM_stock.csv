@@ -2,18 +2,23 @@ Kind,Value,Quantity,Refs,Status
 Capacitor 0603,100nF 16V,2,FC C1 C2,ok
 Capacitor 0603,10nF 16V,1,Frame C24,ok
 Capacitor 0603,1uF 16V,2,Frame C8 C9,ok
+Capacitor 0603,1uF 16V 0603,1,Qwiic deck C1,ok
 Capacitor 0603,1uF 25V,1,Frame C1,verify
 Capacitor 0603,3.3nF 50V,4,Frame C14 C15 C16 C17,ok
 Capacitor 0603,4.7uF 10V,1,Frame C6,ok
+Capacitor 0603,4.7uF 10V 0603,1,FC C3,ok
 Capacitor 0603,47nF 16V,1,Frame C7,ok
 LED 0805,LED red 0805,1,Frame D1,verify
+Resistor 0603,100R 0603,4,FC R3 R4 R5 R6,ok
 Resistor 0603,100k,5,"Frame R11 R12 R13 R14, Frame R19",ok
 Resistor 0603,150,1,Frame R4,ok
 Resistor 0603,156k / 100k / 1.27M,0,Frame R8 R9 R10,DNP
 Resistor 0603,2.2k,1,Frame R7,ok
 Resistor 0603,226,1,Frame R3,ok
 Resistor 0603,30.9k,1,Frame R6,ok
+Resistor 0603,4.7k 0603,2,FC R1 R2,ok
 Resistor 0603,47k,4,Frame R15 R16 R17 R18,TBD
+Resistor 0603,47k 0603,1,FC R7,ok
 Resistor 0603,49.9k,1,Frame R20,ok
 Resistor 0603,5.1k,2,Frame R1 R2,ok
 Resistor 0603,5.23k,1,Frame R5,ok

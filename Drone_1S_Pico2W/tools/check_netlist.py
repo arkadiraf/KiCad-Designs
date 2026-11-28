@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Verify the schematic connectivity exported by KiCad against fc_design.py (FC).
 
-usage: check_netlist.py <kicad .net file>
+usage: check_netlist.py <kicad .net file> [fc|deck]
 """
 import re
 import sys
-from fc_design import build_nets
+import importlib
+
+build_nets = importlib.import_module({"fc": "fc_design", "deck": "deck_design"}[(sys.argv[2:] or ["fc"])[0]]).build_nets
 
 
 def parse(path):

@@ -363,6 +363,30 @@ positions CSV, assembly / copper / schematic PDFs. The same Gerbers suit OSH Par
 later (OSH Park 2-layer options are 1.6 and 0.8 mm as far as known here; 1.0 mm not confirmed - check their site). Not yet done: the frame board's netlist and routing, renders in the
 OpenSCAD model.
 
+## Qwiic deck (Flow deck replacement, 28 Nov 2026)
+
+![Qwiic deck top](docs/qwiic_deck_top.png) ![Qwiic deck bottom](docs/qwiic_deck_bottom.png)
+
+A Crazyflie-deck-format adapter for separate experiments: it plugs into the FC's Flow deck headers (P1 / P2) in place
+of the Flow deck v2 and brings the deck I2C bus out on a SparkFun **Qwiic** connector. Design: `tools/deck_design.py`,
+hand routes `tools/routes_deck.py`, board `QwiicDeck/Drone_1S_QwiicDeck.*`.
+
+| Ref | Side | Part | Role |
+|---|---|---|---|
+| J1, J2 | top | Sullins NPPN101BFLD-RC 1x10 2.00 mm SMD (S5902-10-ND), rows 22.0 mm, pin 1 at the front | onto the FC's P1 / P2 |
+| J3 | bottom, rear edge | JST SH 4 right-angle SM04B-SRSS-TB, opening backwards | Qwiic: 1 GND, 2 3.3V, 3 SDA, 4 SCL |
+| C1 | bottom | 1 uF 0603 | Qwiic supply decoupling |
+
+* Wiring: deck left 1 (VCC_3V = FC 3V3) -> Qwiic 3.3V, left 4 SDA, left 5 SCL, left 10 GND. The right row is mechanical
+  only. No pull-ups here: the FC has 4.7k on SDA / SCL (on a real Crazyflie the deck VCC is 3.0 V).
+* **The FC's P1 / P2 posts must stay at the full 3.20 mm** on an FC used with this deck: the Sullins contact point is
+  2.5 mm deep, so the 1.9 mm trim done for the Flow deck would not reach it.
+* Outline 21.08 x 28.4 mm (the Flow deck's 21.08 x 27.94 plus 0.46 mm so the socket pads keep 0.4 mm to the edge),
+  1.6 mm, 2 layers, GND pours with stitching vias. DRC **0 violations, 0 unconnected, no warnings**; `NETLIST OK`; ERC 0.
+* Fabrication: `bash tools/export_fab_fc.sh deck` -> `fabrication/qwiic_deck/` (OSH Park zip, top + bottom stencils,
+  positions, PDFs). Parts are in `fabrication/BOM_FC.xlsx` (group "Qwiic deck").
+* Regenerate: `python3 gen_schematic.py deck`, netlist check `check_netlist.py <net> deck`, `<kicad python> gen_pcb.py deck finish`.
+
 ## 3D review (OpenSCAD)
 
 Placement is reviewed in 3D **before routing**. `tools/export_scad.py` writes the KiCad boards into

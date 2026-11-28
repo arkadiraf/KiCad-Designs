@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name "KD_Power")(type "KiCad")(uri "${KIPRJMOD}/../../Libraries/KD_Power.kicad_sym")(options "")(descr "KiCad-Designs shared library"))
+  (lib (name "KD_Sensors")(type "KiCad")(uri "${KIPRJMOD}/../../Libraries/KD_Sensors.kicad_sym")(options "")(descr "KiCad-Designs shared library"))
+  (lib (name "KD_Modules")(type "KiCad")(uri "${KIPRJMOD}/../../Libraries/KD_Modules.kicad_sym")(options "")(descr "KiCad-Designs shared library"))
+)

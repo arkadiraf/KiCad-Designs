@@ -12,7 +12,7 @@ import os
 import sys
 
 from design import FRAME_BOM
-from parts import CABLE_PARTS, DIGIKEY, FC_PARTS, FRAME_MPN, FRAME_PLACED, MECH_PARTS
+from parts import CABLE_PARTS, DECK_PARTS, DIGIKEY, FC_PARTS, FRAME_MPN, FRAME_PLACED, MECH_PARTS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "fabrication")
@@ -43,7 +43,8 @@ def rows():
         mfr, mpn, status, note = FRAME_MPN[refs]
         qty = 0 if status == "DNP" else len(refs.split())
         out.append(("Frame", refs, qty, f"{val} ({fp.split(':')[1]})", role, mfr, mpn, status, note))
-    for board, lst in (("Frame", FRAME_PLACED), ("FC", FC_PARTS), ("Cable", CABLE_PARTS), ("Mechanical", MECH_PARTS)):
+    for board, lst in (("Frame", FRAME_PLACED), ("FC", FC_PARTS), ("Qwiic deck", DECK_PARTS), ("Cable", CABLE_PARTS),
+                       ("Mechanical", MECH_PARTS)):
         for refs, qty, val, (mfr, mpn, status, note) in lst:
             out.append((board, refs, 0 if status == "DNP" else qty, val, "", mfr, mpn, status, note))
     return out, missing
@@ -117,7 +118,7 @@ def write_fc_xlsx(rs, boards=FC_ORDER_BOARDS):
         c.fill = PatternFill("solid", fgColor="44546A")
     fills = {"Digi-Key": None, "stock": "E2EFDA", "to source": "FCE4D6", "DNP": "EDEDED", "printed": "DDEBF7", "local": "DDEBF7"}
     for board, refs, qty, val, role, mfr, mpn, status, note in rs:
-        if board != "FC" and (board, refs) not in FC_XLSX_EXTRA and not (board == "Cable" and refs.startswith("J9")):
+        if board not in ("FC", "Qwiic deck") and (board, refs) not in FC_XLSX_EXTRA:
             continue
         dk, life = DIGIKEY.get(mpn, ("", ""))
         if status == "DNP":

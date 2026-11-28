@@ -230,6 +230,13 @@ def capsule(p, q, r, n=24):
 _PM = (pcbnew.SHAPE_POLY_SET.PM_STRICTLY_SIMPLE,) if hasattr(pcbnew.SHAPE_POLY_SET, "PM_STRICTLY_SIMPLE") else ()
 
 
+OUTLINE = None          # outline function of the board being built (fc_outline_pts / deck_outline_pts)
+
+
+def board_outline_pts():
+    return (OUTLINE or fc_outline_pts)()
+
+
 def fc_outline_pts():
     """Minimum FC outline (scad points, closed polygon), see design.FC."""
     x0, x1, by = FC["band"]
@@ -730,6 +737,94 @@ def build_fc():
 
 
 # ---------------------------------------------------------------------------
+# Qwiic deck (deck_design.py): Flow-deck-format adapter, Sullins sockets onto the FC P1/P2, Qwiic J3
+# ---------------------------------------------------------------------------
+def deck_outline_pts():
+    import deck_design as dd
+    w, h = dd.OUTLINE
+    s = poly_set([(-w / 2, -h / 2), (w / 2, -h / 2), (w / 2, h / 2), (-w / 2, h / 2)])
+    s = s.Fillet(mm(dd.FILLET), mm(0.01))
+    o = s.Outline(0)
+    return [(pcbnew.ToMM(o.CPoint(i).x) - ORIGIN_X, ORIGIN_Y - pcbnew.ToMM(o.CPoint(i).y)) for i in range(o.PointCount())]
+
+
+def build_deck():
+    global OUTLINE
+    import deck_design as dd
+    OUTLINE = deck_outline_pts
+    d = os.path.join(ROOT, "QwiicDeck")
+    os.makedirs(d, exist_ok=True)
+    name = dd.PROJECT
+    pcb = os.path.join(d, f"{name}.kicad_pcb")
+    write_project(os.path.join(d, f"{name}.kicad_pro"), ("3V3",))
+    board = new_board(pcb, dd.TITLE, dd.THICKNESS, "Crazyflie-deck adapter: FC deck I2C -> SparkFun Qwiic")
+    poly(board, [VS(x, y) for x, y in deck_outline_pts()], pcbnew.Edge_Cuts, 0.1)
+    # sockets on TOP, pin k at x = 9 - 2(k-1), rows y = +-11 (the FC's P1 / P2 pins sit right above)
+    for ref, sy in (("J1", 1), ("J2", -1)):
+        fp = place_b2b(board, *B2B["socket_fp"], ref, "Sullins NPPN101BFLD-RC (FC " + ("P1" if sy > 0 else "P2") + ")",
+                       sy, bottom=False, row_y=dd.ROW_Y)
+        fp.Value().SetVisible(False)
+        fp.Reference().SetLayer(pcbnew.F_Fab)
+    # Qwiic J3 on the BOTTOM at the rear edge, opening (mounting pads) toward the rear (-x)
+    fp = load_fp("Connector_JST", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal")
+    fp.SetReference("J3")
+    fp.SetValue("Qwiic")
+    board.Add(fp)
+    fp.Flip(fp.GetPosition(), True)
+    x, y = dd.QWIIC_POS
+    for rot in (0, 90, 180, 270):
+        fp.SetOrientationDegrees(rot)
+        fp.SetPosition(VS(x, y))
+        sig = [p.GetPosition() for p in fp.Pads() if p.GetNumber() != "MP"]
+        mp = [p.GetPosition() for p in fp.Pads() if p.GetNumber() == "MP"]
+        if sum(v.x for v in mp) / len(mp) < sum(v.x for v in sig) / len(sig) and abs(mp[0].x - mp[1].x) < mm(0.01):
+            break
+    else:
+        raise AssertionError("J3: no orientation puts its opening at the rear edge")
+    fp.Value().SetVisible(False)
+    fp.Reference().SetLayer(pcbnew.B_Fab)
+    assert all(p.IsOnLayer(pcbnew.B_Cu) for p in fp.Pads())
+    # C1 next to the Qwiic 3V3 pin (bottom)
+    for ref, lib, fpn, val, (cx, cy), rot in (("C1", "Capacitor_SMD", "C_0603_1608Metric", "1u", dd.C1_POS, 0),):
+        c = load_fp(lib, fpn)
+        c.SetReference(ref)
+        c.SetValue(val)
+        board.Add(c)
+        c.Flip(c.GetPosition(), True)
+        c.SetOrientationDegrees(rot)
+        c.SetPosition(VS(cx, cy))
+        c.Reference().SetLayer(pcbnew.B_Fab)
+        c.Value().SetVisible(False)
+    # silkscreen
+    text(board, "QWIIC DECK V01", VS(2.0, 1.2), pcbnew.F_SilkS, 1.0, 0.15)
+    text(board, "FRONT >", VS(2.0, -1.2), pcbnew.F_SilkS, 0.8, 0.15)
+    text(board, "QWIIC", VS(2.5, -4.5), pcbnew.B_SilkS, 1.0, 0.15)
+    text(board, "< FRONT", VS(2.5, 4.5), pcbnew.B_SilkS, 0.8, 0.15)
+    if {"geom", "finish", "nets"} & set(sys.argv):
+        nets = dd.build_nets()
+        assign_nets(board, nets)
+        import importlib
+        import routes_deck
+        importlib.reload(routes_deck)
+        lay = {"F": pcbnew.F_Cu, "B": pcbnew.B_Cu}
+        for net, layer, w, pts in routes_deck.TRACKS:
+            for a_, b_ in zip(pts, pts[1:]):
+                t = pcbnew.PCB_TRACK(board)
+                t.SetStart(VS(*a_)); t.SetEnd(VS(*b_)); t.SetWidth(mm(w)); t.SetLayer(lay[layer])
+                t.SetNet(board.FindNet(net))
+                board.Add(t)
+        for net, vx, vy, dv, dr in routes_deck.VIAS:
+            v = pcbnew.PCB_VIA(board)
+            v.SetPosition(VS(vx, vy)); v.SetWidth(mm(dv)); v.SetDrill(mm(dr))
+            v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu); v.SetNet(board.FindNet(net))
+            board.Add(v)
+        if "finish" in sys.argv:
+            print(f"  GND stitching vias: {stitch_vias(board, spacing=3.5)}")
+            gnd_pours(board)
+    return finish(board, pcb, name)
+
+
+# ---------------------------------------------------------------------------
 # FC electrical: nets (fc_design.py), hand routes (routes_fc.py), router I/O, GND pours
 # ---------------------------------------------------------------------------
 def assign_nets(board, nets):
@@ -798,7 +893,7 @@ def export_geom(board, nets, path):
             a, b = t.GetStart(), t.GetEnd()
             tracks.append({"net": t.GetNetname(), "layer": cu[t.GetLayer()], "x1": pcbnew.ToMM(a.x), "y1": pcbnew.ToMM(a.y),
                            "x2": pcbnew.ToMM(b.x), "y2": pcbnew.ToMM(b.y), "w": pcbnew.ToMM(t.GetWidth())})
-    outline = [to_kicad(x, y) for x, y in fc_outline_pts()]
+    outline = [to_kicad(x, y) for x, y in board_outline_pts()]
     js = {"outline": outline, "pads": pads, "shapes": [], "keepouts": [], "tracks": tracks, "vias": vias,
           "nets": {n: {"pins": c, "power": n in fc_design.POWER_NETS} for n, c in nets.items()}}
     os.makedirs(BUILD, exist_ok=True)
@@ -863,7 +958,7 @@ def gnd_pours(board):
         z.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
         ol = z.Outline()
         ol.NewOutline()
-        for x, y in fc_outline_pts():
+        for x, y in board_outline_pts():
             ol.Append(VS(x, y))
         board.Add(z)
     try:                                  # KiCad 7; KiCad 8+ refill through kicad-cli in finish()
@@ -900,7 +995,7 @@ def stitch_vias(board, pitch=1.2, d=0.6, drill=0.3, spacing=2.4):
             a_, b_ = t.GetStart(), t.GetEnd()
             obst.append(("seg", (pcbnew.ToMM(a_.x), pcbnew.ToMM(a_.y), pcbnew.ToMM(b_.x), pcbnew.ToMM(b_.y),
                                  pcbnew.ToMM(t.GetWidth()) / 2), 0.25))
-    outline = [to_kicad(x, y) for x, y in fc_outline_pts()]
+    outline = [to_kicad(x, y) for x, y in board_outline_pts()]
     def inside(x, y):
         c = False
         for (x1, y1), (x2, y2) in zip(outline, outline[1:] + outline[:1]):
@@ -961,10 +1056,10 @@ def fc_electrical(board):
 
 
 if __name__ == "__main__":
-    which = [a for a in sys.argv[1:] if a in ("frame", "fc")] or ["frame", "fc"]
+    which = [a for a in sys.argv[1:] if a in ("frame", "fc", "deck")] or ["frame", "fc"]
     ok = True
     for w in which:
-        c = {"frame": build_frame, "fc": build_fc}[w]()
+        c = {"frame": build_frame, "fc": build_fc, "deck": build_deck}[w]()
         ok &= all(v == 0 for v in c.values()) and len(c) == 3
     print("DRC OK" if ok else "DRC FAILED")
     sys.exit(0 if ok else 1)

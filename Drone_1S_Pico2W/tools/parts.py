@@ -75,7 +75,22 @@ FC_PARTS = [
     ("J1 J2", 2, "2.00 mm male 1x10 THT (to the frame)",
      ("Wurth Elektronik", "62001011121", "ok", "plastic 2.0, pin 4.0: ~3.6 mm into the Sullins socket on the 7 mm spacers")),
     ("J9", 1, "JST-SH 3 horizontal, SWD", ("JST", "SM03B-SRSS-TB(LF)(SN)", "DNP", "fit when SWD is needed")),
-    ("SW1", 1, "BOOTSEL tactile switch", ("Aratas (formerly Omron)", "B3U-1000PM-B", "ok", "with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole), update pending")),
+    ("SW1", 1, "BOOTSEL tactile switch", ("Aratas (formerly Omron)", "B3U-1000PM-B", "ok", "with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole)")),
+    # added at routing (stage 2/3, 2026-11-28): sensor supply filter, pull-ups, DShot series resistors
+    ("L1", 1, "1uH 0603 (sensor supply filter, 3V3 -> 3V3_SENS)", ("TDK", "MLZ1608N1R0LT000", "verify", "as the Crazyflie Bolt 1.1 (MLZ1608); a few mA load - any 1 uH 0603 with Idc >= 100 mA fits; Digi-Key PN to find")),
+    ("C3", 1, "4.7uF 10V 0603 (3V3_SENS bulk)", (MURATA, "GRM188R61A475KAAJD", "ok", "stock book")),
+    ("R1 R2", 2, "4.7k 0603 (I2C pull-ups)", (YAGEO, "RC0603FR-074K7L", "ok", "stock book")),
+    ("R3 R4 R5 R6", 4, "100R 0603 (DShot series)", (YAGEO, "RC0603FR-07100RL", "ok", "stock book")),
+    ("R7", 1, "47k 0603 (MOTOR_PG pull-up)", (YAGEO, "RC0603FR-0747KL", "ok", "stock book")),
+]
+
+# Qwiic deck (deck_design.py): Flow-deck-format adapter with a SparkFun Qwiic connector (user 2026-11-28).
+# refs, qty, value, (mfr, MPN, status, note)
+DECK_PARTS = [
+    ("J1 J2", 2, "2.00 mm 1x10 SMD socket onto the FC's P1 / P2",
+     ("Sullins", "NPPN101BFLD-RC", "ok", "same socket as the frame J5/J6; the FC's P1/P2 posts stay at 3.20 mm (untrimmed) on an FC used with this deck")),
+    ("J3", 1, "Qwiic: JST SH 4-pin right-angle (GND, 3V3, SDA, SCL)", ("JST", "SM04B-SRSS-TB(LF)(SN)", "ok", "bottom, rear edge")),
+    ("C1", 1, "1uF 16V 0603", (MURATA, "GRM188R71C105KA12D", "ok", "Qwiic 3V3 decoupling (stock book)")),
 ]
 
 # Mechanical stack and printed-part hardware (from the OpenSCAD model 1S_PiZero.scad, screw lengths computed there).

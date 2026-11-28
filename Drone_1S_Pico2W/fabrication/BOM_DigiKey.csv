@@ -10,8 +10,8 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 1,Texas Instruments,TPS61235PRWLT,296-44628-1-ND,Frame U7,"TPS61235P (Texas_RWL_VQFN-HR-9_2.5x2.5mm_P0.5mm); 5.1 V boost, true disconnect",ok,also sold as the larger reel TPS61235PRWLR
 3,Samsung,CL31B226KPHNFNE,1276-3145-1-ND,Frame C20 C21 C22,22uF 10V (TO CHECK) (C_1206_3216Metric); boost output,ok,"22 uF 10 V X7R 1206 (user pick, Digi-Key 1276-3145-1-ND); active (user, Nov 2026)"
 1,Sullins,PRPC040SAAN-RC,S1011EC-40-ND,Frame J1 J2 J3 J4,"2.54 mm male header strip 1x40 (ESC seats: 28 pins, 4 + 3 per ESC)",ok,"1x40 break-away strip, cut to 4 + 3; bulk"
-2,Sullins,NPPN101BFLD-RC,S5902-10-ND,Frame J5 J6,"B2B socket 1x10 2.00 mm SMD, frame bottom (mates with FC J1/J2)",ok,"4.6 mm tall, 7 mm printed spacers; nylon: hand-solder after reflow; footprint update pending; user, Nov 2026"
-1,JST,SM04B-SRSS-TB(LF)(SN),455-SM04B-SRSS-TBCT-ND,Frame J7,"JST-SH 4, Pi USB",ok,
+4,Sullins,NPPN101BFLD-RC,S5902-10-ND,"Frame J5 J6, Qwiic deck J1 J2","B2B socket 1x10 2.00 mm SMD, frame bottom (mates with FC J1/J2)",ok,"4.6 mm tall, 7 mm printed spacers; nylon: hand-solder after reflow; footprint update pending; user, Nov 2026"
+2,JST,SM04B-SRSS-TB(LF)(SN),455-SM04B-SRSS-TBCT-ND,"Frame J7, Qwiic deck J3","JST-SH 4, Pi USB",ok,
 1,JST,B2B-PH-K-S(LF)(SN),455-1704-ND,Frame J8,"JST-PH 2 vertical, Pi 5.1 V",ok,bulk
 1,Raspberry Pi,SC1633,2648-SC1633CT-ND,FC U1,Raspberry Pi Pico 2 W,verify,Pico 2 W without headers
 1,Bosch Sensortec,BMI088,828-1082-1-ND,FC U2,BMI088 IMU,ok,pin 2 (NC) to GND per Bosch
@@ -19,7 +19,8 @@ Quantity,Manufacturer,Manufacturer Part Number,Digi-Key Part Number,Customer Ref
 2,Samtec,TMM-110-01-T-S-SM-P-TR,612-TMM-110-01-T-S-SM-P-CT-ND,FC P1 P2,2.00 mm male 1x10 SMD vertical (to the Flow deck),ok,"same SM footprint as -04; 3.20 mm tin post: TRIM to ~1.9 mm after soldering, else the deck hangs ~1.3 mm lower; pull off the -P pick-and-place cap; cut tape (user, Nov 2026)"
 2,Wurth Elektronik,62001011121,732-62001011121-ND,FC J1 J2,2.00 mm male 1x10 THT (to the frame),ok,"plastic 2.0, pin 4.0: ~3.6 mm into the Sullins socket on the 7 mm spacers; user, Nov 2026"
 0,JST,SM03B-SRSS-TB(LF)(SN),455-SM03B-SRSS-TBCT-ND,FC J9,"JST-SH 3 horizontal, SWD",DNP,fit when SWD is needed
-1,Aratas (formerly Omron),B3U-1000PM-B,39-B3U-1000PM-BCT-ND,FC SW1,BOOTSEL tactile switch,ok,"with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole), update pending; in stock at digikey.co.il (user, Nov 2026)"
+1,Aratas (formerly Omron),B3U-1000PM-B,39-B3U-1000PM-BCT-ND,FC SW1,BOOTSEL tactile switch,ok,"with boss: footprint SW_SPST_B3U-1000P-B (0.8 mm hole); in stock at digikey.co.il (user, Nov 2026)"
+1,TDK,MLZ1608N1R0LT000,,FC L1,"1uH 0603 (sensor supply filter, 3V3 -> 3V3_SENS)",verify,as the Crazyflie Bolt 1.1 (MLZ1608); a few mA load - any 1 uH 0603 with Idc >= 100 mA fits; Digi-Key PN to find
 1,JST,SHR-04V-S-B,,Cable J7 cable,"JST SH 4-pin housing (to frame J7, Pi USB)",ok,frame end; Pi end soldered to the Pi Zero 2 W USB test pads
 4,JST,SSH-003T-P0.2-H,,Cable J7 cable,JST SH crimp contact 28-32 AWG,ok,"or pre-crimped SH leads (28 AWG, ~100 mm)"
 1,JST,PHR-2,,Cable J8 cable,"JST PH 2-pin housing (to frame J8, Pi 5.1 V)",ok,"frame end; Pi end to GPIO pins 4 (5 V) / 6 (GND), soldered or a 1x2 2.54 mm housing"
