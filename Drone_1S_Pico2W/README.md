@@ -18,7 +18,7 @@ The design intent comes from
 | **Frame** (power board) | [Frame/](Frame/) | 117 × 117 mm, the quad frame itself | **2.0 mm** | 18650 tab pads, USB-C + BQ25606 charger, TPS22810 Pico rail switch + SPDT slide switch, 4 × TPS22997 motor switches, TPS61235P 5.1 V boost (optional), 4 × DYS XSD7A ESCs on pin headers, Pi Zero 5.1 V output, 2 × 10 header to the FC |
 | **FC** (flight controller module) | [FC/](FC/) | 55.3 × 41.5 mm bbox, minimum outline | 1.6 mm | **Top:** Pico 2 W only (castellated SMD, faces the frame). **Bottom:** BMI088 IMU (SPI0), BMP388 baro (I2C0), support ICs, and the Crazyflie deck connectors for the Flow deck v2 (SPI1 + I2C0), which plugs in from below as it does under a Crazyflie. Also JST-SH 4 to the Pi Zero and the 2 × 10 header to the frame |
 
-## Status: stage 1, bare boards (rev 0.2: orderable B2B connectors, printed-spacer stack, B3U-1000PM-B)
+## Status: stage 1, bare boards (V01; 28 Nov update: orderable B2B connectors, printed-spacer stack, B3U-1000PM-B)
 
 **Design document (PDF, 27 Nov 2026):** [docs/Toothpick_Drone_Hardware_Design_1S_Pico2W.pdf](docs/Toothpick_Drone_Hardware_Design_1S_Pico2W.pdf),
 exported from the shared design doc. It has the design status, renders, the parts list and the to-do list.
@@ -99,12 +99,12 @@ FC. It is two identical printed skids (front, rear). Each skid is a cross-beam w
 insert boss and a leg at each end, held by M2 × 4 screws from the frame top. A one-piece frame would
 run into the FC standoffs at y = ±17.5. The frame's old 30.5 mm FC holes are gone.
 
-**Connector choice (rev 0.2, 28 Nov 2026): orderable 2.00 mm pair on 7 mm printed spacers.** Options and
+**Connector choice (V01, updated 28 Nov 2026): orderable 2.00 mm pair on 7 mm printed spacers.** Options and
 datasheets: [Materials/connector_options/](Materials/connector_options/README.md).
 * **What sets the height:** the Pico 2 W's micro-USB is its tallest part, **3.73 mm** above the FC
   (KiCad-RP-Pico 3D model; BOOTSEL 2.08 mm, everything else ≤ 1.68 mm), so the gap must be over ~4 mm.
   The connector pair sets it at 7.0 mm, 3.3 mm over the USB.
-* rev 0.1 used the Bitcraze female deck socket on 5 mm standoffs; that socket is not sold as a part.
+* The first V01 layout used the Bitcraze female deck socket on 5 mm standoffs; that socket is not sold as a part.
 
 | Board | Ref | Side | Part | Height |
 |---|---|---|---|---|
@@ -406,10 +406,10 @@ MCU over Wi-Fi. No RP2350 port exists yet. Findings and the port plan are in
 * [ ] ESC header pin functions: the XSD7A's power end (from its silkscreen) has big pads − and +
       at the corners and small round signal pads −, S between them. Map them to J1–J4 pads 1–4
       while placing the frame, once the ESC orientation under the arm is fixed.
-* [x] Header/socket pair and stack from real datasheets (rev 0.2): Würth 62001011121 + Sullins NPPN101BFLD-RC
+* [x] Header/socket pair and stack from real datasheets (28 Nov): Würth 62001011121 + Sullins NPPN101BFLD-RC
       on 7.0 mm printed spacers with M2 × 20 through-bolts.
 * [ ] OpenSCAD: draw the 7.0 mm printed spacer, update the stack (M2 × 20 bolt, nyloc nut, no standoff) and
-      re-run `export_scad.py` + `1S_PiZero_verify.py` (not done: the scad repo is untouched by rev 0.2).
+      re-run `export_scad.py` + `1S_PiZero_verify.py` (not done: the scad repo is untouched by the 28 Nov update).
 * [ ] Future: landing gear on **M2.5** bolts instead of M2 (user, 28 Nov 2026): H_LG1–4 holes, skid inserts, BOM.
 * [ ] The 20-pin assignment of J1/J2 ↔ J5/J6. The doc's bus fits: VSYS, 4 × ON, 4 × PG, 4 × DShot,
       BOOST_EN, CHG_PG, GND.
@@ -443,7 +443,7 @@ When the OpenSCAD frame changes, export `part="pcb_outline"` to DXF, copy it to
 `Materials/extracted/1S_PiZero_PCB_outline.dxf`, update `SCAD` in `design.py`, and regenerate.
 
 Current results: see the last `gen_pcb.py` run (both boards print footprint/pad counts). `BOM OK`. `MATING OK`. DRC **0 violations, 0 unconnected,
-0 footprint errors** on both boards (rev 0.2, KiCad 10.0.8 on Windows, 28 Nov 2026; one accepted warning on the
-FC: SW1's boss hole in the Pico courtyard). `IMPORT OK`. The rev 0.2 `.kicad_pcb` files are KiCad 10 format
-(rev 0.1 was KiCad 7 format from the container). `render.py` was not re-run (needs cairosvg), so `docs/*.png`
-still show rev 0.1.
+0 footprint errors** on both boards (V01 28 Nov update, KiCad 10.0.8 on Windows, 28 Nov 2026; one accepted warning on the
+FC: SW1's boss hole in the Pico courtyard). `IMPORT OK`. The `.kicad_pcb` files are now KiCad 10 format
+(earlier: KiCad 7 format from the container). `render.py` was not re-run (needs cairosvg), so `docs/*.png`
+still show the first layout; `docs/fc_v01_top.png` / `fc_v01_bottom.png` are the current FC renders.

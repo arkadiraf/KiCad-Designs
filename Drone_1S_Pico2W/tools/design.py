@@ -42,7 +42,8 @@ def to_kicad(x, y):
     return ORIGIN_X + x, ORIGIN_Y - y
 
 
-REVISION = "0.2"     # 0.2 (2026-11-28): orderable B2B pair (Wurth male + Sullins socket) on 7 mm printed spacers, SW1 B3U-1000PM-B
+REVISION = "0.1"     # stays 0.1 (V01) until the first production run; changes before that are internal updates
+                     # (2026-11-28: orderable B2B pair Wurth male + Sullins socket on 7 mm printed spacers, SW1 B3U-1000PM-B)
 DATE = "2026-11-28"
 
 # ---------------------------------------------------------------------------
@@ -111,7 +112,7 @@ CRAD = SCAD["crad_hole"]
 FC = dict(
     project="Drone_1S_FC",
     title="1S Pico 2 W drone - flight controller module",
-    silk_name="Pico 2W Flight Controller V02",   # follows REVISION 0.2
+    silk_name="Pico 2W Flight Controller V01",   # follows REVISION (V01 until production)
     thickness=1.6,
     holes=[(sx * CRAD[0], sy * CRAD[1]) for sx, sy in ((1, 1), (1, -1), (-1, -1), (-1, 1))],
     hole_d=SCAD["crad_hole_d"],  # 2.2 mm, M2
