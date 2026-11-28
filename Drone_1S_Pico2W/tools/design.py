@@ -121,12 +121,12 @@ FC = dict(
     pico_c=(-2.5, 0.0),          # Pico spans x -28 .. 23; micro-USB at the rear edge (x = -28)
     notch=(14.0, 9.0),           # Pico 2 W datasheet 2.2.1: 14 x 9 mm antenna cut-out
     # Minimum outline = union of
-    #   the Pico band     x -28 .. 23, |y| <= 12.5 (Pico lands reach |y| 11.29, + edge clearance and its silk)
+    #   the Pico band     x -28 .. 23, |y| <= 13.0 (Pico lands reach |y| 11.29, + a via row at |y| 12.0 + edge clearance)
     #   the middle block  |x| <= 12.5, |y| <= 16.5 (deck pads |y| <= 13.4, B2B header pads |y| <= 15.7, + silk)
     #   four ears         capsule from each hole to the band, radius ear_r
     # minus the antenna notch, all corners filleted 1 mm.
-    band=(-28.0, 23.0, 12.5),
-    middle=(12.5, 16.5),
+    band=(-28.0, 23.0, 13.6),    # 13.6 (was 12.5, 2026-11-28): a via row just outside each Pico land + one more track lane
+    middle=(14.0, 16.5),         # 14.0 (was 12.5, 2026-11-28): routing room round the J and P rows
     ear_root=(20.0, 10.0),       # |x|, |y| where each ear joins the band
     fillet=1.0,
     # Crazyflie deck interface (Bitcraze deck template c8f9a2e): two 1x10 rows,
@@ -136,11 +136,29 @@ FC = dict(
     deck_board=(21.079, 27.94),  # Flow deck v2, x (along the rows) by y: Bitcraze mechanical drawing
     # [ref, lib, footprint, value, (x, y) scad, rotation] - all on the FC BOTTOM, between the
     # deck rows (|x| <= 9, |y| <= 8.6 clear of the deck header pads), under the Flow deck.
+    # 2026-11-28 (routing): U2 rotated 180 so its signal row (SDI, SDO, CSB1, INT3) faces -y, toward the Pico's
+    # SPI0 pins; C1 moved to the VDD pin side; C2 turned so its 3V3_SENS pad faces the BMP390 supply pins.
     sensors=[
-        ("U2", "KD_Sensors", "Bosch_LGA-16_3x4.5mm_P0.5mm", "BMI088", (0.0, 0.0), 0),
-        ("C1", "Capacitor_SMD", "C_0603_1608Metric", "100n", (0.0, 2.6), 0),
+        ("U2", "KD_Sensors", "Bosch_LGA-16_3x4.5mm_P0.5mm", "BMI088", (0.0, 0.0), 180),
+        ("C1", "Capacitor_SMD", "C_0603_1608Metric", "100n", (0.5, 3.45), 90),
         ("U3", "KD_Sensors", "Bosch_LGA-10_2x2mm_P0.5mm", "BMP390", (-6.0, 0.0), 0),   # BMP388 obsolete -> BMP390, same footprint
-        ("C2", "Capacitor_SMD", "C_0603_1608Metric", "100n", (-6.0, 2.1), 0),
+        ("C2", "Capacitor_SMD", "C_0603_1608Metric", "100n", (-6.0, 2.1), 180),
+    ],
+    # Support parts added for routing (user 2026-11-28): [ref, lib, footprint, value, (x, y) scad, rotation, side]
+    passives=[
+        ("L1", "Inductor_SMD", "L_0603_1608Metric", "1uH", (-11.8, 4.0), 0, "B"),      # 3V3 -> 3V3_SENS filter (Bolt)
+        ("C3", "Capacitor_SMD", "C_0603_1608Metric", "4.7u", (-8.6, 4.0), 0, "B"),     # 3V3_SENS bulk
+        ("R1", "Resistor_SMD", "R_0603_1608Metric", "4.7k", (-2.6, 5.8), 0, "B"),      # I2C SDA pull-up (on the I2C path)
+        ("R2", "Resistor_SMD", "R_0603_1608Metric", "4.7k", (-2.6, 7.3), 0, "B"),      # I2C SCL pull-up
+        ("R7", "Resistor_SMD", "R_0603_1608Metric", "47k", (-14.0, -7.0), 0, "B"),     # MOTOR_PG pull-up
+        # DShot series resistors on the BOTTOM, one under each Pico pin (GP19 / GP18 / GP17 / GP16 at x 11.47 /
+        # 14.01 / 19.09 / 21.63): the pin goes up to a via just outside its land, down to the resistor, and on to J1
+        # through the gaps between the Flow deck header pads (routes_fc.py). Under the antenna-notch prongs there is
+        # no room on top for four tracks, so the resistors sit on the prongs' underside.
+        ("R3", "Resistor_SMD", "R_0603_1608Metric", "100", (11.47, 10.4), 270, "B"),    # DSHOT1 (J1.1) <- GP19
+        ("R4", "Resistor_SMD", "R_0603_1608Metric", "100", (14.01, 10.4), 270, "B"),    # DSHOT2 (J1.2) <- GP18
+        ("R5", "Resistor_SMD", "R_0603_1608Metric", "100", (19.09, 10.4), 270, "B"),    # DSHOT3 (J1.3) <- GP17
+        ("R6", "Resistor_SMD", "R_0603_1608Metric", "100", (21.63, 10.4), 270, "B"),    # DSHOT4 (J1.4) <- GP16
     ],
     # J9 SWD, NOT POPULATED: JST-SH 3 (Raspberry Pi 3-pin debug connector style: SWCLK, GND,
     # SWDIO) on the FC bottom at the rear edge, wired from the Pico's SWD pads. Its opening faces
@@ -225,11 +243,14 @@ B2B_PIN_X = [9.0 - B2B["pitch"] * k for k in range(B2B["pins"])]   # scad x of p
 #  - SWD does NOT cross: it goes to J9 on the FC itself (to the Pi's GPIO or a debugger);
 #  - so the four motor-switch ON lines stay separate (staggered turn-on, a faulted ESC can
 #    be switched off alone), and three GND.
-B2B_SIGNALS = ["VSYS", "GND", "GND", "GND",
-               "ON1", "ON2", "ON3", "ON4", "PG1", "PG2", "PG3", "PG4",
-               "DSHOT1", "DSHOT2", "DSHOT3", "DSHOT4",
-               "BOOST_EN", "CHG_PG", "USB_DP", "USB_DM"]
-assert len(B2B_SIGNALS) == 2 * B2B["pins"]
+# 2026-11-28 (user): the four TPS22997 PG outputs are tied together on the frame (open drain, wired-AND) into one
+# MOTOR_PG line (47k pull-up R7 on the FC): it frees the GPIOs the Pico 2 W lacks (27 needed, 26 free). Firmware finds
+# a faulted ESC by switching the ON lines one at a time. Pin k of J1 (+y) / J2 (-y), k = 1 at the front (x = 9).
+# The order follows the Pico pins they come from, so the FC side routes without crossings where it can.
+B2B_J1 = ["DSHOT1", "DSHOT2", "DSHOT3", "DSHOT4", "GND", "BOOST_EN", "CHG_PG", "GND", "VSYS", "VSYS"]
+B2B_J2 = ["ON1", "ON2", "ON3", "GND", "GND", "ON4", "MOTOR_PG", "GND", "USB_DP", "USB_DM"]   # USB on the end pins: straight in from the rear
+B2B_SIGNALS = B2B_J1 + B2B_J2
+assert len(B2B_J1) == len(B2B_J2) == B2B["pins"]
 
 # Frame-top connectors to the Pi Zero 2 W (design doc: 5.1 V separately, UART + status on
 # a 4-pin JST-SH with 1 k series resistors). [ref, lib, footprint, value, (x, y), rotation]

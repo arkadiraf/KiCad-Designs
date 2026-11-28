@@ -35,10 +35,10 @@ options not taken: [Materials/connector_options/](Materials/connector_options/RE
 | Stage | Content | State |
 |---|---|---|
 | 1 | Outlines, holes, fixed pads, placement guides, design rules | **done** |
-| 2 | Pin map and netlist in `design.py`: Pico 2 W GPIO allocation, 2 × 10 header pinout (shared by both boards) | next |
-| 3 | Symbols/footprints (TPS22997 WQFN-HR, TPS22810, BQ25606, BMI088, BMP388, ...), schematics | |
-| 3b | **3D review of components and placement (OpenSCAD) - routing starts only after it is approved** | in review |
-| 4 | Routing, pours, DRC, fab outputs (see `../AGENTS.md`) | |
+| 2 | Pin map and netlist: FC in `tools/fc_design.py`, 2 × 10 header pinout in `design.py` (shared by both boards) | **FC done** (frame: next) |
+| 3 | Symbols/footprints, schematics | **FC done** (`FC/Drone_1S_FC.kicad_sch`, NETLIST OK); frame next |
+| 3b | 3D review of components and placement (OpenSCAD) | in review (scad not yet updated for the 7 mm stack) |
+| 4 | Routing, pours, DRC, fab outputs (see `../AGENTS.md`) | **FC done** (28 Nov 2026, see "FC routing" below); frame next |
 
 ![frame](docs/frame_stage1.png)
 ![fc](docs/fc_stage1.png)
@@ -321,6 +321,48 @@ The documents are in `Materials/`, with text extracts in `Materials/extracted/`.
   7 A continuous, 9 A burst (10 s), no BEC. Power end: big pads − and + at the corners, small round
   pads −, S between them. The three motor-phase pads are at the other end.
 
+## FC routing (stages 2-4, 28 Nov 2026)
+
+![FC top](docs/fc_v01_top.png) ![FC bottom](docs/fc_v01_bottom.png)
+
+**Result:** 2 layers, 1.6 mm, routed and poured; DRC **0 violations, 0 unconnected** (KiCad 10, kicad-cli),
+`NETLIST OK`, `MATING OK`. Accepted DRC warnings: SW1's boss hole in the Pico courtyard, four one-sided escape vias at
+the BMI088 (joints between a hand escape and a router track) and one escape stub. ERC: one warning (BMP390 SDO strapped
+to 3V3_SENS for address 0x77, by design). Trace widths: signals 0.25 mm, LGA escapes 0.20 mm, VSYS / 3V3 0.40 mm, GND
+pours on both layers with stitching vias (one per standoff arm); vias 0.6 / 0.3 mm; clearance 0.20 mm.
+
+**Pin map** (`tools/fc_design.py`, 24 of 26 GPIOs, GP0 and GP9 spare):
+
+| Bus / function | Pico 2 W pins | Goes to |
+|---|---|---|
+| SPI0 (BMI088) | GP6 SCK, GP7 MOSI, GP4 MISO, GP5 CS_ACC, GP28 CS_GYR, GP8 INT_ACC, GP3 INT_GYR | U2 |
+| SPI1 (PMW3901) | GP10 SCK, GP11 MOSI, GP12 MISO, GP26 FLOW_CS (IO_3) | P2.3-5, P1.8 |
+| I2C0 | GP20 SDA, GP21 SCL (4.7k pull-ups R1 / R2) | U3 BMP390 (0x77), P1.4/5 (VL53L1X) |
+| DShot | GP19 / 18 / 17 / 16 -> 100R R3-R6 | J1.1-J1.4 (DSHOT1-4) |
+| Motor switches | GP13 / 14 / 15 / 2 ON1-ON4, GP1 MOTOR_PG (47k R7) | J2.1-3, J2.6, J2.7 |
+| Frame control | GP22 BOOST_EN, GP27 CHG_PG | J1.6, J1.7 |
+| USB, SWD, BOOTSEL | TP3 D+, TP2 D-; SWCLK / SWDIO pads; TP6 | J2.9 / J2.10; J9; SW1 |
+
+**Board-to-board** (`B2B_J1` / `B2B_J2`, pin 1 at the front): J1 = DSHOT1-4, GND, BOOST_EN, CHG_PG, GND, VSYS,
+VSYS; J2 = ON1, ON2, ON3, GND, GND, ON4, MOTOR_PG, GND, USB_DP, USB_DM. The frame ties its four TPS22997 PG outputs
+into MOTOR_PG (user, 28 Nov: the Pico lacked a GPIO for four PG lines).
+
+**What changed for routing:** BMI088 rotated 180 (signal row toward the Pico SPI pins; firmware axis remap); INT2 /
+INT4 open (Bosch "DNC"); sensor supply through L1 1 uH + C3 4.7 uF (3V3_SENS, Bolt); DShot resistors on the bottom
+under the Pico pins; GP16-19 and GP13-15 assigned so the DShot and ON lines nest through the gaps between the Flow
+deck pads without crossing; CS_GYR moved to GP28; outline widened slightly (Pico band +-12.5 -> +-13.6 mm, middle
+block +-12.5 -> +-14.0 mm; +3 % area, same 55.3 x 41.5 mm bounding box).
+
+**Flow:** `routes_fc.py` holds the hand routes (LGA escapes, DShot / ON nests, SPI1, FLOW_CS, SCK, GND links);
+`router.py` (from PicoBalancer) routes the rest; `gen_pcb.py fc finish` imports the routes, adds GND stitching vias,
+pours, prunes stitching vias that land in cut-off pockets, refills with kicad-cli and runs DRC.
+
+**Fabrication** (`bash tools/export_fab_fc.sh`, `fabrication/fc/`): `Drone_1S_FC_OSHPark.zip` (Protel-named Gerbers +
+`.XLN` drill, inch; upload the zip, not the KiCad 10 file), top and bottom stencil zips (parts on both sides),
+positions CSV, assembly / copper / schematic PDFs. The same Gerbers suit OSH Park's 0.8 mm "2 layer thin" option
+later (OSH Park 2-layer options are 1.6 and 0.8 mm as far as known here; 1.0 mm not confirmed - check their site). Not yet done: the frame board's netlist and routing, renders in the
+OpenSCAD model.
+
 ## 3D review (OpenSCAD)
 
 Placement is reviewed in 3D **before routing**. `tools/export_scad.py` writes the KiCad boards into
@@ -437,6 +479,10 @@ python3 dxf_import.py                 # outline + hole summary from the DXF
 /usr/bin/python3 check_mating.py      # FC J1/J2 + holes == frame J5/J6 + holes, prints MATING OK
 /usr/bin/python3 export_scad.py       # -> OpenScad-Designs/Drones/1S_PiZero/1S_PiZero_electronics.scad
 python3 render.py                     # docs/*.png
+# FC (stages 2-4): schematic, netlist check, place + hand routes, router, finish, fab
+python3 gen_schematic.py && kicad-cli sch export netlist -o ../build/fc_net.net ../FC/Drone_1S_FC.kicad_sch && python3 check_netlist.py ../build/fc_net.net
+<kicad python> gen_pcb.py fc geom && python3 router.py && <kicad python> gen_pcb.py fc finish
+bash export_fab_fc.sh
 ```
 
 When the OpenSCAD frame changes, export `part="pcb_outline"` to DXF, copy it to

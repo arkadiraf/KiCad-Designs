@@ -4,6 +4,9 @@ Generate the bare boards (run with the system interpreter, which has pcbnew):
 
     /usr/bin/python3 gen_pcb.py            # both boards
     /usr/bin/python3 gen_pcb.py frame|fc
+    gen_pcb.py fc geom                     # FC with nets + hand routes (routes_fc.py) -> build/fc_geometry.json
+    gen_pcb.py fc finish                   # ... + router output build/fc_routes.json + GND pours, then DRC
+(Windows: "C:/Program Files/KiCad/10.0/bin/python.exe")
 
 Each board gets: .kicad_pro (rules), .kicad_pcb (outline, holes, fixed pads,
 placement guides on Dwgs.User = top side / Cmts.User = bottom side), and a DRC
@@ -23,6 +26,7 @@ from gen_libs import gen_lib                      # shared library generator (Li
 PICO_TP, PICO_SWD = gen_lib.PICO_TP, gen_lib.PICO_SWD
 from design import (FC, FRAME, SHARED_LIBS, DECK_LEFT, DECK_RIGHT, B2B, B2B_PIN_X, FRAME_CONN, MOTORS, MOTOR_NAMES, SCAD, ESC_PAD, TAB_PAD_SIZE, TAB_PAD_X,
                     REVISION, DATE, to_kicad, uid, ORIGIN_X, ORIGIN_Y)
+import fc_design
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
@@ -327,18 +331,90 @@ def new_board(path, title, thickness, comment):
     return board
 
 
+def isolated_gnd_vias(board):
+    """GND vias whose pour islands (followed through other GND vias) reach no GND pad: stitching that landed in pockets
+    cut off by tracks. Returns their positions (KiCad mm) for removal."""
+    cu = (pcbnew.F_Cu, pcbnew.B_Cu)
+    islands = []                                      # (layer, SHAPE_POLY_SET)
+    for z in board.Zones():
+        if z.GetNetname() != "GND":
+            continue
+        for L in cu:
+            if not z.IsOnLayer(L):
+                continue
+            fp = z.GetFilledPolysList(L)
+            for i in range(fp.OutlineCount()):
+                s = pcbnew.SHAPE_POLY_SET()
+                s.AddOutline(fp.Outline(i))
+                for h in range(fp.HoleCount(i)):
+                    s.AddHole(fp.Hole(i, h))
+                islands.append((L, s))
+    anchor = [False] * len(islands)
+    for fp in board.GetFootprints():
+        for pd in fp.Pads():
+            if pd.GetNetname() != "GND":
+                continue
+            r = max(pd.GetSize().x, pd.GetSize().y) // 2 + mm(0.6)
+            for k, (L, s) in enumerate(islands):
+                if pd.IsOnLayer(L) and s.Contains(pd.GetPosition(), -1, r):
+                    anchor[k] = True
+    vias = [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA" and t.GetNetname() == "GND"]
+    vis = [[k for k, (L, s) in enumerate(islands) if s.Contains(v.GetPosition(), -1, mm(0.35))] for v in vias]
+    parent = list(range(len(islands)))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+    for ks in vis:
+        for a, b in zip(ks, ks[1:]):
+            parent[find(a)] = find(b)
+    good = {find(k) for k in range(len(islands)) if anchor[k]}
+    out = []
+    for v, ks in zip(vias, vis):
+        if not ks or all(find(k) not in good for k in ks):
+            p_ = v.GetPosition()
+            out.append((pcbnew.ToMM(p_.x), pcbnew.ToMM(p_.y)))
+    return out
+
+
 def finish(board, path, name):
     os.makedirs(BUILD, exist_ok=True)
     pcbnew.SaveBoard(path, board)
     board = pcbnew.LoadBoard(path)
     rpt = os.path.join(BUILD, f"{name}_drc.txt")
     if os.path.isfile(KICAD_CLI):      # KiCad 8+: WriteDRCReport() needs the GUI, so use kicad-cli
-        subprocess.run([KICAD_CLI, "pcb", "drc", "--format", "report", "--units", "mm", "-o", rpt, path],
+        refill = ["--refill-zones", "--save-board"] if list(board.Zones()) else []   # pours filled by KiCad itself
+        subprocess.run([KICAD_CLI, "pcb", "drc", "--format", "report", "--units", "mm", *refill, "-o", rpt, path],
                        check=True, capture_output=True)
     else:                              # KiCad 7 in the container
         pcbnew.WriteDRCReport(board, rpt, pcbnew.EDA_UNITS_MILLIMETRES, True)
     txt = open(rpt).read()
     import re
+    dang = [(float(x), float(y)) for x, y in re.findall(
+        r"\[via_dangling\][^\n]*\n[^\n]*\n\s+@\(([-\d.]+) mm, ([-\d.]+) mm\): Via \[GND\]", txt)]   # stitching only:
+    # a one-sided signal via can still be the joint between a hand escape and a router track on the same layer
+    dang += [(float(x), float(y)) for x, y in re.findall(
+        r"\[unconnected_items\][^\n]*\n[^\n]*\n(?:\s+@[^\n]*\n)?\s+@\(([-\d.]+) mm, ([-\d.]+) mm\): Via \[GND\]", txt)]
+    if list(board.Zones()):
+        dang += isolated_gnd_vias(board)
+    if dang and os.path.isfile(KICAD_CLI) and list(board.Zones()):
+        # vias left on one layer (an escape the router finished on the other side, or a stitching via that landed in
+        # an enclosed pour pocket) are removed, then the pours are refilled and DRC runs again
+        n = 0
+        for t in list(board.GetTracks()):
+            if t.GetClass() == "PCB_VIA":
+                p_ = t.GetPosition()
+                if any(abs(pcbnew.ToMM(p_.x) - x) < 0.01 and abs(pcbnew.ToMM(p_.y) - y) < 0.01 for x, y in dang):
+                    board.Remove(t)
+                    n += 1
+        pcbnew.SaveBoard(path, board)
+        subprocess.run([KICAD_CLI, "pcb", "drc", "--format", "report", "--units", "mm", "--refill-zones",
+                        "--save-board", "-o", rpt, path], check=True, capture_output=True)
+        board = pcbnew.LoadBoard(path)
+        txt = open(rpt).read()
+        print(f"  removed {n} dangling vias, DRC re-run")
     counts = {k: int(v) for v, k in re.findall(r"\*\* Found (\d+) (DRC violations|unconnected pads|Footprint errors)", txt)}
     warns = re.findall(r"^\[(\w+)\]: (.*)\n\s+[^\n]*; warning", txt, re.M)
     if warns:                          # warnings are listed, and only errors count against the gate
@@ -571,6 +647,20 @@ def build_fc():
         fp.Reference().SetLayer(pcbnew.B_Fab)
         assert all(p.IsOnLayer(pcbnew.B_Cu) for p in fp.Pads())
 
+    # --- support passives (stage 2/3): sensor supply filter, pull-ups, DShot series resistors ---
+    for ref, lib, fpn, val, (x, y), rot, side in FC["passives"]:
+        fp = load_fp(lib, fpn)
+        fp.SetReference(ref)
+        fp.SetValue(val)
+        board.Add(fp)
+        if side == "B":
+            fp.Flip(fp.GetPosition(), True)
+        fp.SetOrientationDegrees(rot)
+        fp.SetPosition(VS(x, y))
+        fp.Reference().SetLayer(pcbnew.B_Fab if side == "B" else pcbnew.F_Fab)
+        fp.Value().SetVisible(False)
+        assert all(p.IsOnLayer(pcbnew.B_Cu if side == "B" else pcbnew.F_Cu) for p in fp.Pads())
+
     # --- J1 / J2 male headers on TOP: plug up into the frame's J5 / J6 ---
     # Wurth 62001011121: its datasheet asks for 0.90 mm holes (the stock footprint has 0.8 mm).
     for ref, sy in (("J1", 1), ("J2", -1)):
@@ -632,14 +722,246 @@ def build_fc():
     seg(board, VS(-6, -13), VS(6, -13), top, 0.3)
     seg(board, VS(6, -13), VS(4, -11.5), top, 0.3)
     seg(board, VS(6, -13), VS(4, -14.5), top, 0.3)
-    text(board, FC["silk_name"], VS(0, 13.0), pcbnew.F_SilkS, 0.8, 0.15)   # strip between the Pico and J1
+    text(board, FC["silk_name"], VS(0, -12.9), pcbnew.F_SilkS, 0.8, 0.15)  # strip between the Pico and J2 (J1 side: DShot resistors)
     text(board, FC["silk_name"], VS(-18.5, 0), pcbnew.B_SilkS, 0.8, 0.15, rot=90)
     text(board, "< FRONT", VS(17.5, -10.0), pcbnew.B_SilkS, 0.8, 0.15)    # reads from below: front is to the left
+    fc_electrical(board)
     return finish(board, pcb, name)
 
 
+# ---------------------------------------------------------------------------
+# FC electrical: nets (fc_design.py), hand routes (routes_fc.py), router I/O, GND pours
+# ---------------------------------------------------------------------------
+def assign_nets(board, nets):
+    names = {}
+    for net in nets:
+        ni = pcbnew.NETINFO_ITEM(board, net)
+        board.Add(ni)
+        names[net] = ni
+    missing = []
+    for net, conns in nets.items():
+        for ref, pin in conns:
+            fp = board.FindFootprintByReference(ref)
+            pads = [p for p in fp.Pads() if p.GetNumber() == pin] if fp else []
+            if not pads:
+                missing.append(f"{ref}.{pin}")
+            for p in pads:
+                p.SetNet(names[net])
+    if missing:
+        raise SystemExit(f"pads not found for nets: {missing}")
+    return names
+
+
+def add_hand_routes(board):
+    import importlib
+    import routes_fc
+    importlib.reload(routes_fc)
+    lay = {"F": pcbnew.F_Cu, "B": pcbnew.B_Cu}
+    for net, layer, w, pts in routes_fc.TRACKS:
+        for a, b in zip(pts, pts[1:]):
+            t = pcbnew.PCB_TRACK(board)
+            t.SetStart(VS(*a))
+            t.SetEnd(VS(*b))
+            t.SetWidth(mm(w))
+            t.SetLayer(lay[layer])
+            t.SetNet(board.FindNet(net))
+            board.Add(t)
+    for net, x, y, d, drill in routes_fc.VIAS:
+        v = pcbnew.PCB_VIA(board)
+        v.SetPosition(VS(x, y))
+        v.SetWidth(mm(d))
+        v.SetDrill(mm(drill))
+        v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
+        v.SetNet(board.FindNet(net))
+        board.Add(v)
+    return len(routes_fc.TRACKS), len(routes_fc.VIAS)
+
+
+def _bbox(item):
+    b = item.GetBoundingBox()
+    return [pcbnew.ToMM(b.GetLeft()), pcbnew.ToMM(b.GetTop()), pcbnew.ToMM(b.GetRight()), pcbnew.ToMM(b.GetBottom())]
+
+
+def export_geom(board, nets, path):
+    """Router input (router.py): outline, pads, keep-outs, hand-routed tracks / vias, nets (KiCad mm)."""
+    cu = {pcbnew.F_Cu: "F", pcbnew.B_Cu: "B"}
+    pads = [{"ref": fp.GetReference(), "pin": pd.GetNumber(), "net": pd.GetNetname(),
+             "layers": [n for l, n in cu.items() if pd.IsOnLayer(l)], "bbox": _bbox(pd)}
+            for fp in board.GetFootprints() for pd in fp.Pads()]
+    tracks, vias = [], []
+    for t in board.GetTracks():
+        if t.GetClass() == "PCB_VIA":
+            p = t.GetPosition()
+            vias.append({"net": t.GetNetname(), "x": pcbnew.ToMM(p.x), "y": pcbnew.ToMM(p.y),
+                         "d": pcbnew.ToMM(t.GetWidth(pcbnew.F_Cu))})
+        else:
+            a, b = t.GetStart(), t.GetEnd()
+            tracks.append({"net": t.GetNetname(), "layer": cu[t.GetLayer()], "x1": pcbnew.ToMM(a.x), "y1": pcbnew.ToMM(a.y),
+                           "x2": pcbnew.ToMM(b.x), "y2": pcbnew.ToMM(b.y), "w": pcbnew.ToMM(t.GetWidth())})
+    outline = [to_kicad(x, y) for x, y in fc_outline_pts()]
+    js = {"outline": outline, "pads": pads, "shapes": [], "keepouts": [], "tracks": tracks, "vias": vias,
+          "nets": {n: {"pins": c, "power": n in fc_design.POWER_NETS} for n, c in nets.items()}}
+    os.makedirs(BUILD, exist_ok=True)
+    json.dump(js, open(path, "w"))
+    print(f"  geometry: {len(pads)} pads, {len(tracks)} tracks, {len(vias)} vias -> {os.path.relpath(path, ROOT)}")
+
+
+def import_routes(board, path):
+    data = json.load(open(path))
+    lay = {"F": pcbnew.F_Cu, "B": pcbnew.B_Cu}
+    for t in data["tracks"]:
+        tr = pcbnew.PCB_TRACK(board)
+        tr.SetStart(V(t["x1"], t["y1"]))
+        tr.SetEnd(V(t["x2"], t["y2"]))
+        tr.SetWidth(mm(t["w"]))
+        tr.SetLayer(lay[t["layer"]])
+        tr.SetNet(board.FindNet(t["net"]))
+        board.Add(tr)
+    for v in data["vias"]:
+        via = pcbnew.PCB_VIA(board)
+        via.SetPosition(V(v["x"], v["y"]))
+        via.SetWidth(mm(v["d"]))
+        via.SetDrill(mm(v["drill"]))
+        via.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
+        via.SetNet(board.FindNet(v["net"]))
+        board.Add(via)
+    # track ends inside a pad's box but off its copper (round pads): extend to the pad centre
+    pads = [(pd, _bbox(pd)) for fp in board.GetFootprints() for pd in fp.Pads() if pd.GetNetname()]
+    fixed = 0
+    for t in data["tracks"]:
+        for x, y in ((t["x1"], t["y1"]), (t["x2"], t["y2"])):
+            for pd, (x0, y0, x1, y1) in pads:
+                if pd.GetNetname() != t["net"] or not (x0 <= x <= x1 and y0 <= y <= y1) or not pd.IsOnLayer(lay[t["layer"]]):
+                    continue
+                if pd.HitTest(V(x, y)):
+                    break
+                tr = pcbnew.PCB_TRACK(board)
+                tr.SetStart(V(x, y))
+                tr.SetEnd(pd.GetPosition())
+                tr.SetWidth(mm(min(t["w"], 0.25)))
+                tr.SetLayer(lay[t["layer"]])
+                tr.SetNet(board.FindNet(t["net"]))
+                board.Add(tr)
+                fixed += 1
+                break
+    print(f"  router: {len(data['tracks'])} segments, {len(data['vias'])} vias; failed {data['failed']}; "
+          f"{fixed} ends extended to pad centres")
+
+
+def gnd_pours(board):
+    """GND pour on both copper layers over the FC outline (0.25 mm clearance, thermal reliefs)."""
+    gnd = board.FindNet("GND")
+    for layer in (pcbnew.F_Cu, pcbnew.B_Cu):
+        z = pcbnew.ZONE(board)
+        z.SetLayer(layer)
+        z.SetNet(gnd)
+        z.SetLocalClearance(mm(0.25))
+        z.SetMinThickness(mm(0.25))
+        z.SetThermalReliefGap(mm(0.3))
+        z.SetThermalReliefSpokeWidth(mm(0.4))
+        z.SetPadConnection(pcbnew.ZONE_CONNECTION_THERMAL)
+        z.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
+        ol = z.Outline()
+        ol.NewOutline()
+        for x, y in fc_outline_pts():
+            ol.Append(VS(x, y))
+        board.Add(z)
+    try:                                  # KiCad 7; KiCad 8+ refill through kicad-cli in finish()
+        pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+    except Exception as e:                # noqa: BLE001
+        print(f"  zone fill deferred to kicad-cli ({e})")
+
+
+def stitch_vias(board, pitch=1.2, d=0.6, drill=0.3, spacing=2.4):
+    """GND stitching vias on a grid wherever no foreign copper, hole or edge is near: they tie the two GND pours
+    together and reach pour islands that tracks have cut off. Returns the number placed."""
+    import numpy as np
+    def segd(px, py, x1, y1, x2, y2):
+        dx, dy = x2 - x1, y2 - y1
+        L = dx * dx + dy * dy
+        t = 0.0 if L == 0 else max(0.0, min(1.0, ((px - x1) * dx + (py - y1) * dy) / L))
+        return math.hypot(px - (x1 + t * dx), py - (y1 + t * dy))
+    obst = []                                    # (kind, data, clearance radius beyond the via edge)
+    for fp in board.GetFootprints():
+        for pd in fp.Pads():
+            bb = _bbox(pd)
+            same = pd.GetNetname() == "GND"
+            hole = pd.GetDrillSize().x > 0
+            if same and not hole:
+                continue
+            obst.append(("box", bb, 0.25 if not same else 0.3))
+    for t in board.GetTracks():
+        if t.GetNetname() == "GND" and t.GetClass() != "PCB_VIA":
+            continue
+        if t.GetClass() == "PCB_VIA":
+            p_ = t.GetPosition()
+            obst.append(("pt", (pcbnew.ToMM(p_.x), pcbnew.ToMM(p_.y), pcbnew.ToMM(t.GetWidth(pcbnew.F_Cu)) / 2), 0.3))
+        else:
+            a_, b_ = t.GetStart(), t.GetEnd()
+            obst.append(("seg", (pcbnew.ToMM(a_.x), pcbnew.ToMM(a_.y), pcbnew.ToMM(b_.x), pcbnew.ToMM(b_.y),
+                                 pcbnew.ToMM(t.GetWidth()) / 2), 0.25))
+    outline = [to_kicad(x, y) for x, y in fc_outline_pts()]
+    def inside(x, y):
+        c = False
+        for (x1, y1), (x2, y2) in zip(outline, outline[1:] + outline[:1]):
+            if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+                c = not c
+        return c
+    def edge_d(x, y):
+        return min(segd(x, y, x1, y1, x2, y2) for (x1, y1), (x2, y2) in zip(outline, outline[1:] + outline[:1]))
+    xs = [p[0] for p in outline]; ys = [p[1] for p in outline]
+    gnd = board.FindNet("GND")
+    placed = []
+    r = d / 2
+    for x in np.arange(min(xs) + 1, max(xs) - 1, pitch):
+        for y in np.arange(min(ys) + 1, max(ys) - 1, pitch):
+            if not inside(x, y) or edge_d(x, y) < r + 0.5:
+                continue
+            ok = True
+            for kind, o, c in obst:
+                if kind == "box":
+                    x0, y0, x1, y1 = o
+                    dd = math.hypot(max(x0 - x, 0, x - x1), max(y0 - y, 0, y - y1))
+                    ok = dd >= r + c
+                elif kind == "pt":
+                    ok = math.hypot(x - o[0], y - o[1]) >= r + o[2] + c
+                else:
+                    ok = segd(x, y, *o[:4]) >= r + o[4] + c
+                if not ok:
+                    break
+            if ok and all(math.hypot(x - a_, y - b_) >= spacing for a_, b_ in placed):
+                placed.append((x, y))
+                v = pcbnew.PCB_VIA(board)
+                v.SetPosition(V(float(x), float(y)))
+                v.SetWidth(mm(d))
+                v.SetDrill(mm(drill))
+                v.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
+                v.SetNet(gnd)
+                board.Add(v)
+    return len(placed)
+
+
+FC_GEOM = os.path.join(BUILD, "fc_geometry.json")
+FC_ROUTES = os.path.join(BUILD, "fc_routes.json")
+
+
+def fc_electrical(board):
+    if not ({"geom", "finish", "nets"} & set(sys.argv)):
+        return                                   # bare board (stage 1 behaviour)
+    nets = fc_design.build_nets()
+    assign_nets(board, nets)
+    n_t, n_v = add_hand_routes(board)
+    print(f"  nets: {len(nets)}; hand routes: {n_t} tracks, {n_v} vias")
+    if "geom" in sys.argv:
+        export_geom(board, nets, FC_GEOM)
+    if "finish" in sys.argv:
+        import_routes(board, FC_ROUTES)
+        print(f"  GND stitching vias: {stitch_vias(board)}")
+        gnd_pours(board)
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["frame", "fc"]
+    which = [a for a in sys.argv[1:] if a in ("frame", "fc")] or ["frame", "fc"]
     ok = True
     for w in which:
         c = {"frame": build_frame, "fc": build_fc}[w]()
